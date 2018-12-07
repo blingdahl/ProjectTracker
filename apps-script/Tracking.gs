@@ -22,10 +22,10 @@ Tracking.init = function() {
   
   Tracking.sheetIdToSheet = {};
   
-  Tracking.Sheet = class Sheet extends Spreadsheet.Sheet {
-    constructor(sheet) {
+  Tracking.Sheet = function(sheet) {
       super(sheet, Tracking.COLUMN_NAMES);
     }
+    Tracking.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
     
     getRowsForPriority(priority) {
       let ret = [];
