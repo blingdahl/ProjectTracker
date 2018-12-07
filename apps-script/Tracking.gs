@@ -1,4 +1,4 @@
-let Tracking = {};
+var Tracking = {};
 Tracking.initialized = false;
   
 Tracking.COLUMN_NAMES = {'NOTES': 'Notes',
@@ -27,8 +27,8 @@ Tracking.init = function() {
     }
     Tracking.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
     
-    getRowsForPriority(priority) {
-      let ret = [];
+    Tracking.Sheet.prototype.getRowsForPriority = function(priority) {
+      var ret = [];
       this.getRows().forEach(function(row) {
         if (row.getValue(Tracking.COLUMN_NAMES.PRIORITY) === priority) {
           ret.push(row);
@@ -37,28 +37,28 @@ Tracking.init = function() {
       return ret;
     }
   
-    organize() {
-      let rows = this.getRows();
-      for (let i = 0; i < rows.length; i++) {
-        let row = rows[i];
+    Tracking.Sheet.prototype.organize = function() {
+      var rows = this.getRows();
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
         row.setDataValidation(Tracking.COLUMN_NAMES.PRIORITY, Tracking.PRIORITIES);
       }
       this.sortBy(Tracking.COLUMN_NAMES.PRIORITY);
       log(Log.Level.INFO, 'Set up tracking');
     }
     
-    static forSheet(sheet) {
+    Tracking.Sheet.forSheet = function(sheet) {
       if (!Tracking.sheetIdToSheet[sheet.getSheetId()]) {
         Tracking.sheetIdToSheet[sheet.getSheetId()] = new Tracking.Sheet(sheet);
       }
       return Tracking.sheetIdToSheet[sheet.getSheetId()];
     }
     
-    static forSheetId(sheetId) {
-      let sheets = SpreadsheetApp.getActive().getSheets();
+    Tracking.Sheet.forSheetId = function(sheetId) {
+      var sheets = SpreadsheetApp.getActive().getSheets();
       log(Log.Level.INFO, 'forSheetId(' + sheetId + ')');
-      for (let i = 0; i < sheets.length; i++) {
-        let sheet = sheets[i];
+      for (var i = 0; i < sheets.length; i++) {
+        var sheet = sheets[i];
         if (sheet.getSheetId() == sheetId) {
           return Tracking.Sheet.forSheet(sheet);
         }
@@ -66,17 +66,17 @@ Tracking.init = function() {
       throw new Error('Sheet not found for ' + sheetId);
     }
     
-    static getAll() {
-      let sheets = SpreadsheetApp.getActive().getSheets();
-      let ret = [];
+    Tracking.Sheet.getAll = function() {
+      var sheets = SpreadsheetApp.getActive().getSheets();
+      var ret = [];
       sheets.forEach(function(sheet) {
         if (sheet.getSheetName() == 'Overview') {
           log(Log.Level.INFO, 'Not including Overview');
           return;
         }
-        let headerRow = sheet.getDataRange().offset(0, 0, 1);
-        for (let columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
-          let headerCell = headerRow.offset(0, columnOffset);
+        var headerRow = sheet.getDataRange().offset(0, 0, 1);
+        for (var columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
+          var headerCell = headerRow.offset(0, columnOffset);
           if (headerCell.getValue() === Tracking.COLUMN_NAMES.PRIORITY) {
             log(Log.Level.INFO, 'Tracking sheet: ' + sheet.getSheetName());
             ret.push(Tracking.Sheet.forSheet(sheet));
