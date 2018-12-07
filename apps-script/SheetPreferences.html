@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <style>
+      h1 {
+        font-family: sans-serif;
+        font-size: 13px;
+      }
+      
+      div {
+        font-family: sans-serif;
+      }
+      
+      error {
+        color: red;
+      }
+    </style>
+    <h1 data-sheet-id="<?= sheetId ?>">Preferences for <?= sheetName ?></h1>
+    <div class="labelPicker" style="display: none">
+      <div class="displayMode">
+        <span class="labelName"></span>
+        <button class="chooseButton">Choose...</button>
+        <button class="removeButton">Remove</button>
+      </div>
+      <div class="selectMode">
+        <select class="labelSelect">
+        </select>
+        <button class="selectButton">Select</button>
+        <button class="cancelButton">Cancel</button>
+      </div>
+    </div>
+    <button class="syncButton">Sync</button>
+    <div class="message"></div>
+    <div class="error"></div>
+  </body>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>
+  let MODE = {'SELECT': 1, 'DISPLAY': 2};
+  
+  class LabelPicker {
+    static getSelectElement() {
+      return $('.labelSelect');
+    }
+
+    static clearSelectOptions(initialOptionText) {
+      LabelPicker.getSelectElement().find('option').remove();
+      LabelPicker.getSelectElement().append($('<option />').text(initialOptionText));
+    }
+    
+    static populateSelect(labels) {
+      LabelPicker.clearSelectOptions('Select Label');
+      let currLabel = LabelPicker.getCurrLabel();
+      labels.sort();
+      for (let i = 0; i < labels.length; i++) {
+        let label = labels[i];
+        let newOption = $('<option />').val(label).text(label);
+        LabelPicker.getSelectElement().append(newOption)
+        if (currLabel == label) {
+          newOption.prop('selected', true);
+        }
+      }
+    }
+
+    static getLabelNameElt() {
+      return $('.labelName');
+    }
+    
+    static getCurrLabel() {
+      return LabelPicker.getLabelNameElt().attr('data-label-name');
+    }
+    
+    static setCurrLabel(label) {
+      LabelPicker.getLabelNameElt().attr('data-label-name', label);
+    }
+  
+    static setMode(mode) {
+      if (mode == MODE.SELECT) {
+        $('.selectMode').show();
+        $('.displayMode').hide();
+      } else if (mode == MODE.DISPLAY) {
+        let labelName = this.getCurrLabel();
+        $('.labelName').text(labelName || 'No label');
+        $('.displayMode').show();
+        $('.selectMode').hide();
+        if (labelName) {
+          $('.removeButton').show();
+          $('.syncButton').show();
+        } else {
+          $('.removeButton').hide();
+          $('.syncButton').hide();
+        }
+      } else {
+        throw new Error('Unexpected mode: ' + mode);
+      }
+    }
+    
+    static updateCurrLabelFromSelect() {
+      let ret = LabelPicker.getSelectElement().val();
+      LabelPicker.setCurrLabel(ret);
+      return ret;
+    }
+    
+    static clearCurrLabel() {
+      LabelPicker.setCurrLabel(null);
+    }
+  }
+  
+  class Preferences {
+    static getSheetId() {
+      return $('[data-sheet-id]').attr('data-sheet-id');
+    }
+    
+    static populateSelect() {
+      LabelPicker.clearSelectOptions('Populating...');
+      google.script.run.withSuccessHandler(function(labels) {
+        LabelPicker.populateSelect(JSON.parse(labels));
+      }).getAllLabels();
+    }
+    
+    static chooseClicked() {
+      Preferences.populateSelect();
+      LabelPicker.setMode(MODE.SELECT);
+    }
+    
+    static removeClicked() {
+      LabelPicker.clearCurrLabel();
+      google.script.run.clearLabelForSheet(Preferences.getSheetId());
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+    
+    static cancelClicked() {
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+    
+    static selectClicked() {
+      google.script.run.setLabelForSheet(Preferences.getSheetId(), LabelPicker.updateCurrLabelFromSelect());
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+
+    static init() {
+      google.script.run.withSuccessHandler(function(label) {
+        LabelPicker.setCurrLabel(label);
+        LabelPicker.setMode(MODE.DISPLAY);
+        $('.labelPicker').show();
+      }).getLabelForSheet(Preferences.getSheetId());
+    }
+
+    static setMessage(msg) {
+      $('.message').text(msg);
+    }
+
+    static setError(msg) {
+      $('.error').text(msg);
+    }
+
+    static handleFailure(msg) {
+      Preferences.setError(msg);
+    }
+
+    static syncClicked() {
+      Preferences.setMessage('Syncing...');
+      Preferences.setError('');
+      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).syncSheetWithGmail(Preferences.getSheetId());
+    }
+    
+    static addListeners() {
+      $('.chooseButton').click(Preferences.chooseClicked);
+      $('.removeButton').click(Preferences.removeClicked);
+      $('.cancelButton').click(Preferences.cancelClicked);
+      $('.selectButton').click(Preferences.selectClicked);
+      $('.syncButton').click(Preferences.syncClicked);
+    }
+  }
+  
+  Preferences.currSheetId = null;
+  
+  Preferences.addListeners();
+  Preferences.init();
+  
+  </script>
+</html>
+
+
