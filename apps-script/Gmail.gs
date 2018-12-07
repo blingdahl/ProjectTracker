@@ -318,11 +318,11 @@ Gmail.clearLabelForSheet = function(sheetId) {
   PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
 }
 
-Gmail.getLabelForSheet = function(sheetId) {
+function getLabelForSheet(sheetId) {
   return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
 }
 
-Gmail.getAllLabels = function() {
+function getAllLabels() {
   var ret = [];
   var labels = GmailApp.getUserLabels(); 
   for (var i = 0; i < labels.length; i++) {
@@ -332,7 +332,7 @@ Gmail.getAllLabels = function() {
   return JSON.stringify(ret);
 }
 
-Gmail.syncSheet = function(sheetId) {
+function syncSheet(sheetId) {
   var label = getLabelForSheet(sheetId);
   if (!label) {
     Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
