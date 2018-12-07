@@ -38,12 +38,12 @@ Gmail.init = function() {
   
   Gmail.sheetIdToSheet = {};
   
-  Gmail.Sheet = class Sheet extends Spreadsheet.Sheet {
-    constructor(sheet) {
+  Gmail.Sheet = function(sheet) {
       super(sheet, Gmail.COLUMN_NAMES);
     }
+  Gmail.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
     
-    getRowForId(id) {
+  Gmail.Sheet.prototype.getRowForId = function(id) {
       log(Log.Level.FINE, 'getRowForId');
       if (!this.rowsById) {
         this.rowsById = {};
@@ -62,14 +62,14 @@ Gmail.init = function() {
       return row;
     }
     
-    static forSheet(sheet) {
+  Gmail.Sheet.forSheet = function(sheet) {
       if (!Gmail.sheetIdToSheet[sheet.getSheetId()]) {
         Gmail.sheetIdToSheet[sheet.getSheetId()] = new Gmail.Sheet(sheet);
       }
       return Gmail.sheetIdToSheet[sheet.getSheetId()];
     }
     
-    static forSheetId(sheetId) {
+  Gmail.Sheet.forSheetId = function(sheetId) {
       let sheets = SpreadsheetApp.getActive().getSheets();
       for (let i = 0; i < sheets.length; i++) {
         let sheet = sheets[i];
@@ -305,6 +305,32 @@ Gmail.init = function() {
     sheet.sortBy(Gmail.COLUMN_NAMES.DATE).sortBy(Gmail.COLUMN_NAMES.INBOX, false).sortBy(Gmail.COLUMN_NAMES.PRIORITY);
     log(Log.Level.INFO, 'Synced with ' + label);
   }
+  
+  Gmail.labelProperty = function(sheetId) {
+		return 'label:' + sheetId;
+	}
+
+	Gmail.setLabelForSheet = function(sheetId, label) {
+		PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
+	}
+
+	Gmail.clearLabelForSheet = function(sheetId) {
+		PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
+	}
+
+	Gmail.getLabelForSheet = function(sheetId) {
+		return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
+	}
+
+	Gmail.getAllLabels = function() {
+		let ret = [];
+		let labels = GmailApp.getUserLabels(); 
+		for (let i = 0; i < labels.length; i++) {
+			let label = labels[i];
+			ret.push(label.getName());
+		}
+		return JSON.stringify(ret);
+	}
   
   Gmail.syncSheet = function(sheetId) {
     let label = getLabelForSheet(sheetId);
