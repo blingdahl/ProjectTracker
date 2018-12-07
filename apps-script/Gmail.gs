@@ -306,7 +306,7 @@ Gmail.syncWithGmail = function(sheetId, label) {
   log(Log.Level.INFO, 'Synced with ' + label);
 }
 
-Gmail.labelProperty = function(sheetId) {
+function labelProperty(sheetId) {
   return 'label:' + sheetId;
 }
 
@@ -322,7 +322,7 @@ function getLabelForSheet(sheetId) {
   return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
 }
 
-function getAllLabels() {
+Gmail.getAllLabels = function() {
   var ret = [];
   var labels = GmailApp.getUserLabels(); 
   for (var i = 0; i < labels.length; i++) {
@@ -332,7 +332,7 @@ function getAllLabels() {
   return JSON.stringify(ret);
 }
 
-function syncSheet(sheetId) {
+Gmail.syncSheet = function(sheetId) {
   var label = getLabelForSheet(sheetId);
   if (!label) {
     Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
