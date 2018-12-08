@@ -3,35 +3,12 @@ Gmail.initialized = false;
 
 Gmail.NO_TRACK_LABEL = 'No-Track';
 
-Gmail.COLUMN_NAMES = {'THREAD_ID': 'Thread ID',
-                      'SUBJECT': 'Subject',
-                      'LINK': 'Link',
-                      'ITEM': 'Item',
-                      'EMAIL': 'Email',
-                      'ACTION': 'Action',
-                      'INBOX': 'Inbox',
-                      'SCRIPT_NOTES': 'Script Notes',
-                      'DATE': 'Date',
-                      'PRIORITY': 'Priority'};
-
-Gmail.ACTIONS_IN_INBOX = ['Archive',
-                          'Untrack',
-                          'Unlabel',
-                          'Archive+Untrack',
-                          'Archive+Unlabel',
-                          'Mute'];
-
-Gmail.ACTIONS_ARCHIVED = ['Untrack',
-                          'Unlabel',
-                          'Mute',
-                          'Inbox'];
-
 Gmail.init = function() {
   if (Gmail.initialized) {
     return;
   }
   
-  Spreadsheet.init();
+  TrackingSheet.init();
   log(Log.Level.INFO, 'Gmail.init()');
   
   Gmail.initialized = true;
@@ -42,24 +19,6 @@ Gmail.init = function() {
     super(sheet, Gmail.COLUMN_NAMES);
   }
   Gmail.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
-  
-  Gmail.Sheet.prototype.getRowForId = function(id) {
-    log(Log.Level.FINE, 'getRowForId');
-    if (!this.rowsById) {
-      this.rowsById = {};
-      var rows = this.getRows();
-      for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        this.rowsById[row.getValue(Gmail.COLUMN_NAMES.THREAD_ID)] = row;
-      }
-    }
-    if (this.rowsById[id]) {
-      return this.rowsById[id];
-    }
-    var row = this.addRow();
-    row.setValue(Gmail.COLUMN_NAMES.THREAD_ID, id);
-    this.rowsById[id] = row;
-    return row;
   }
   
   Gmail.Sheet.forSheet = function(sheet) {
@@ -310,11 +269,11 @@ function labelProperty(sheetId) {
   return 'label:' + sheetId;
 }
 
-Gmail.setLabelForSheet = function(sheetId, label) {
+function setLabelForSheet(sheetId, label) {
   PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
 }
 
-Gmail.clearLabelForSheet = function(sheetId) {
+function clearLabelForSheet(sheetId) {
   PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
 }
 
@@ -322,7 +281,7 @@ function getLabelForSheet(sheetId) {
   return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
 }
 
-Gmail.getAllLabels = function() {
+function getAllLabels() {
   var ret = [];
   var labels = GmailApp.getUserLabels(); 
   for (var i = 0; i < labels.length; i++) {
@@ -332,7 +291,7 @@ Gmail.getAllLabels = function() {
   return JSON.stringify(ret);
 }
 
-Gmail.syncSheet = function(sheetId) {
+function syncSheet(sheetId) {
   var label = getLabelForSheet(sheetId);
   if (!label) {
     Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());

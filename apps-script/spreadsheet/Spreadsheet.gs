@@ -11,23 +11,19 @@ Spreadsheet.init = function() {
   
   log(Log.Level.INFO, 'Spreadsheet.init()');
   
-  Spreadsheet.getActiveSheetId = function() {
-    log(Log.Level.FINER, 'getActiveSheetId');
-    return SpreadsheetApp.getActiveSheet().getSheetId();
+  Spreadsheet.ColumnDefinitions = function() {
+    this.columnsInOrder = [];
   }
   
-  Spreadsheet.hyperlinkFormula = function(url, text) {
-    return '=hyperlink("' + url + '", "' + text + '")'
-  };
+  Spreadsheet.ColumnDefinitions.prototype.addColumn(key, header) {
+    this.columnsInOrder.push(header);
+    this[key] = header;
+    return this;
+  }
   
-  Spreadsheet.getUrlFromHyperlinkFormula = function(formula) {
-    return formula.substring(formula.indexOf('"') + 1, formula.lastIndexOf(',') - 1);
-  };
-  
-  function Sheet(sheet, columns) {
+  Spreadsheet.Sheet = function(sheet, columnDefinitions) {
       this.sheet = sheet;
-      this.columns = new Spreadsheet.Columns(sheet);
-      this.columns.createColumnsIfMissing(Object.values(columns));
+      this.columns = new Spreadsheet.Columns(sheet, columnDefinitions);
       this.dataRange = this.sheet.getDataRange();
       this.rows = [];
       this.rowsById = null;
@@ -35,23 +31,23 @@ Spreadsheet.init = function() {
       this.cache.seed(this.dataRange.getValues(), this.dataRange.getFormulas());
     }
   
-  Sheet.prototype.getSheetName = function() {
+  Spreadsheet.Sheet.prototype.getSheetName = function() {
     return this.sheet.getSheetName();
   }
   
-  Sheet.prototype.getSheetId = function() {
+  Spreadsheet.Sheet.prototype.getSheetId = function() {
     return this.sheet.getSheetId();
   }
   
-  Sheet.prototype.getDataRange = function() {
+  Spreadsheet.Sheet.prototype.getDataRange = function() {
     return this.sheet.getDataRange();
   }
   
-  Sheet.prototype.getUrl = function() {
+  Spreadsheet.Sheet.prototype.getUrl = function() {
     return '#gid=' + this.sheet.getSheetId();
   }
   
-  Sheet.prototype.clearData = function() {
+  Spreadsheet.Sheet.prototype.clearData = function() {
     log(Log.Level.INFO, 'clearData');
     if (this.sheet.getDataRange().getNumRows() <= 1) {
       log(Log.Level.INFO, 'Nothing to clear');
@@ -61,7 +57,7 @@ Spreadsheet.init = function() {
     log(Log.Level.INFO, 'Cleared');
   }
   
-  Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
+  Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
     return this.cache.getItem(rowOffset, function() {
       return new Spreadsheet.Row(
         function() { this.sheet.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
@@ -70,7 +66,7 @@ Spreadsheet.init = function() {
     }.bind(this));
   }
   
-  Sheet.prototype.getRows = function() {
+  Spreadsheet.Sheet.prototype.getRows = function() {
     var rows = [];
     for (var rowOffset = 1; rowOffset < this.getDataRange().getNumRows(); rowOffset++) {
       rows.push(this.getRow(rowOffset));
@@ -78,13 +74,13 @@ Spreadsheet.init = function() {
     return rows;
   }
   
-  Sheet.prototype.addRow = function() {
+  Spreadsheet.Sheet.prototype.addRow = function() {
     var rows = this.getRows();
     var rowOffset = rows.length + 1;
     return this.getRow(rows.length + 1, true);
   }
   
-  Sheet.prototype.removeRows = function(positions) {
+  Spreadsheet.Sheet.prototype.removeRows = function(positions) {
     for (var i = 0; i < positions.length; i++) {
       positions[i] = parseInt(positions[i]);
     }
@@ -97,7 +93,7 @@ Spreadsheet.init = function() {
     this.cache.clear();
   }
   
-  Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
+  Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
     var ascending = (opt_ascending === undefined) ? true : opt_ascending;
     var columnOffset = this.columns.getColumnOffset(columnHeader);
     this.sheet.sort(columnOffset + 1, ascending);
@@ -107,12 +103,14 @@ Spreadsheet.init = function() {
   
   // Spreadsheet.Columns
   
-  function Columns(sheet) {
+  Spreadsheet.Columns = function(sheet, columnDefinitions) {
     this.sheet = sheet;
+    this.columnDefinitions = columnDefinitions;
+    this.columns.createColumnsIfMissing(columnDefinitions);
     this.refreshHeaders();
   };
   
-  Columns.prototype.createColumnIfMissing = function(columnName) {
+  Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnName) {
     if (this.getColumnOffset(columnName) === undefined) {
       var dataRange = this.sheet.getDataRange();
       var headerCell = dataRange.offset(0, 0, 1, 1);
@@ -124,13 +122,13 @@ Spreadsheet.init = function() {
     }
   };
   
-  Columns.prototype.createColumnsIfMissing = function(columnNames) {
-    columnNames.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
+  Spreadsheet.Columns.prototype.createColumnsIfMissing = function(columnDefinitions) {
+    columnDefinitions.columnNamesInOrder.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
     this.sheet.setFrozenRows(1)
     this.refreshHeaders();
   };
   
-  Columns.prototype.refreshHeaders = function() {
+  Spreadsheet.Columns.prototype.refreshHeaders = function() {
     var headerRow = this.sheet.getDataRange();
     this.headers = [];
     this.mapping = {};
@@ -141,7 +139,7 @@ Spreadsheet.init = function() {
     }
   };
   
-  Columns.prototype.getColumnOffset = function(columnName) {
+  Spreadsheet.Columns.prototype.getColumnOffset = function(columnName) {
     if (!columnName in this.mapping) {
       throw new Error('Invalid column name: ' + columnName);
     }
@@ -150,7 +148,7 @@ Spreadsheet.init = function() {
   
   // Spreadsheet.Row
   
-  function Row(rowRangeCallback, columns, rowCache, isNew) {
+  Spreadsheet.Row = function(rowRangeCallback, columns, rowCache, isNew) {
     log(Log.Level.FINE, 'Creating Row object');
     this.rowRangeCallback = rowRangeCallback;
     this.rowRange = null;
@@ -159,12 +157,12 @@ Spreadsheet.init = function() {
     this.isNew = isNew;
   };
   
-  Row.prototype.column_ = function(columnHeader) {
+  Spreadsheet.Row.prototype.column_ = function(columnHeader) {
     log(Log.Level.FINE, 'column_(' + columnHeader + ')');
     return this.columns.getColumnOffset(columnHeader);
   };
   
-  Row.prototype.getRowRange = function() {
+  Spreadsheet.Row.prototype.getRowRange = function() {
     if (!this.rowRange) {
       log(Log.Level.FINE, 'Generating row range');
       this.rowRange = this.rowRangeCallback();
@@ -176,16 +174,16 @@ Spreadsheet.init = function() {
     return this.rowRange;
   };
   
-  Row.prototype.getCell = function(columnHeader) {
+  Spreadsheet.Row.prototype.getCell = function(columnHeader) {
     log(Log.Level.FINE, 'getCell(' + columnHeader + ')');
     return this.getRowRange().offset(0, this.column_(columnHeader), 1, 1);
   };
   
-  Row.prototype.getA1Notation = function(columnHeader) {
+  Spreadsheet.Row.prototype.getA1Notation = function(columnHeader) {
     return this.getCell(columnHeader).getA1Notation();
   };
   
-  Row.prototype.getValue = function(columnHeader) {
+  Spreadsheet.Row.prototype.getValue = function(columnHeader) {
     var value =  this.rowCache.getValue(this.column_(columnHeader), function() {
       return this.getCell(columnHeader).getValue();
     }.bind(this));
@@ -193,12 +191,12 @@ Spreadsheet.init = function() {
     return value;
   };
   
-  Row.prototype.getBooleanValue = function(columnHeader) {
+  Spreadsheet.Row.prototype.getBooleanValue = function(columnHeader) {
     var val = this.getValue(columnHeader);
     return val.toUpperCase() === 'Y' || val.toUpperCase() === 'YES';
   };
   
-  Row.prototype.setValue = function(columnHeader, val) {
+  Spreadsheet.Row.prototype.setValue = function(columnHeader, val) {
     if (this.getValue(columnHeader) == val) {
       return;
     }
@@ -207,13 +205,13 @@ Spreadsheet.init = function() {
     return this;
   };
   
-  Row.prototype.getFormula = function(columnHeader) {
+  Spreadsheet.Row.prototype.getFormula = function(columnHeader) {
     return this.rowCache.getFormula(columnHeader, function() {
       return this.getCell(columnHeader).getFormula();
     }.bind(this));
   };
   
-  Row.prototype.setFormula = function(columnHeader, formula) {
+  Spreadsheet.Row.prototype.setFormula = function(columnHeader, formula) {
     if (this.getFormula(columnHeader) == formula) {
       return;
     }
@@ -222,15 +220,15 @@ Spreadsheet.init = function() {
     return this;
   };
   
-  Row.prototype.getRowNumber = function() {
+  Spreadsheet.Row.prototype.getRowNumber = function() {
     return this.getRowRange().getRow();
   };
   
-  Row.prototype.getRowOffset = function() {
+  Spreadsheet.Row.prototype.getRowOffset = function() {
     return this.getRowNumber() - 1;
   };
   
-  Row.prototype.setDataValidation = function(columnHeader, options) {
+  Spreadsheet.Row.prototype.setDataValidation = function(columnHeader, options) {
     var cell = this.getCell(columnHeader);
     var currDataValidation = cell.getDataValidation();
     if (currDataValidation) {
