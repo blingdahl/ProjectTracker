@@ -1,7 +1,7 @@
 var TrackingSheet = {};
 TrackingSheet.initialized = false;
 
-TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions
+TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
     .addColumn('ITEM', 'Item')
     .addColumn('PRIORITY', 'Priority')
     .addColumn('EMAIL', 'Email')
@@ -61,6 +61,7 @@ TrackingSheet.init = function() {
     row.setValue(Gmail.COLUMN_NAMES.THREAD_ID, id);
     this.rowsById[id] = row;
     return row;
+  }
   
   TrackingSheet.Sheet.prototype.organize = function() {
     var rows = this.getRows();

@@ -1,15 +1,6 @@
 var OverviewSheet = {};
 OverviewSheet.initialized = false;
 
-OverviewSheet.COLUMNS = new Spreadsheet.ColumnDefinitions
-    .addColumn('SHEET', 'Sheet')
-    .addColumn('ITEM', 'Item')
-    .addColumn('PRIORITY', 'Priority')
-    .addColumn('EMAIL', 'Email')
-    .addColumn('LINK', 'Link')
-    .addColumn('NOTES', 'Notes')
-    .addColumn('SCRIPT_NOTES', 'Script Notes');
-
 OverviewSheet.init = function() {
   if (OverviewSheet.initialized) {
     return;
@@ -18,11 +9,20 @@ OverviewSheet.init = function() {
   Spreadsheet.init();
   TrackingSheet.init();
   log(Log.Level.INFO, 'OverviewSheet.init()');
+
+  OverviewSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
+      .addColumn('SHEET', 'Sheet')
+      .addColumn('ITEM', 'Item')
+      .addColumn('PRIORITY', 'Priority')
+      .addColumn('EMAIL', 'Email')
+      .addColumn('LINK', 'Link')
+      .addColumn('NOTES', 'Notes')
+      .addColumn('SCRIPT_NOTES', 'Script Notes');
   
   OverviewSheet.initialized = true;
   
   OverviewSheet.Sheet = function(sheet) {
-    OverviewSheet.Sheet.call(this, sheet, Overview.COLUMNS);
+    OverviewSheet.Sheet.call(this, sheet, OverviewSheet.Sheet.COLUMNS);
   }
   OverviewSheet.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
   

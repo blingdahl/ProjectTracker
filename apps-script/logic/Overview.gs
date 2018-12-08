@@ -1,22 +1,6 @@
 var Overview = {};
 Overview.initialized = false;
 
-Overview.COLUMN_NAMES = {'NOTES': 'Notes',
-                         'ITEM': 'Item',
-                         'STATUS': 'Status',
-                         'EMAIL': 'Email',
-                         'LINK': 'Link',
-                         'PRIORITY': 'Priority',
-                         'SHEET': 'Sheet'};
-
-Overview.COLUMNS = [Overview.COLUMN_NAMES.SHEET,
-                    Overview.COLUMN_NAMES.ITEM,
-                    Overview.COLUMN_NAMES.PRIORITY,
-                    Overview.COLUMN_NAMES.EMAIL,
-                    Overview.COLUMN_NAMES.LINK,
-                    Overview.COLUMN_NAMES.NOTES,
-                    Overview.COLUMN_NAMES.STATUS];
-
 Overview.init = function() {
   if (Overview.initialized) {
     return;
