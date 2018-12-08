@@ -3,6 +3,18 @@ Gmail.initialized = false;
 
 Gmail.NO_TRACK_LABEL = 'No-Track';
 
+Gmail.ACTIONS_IN_INBOX = ['Archive',
+                          'Untrack',
+                          'Unlabel',
+                          'Archive+Untrack',
+                          'Archive+Unlabel',
+                          'Mute'];
+
+Gmail.ACTIONS_ARCHIVED = ['Untrack',
+                          'Unlabel',
+                          'Mute',
+                          'Inbox'];
+
 Gmail.init = function() {
   if (Gmail.initialized) {
     return;

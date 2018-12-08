@@ -17,18 +17,6 @@ TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions
 
 TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner'];
 
-TrackingSheet.ACTIONS_IN_INBOX = ['Archive',
-                          'Untrack',
-                          'Unlabel',
-                          'Archive+Untrack',
-                          'Archive+Unlabel',
-                          'Mute'];
-
-TrackingSheet.ACTIONS_ARCHIVED = ['Untrack',
-                          'Unlabel',
-                          'Mute',
-                          'Inbox'];
-
 TrackingSheet.init = function() {
   if (TrackingSheet.initialized) {
     return;
