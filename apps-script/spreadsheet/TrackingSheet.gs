@@ -1,19 +1,6 @@
 var TrackingSheet = {};
 TrackingSheet.initialized = false;
 
-TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
-    .addColumn('ITEM', 'Item')
-    .addColumn('PRIORITY', 'Priority')
-    .addColumn('EMAIL', 'Email')
-    .addColumn('LINK', 'Link')
-    .addColumn('ACTION', 'Action')
-    .addColumn('INBOX', 'Inbox')
-    .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
-    .addColumn('NOTES', 'Notes')
-    .addColumn('THREAD_ID', 'Thread ID')
-    .addColumn('SUBJECT', 'Subject')
-    .addColumn('SCRIPT_NOTES', 'Script Notes');
-
 
 TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner'];
 
@@ -24,8 +11,20 @@ TrackingSheet.init = function() {
   
   Spreadsheet.init();
   log(Log.Level.INFO, 'TrackingSheet.init()');
-  
   TrackingSheet.initialized = true;
+
+  TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
+      .addColumn('ITEM', 'Item')
+      .addColumn('PRIORITY', 'Priority')
+      .addColumn('EMAIL', 'Email')
+      .addColumn('LINK', 'Link')
+      .addColumn('ACTION', 'Action')
+      .addColumn('INBOX', 'Inbox')
+      .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
+      .addColumn('NOTES', 'Notes')
+      .addColumn('THREAD_ID', 'Thread ID')
+      .addColumn('SUBJECT', 'Subject')
+      .addColumn('SCRIPT_NOTES', 'Script Notes');
   
   TrackingSheet.sheetIdToSheet = {};
   
@@ -44,21 +43,21 @@ TrackingSheet.init = function() {
     return ret;
   }
   
-  Gmail.Sheet.prototype.getRowForThreadId = function(id) {
+  TrackingSheet.Sheet.prototype.getRowForThreadId = function(id) {
     log(Log.Level.FINE, 'getRowForThreadId');
     if (!this.rowsById) {
       this.rowsById = {};
       var rows = this.getRows();
       for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
-        this.rowsById[row.getValue(Gmail.COLUMN_NAMES.THREAD_ID)] = row;
+        this.rowsById[row.getValue(TrackingSheet.COLUMNS.THREAD_ID)] = row;
       }
     }
     if (this.rowsById[id]) {
       return this.rowsById[id];
     }
     var row = this.addRow();
-    row.setValue(Gmail.COLUMN_NAMES.THREAD_ID, id);
+    row.setValue(TrackingSheet.COLUMNS.THREAD_ID, id);
     this.rowsById[id] = row;
     return row;
   }

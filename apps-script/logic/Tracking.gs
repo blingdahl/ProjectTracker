@@ -15,9 +15,9 @@ Tracking.init = function() {
     var rows = trackingSheet.getRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
-      row.setDataValidation(Tracking.COLUMN_NAMES.PRIORITY, Tracking.PRIORITIES);
+      row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
     }
-    trackingSheet.sortBy(Tracking.COLUMN_NAMES.PRIORITY);
+    trackingSheet.sortBy(TrackingSheet.COLUMNS.PRIORITY);
     log(Log.Level.INFO, 'Set up tracking');
   }
 }
@@ -30,7 +30,7 @@ function organizeAllTracking() {
 
 function organizeTracking(sheetId) {
 	Tracking.init();
-	Tracking.organize(TrackingSheet.forSheetId(sheetId).organize());
+	Tracking.organize(TrackingSheet.forSheetId(sheetId));
 }
 
 function organizeTrackingOnCurrentSheet() {

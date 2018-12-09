@@ -12,11 +12,11 @@ Spreadsheet.init = function() {
   log(Log.Level.INFO, 'Spreadsheet.init()');
   
   Spreadsheet.ColumnDefinitions = function() {
-    this.columnsInOrder = [];
+    this.columnNamesInOrder = [];
   }
   
-  Spreadsheet.ColumnDefinitions.prototype.addColumn(key, header) {
-    this.columnsInOrder.push(header);
+  Spreadsheet.ColumnDefinitions.prototype.addColumn = function(key, header) {
+    this.columnNamesInOrder.push(header);
     this[key] = header;
     return this;
   }
@@ -27,7 +27,7 @@ Spreadsheet.init = function() {
       this.dataRange = this.sheet.getDataRange();
       this.rows = [];
       this.rowsById = null;
-      this.cache = new Cache();
+      this.cache = new Cache.Sheet();
       this.cache.seed(this.dataRange.getValues(), this.dataRange.getFormulas());
     }
   
@@ -60,7 +60,7 @@ Spreadsheet.init = function() {
   Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
     return this.cache.getItem(rowOffset, function() {
       return new Spreadsheet.Row(
-        function() { this.sheet.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
+        function() { return this.sheet.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
         this.columns, this.cache.getRowCache(rowOffset),
           opt_isNew === true);
     }.bind(this));
@@ -106,8 +106,8 @@ Spreadsheet.init = function() {
   Spreadsheet.Columns = function(sheet, columnDefinitions) {
     this.sheet = sheet;
     this.columnDefinitions = columnDefinitions;
-    this.columns.createColumnsIfMissing(columnDefinitions);
     this.refreshHeaders();
+    this.createColumnsIfMissing(columnDefinitions);
   };
   
   Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnName) {

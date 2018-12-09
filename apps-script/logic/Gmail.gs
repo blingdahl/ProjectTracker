@@ -173,7 +173,7 @@ Gmail.init = function() {
   
   Gmail.syncWithGmail = function(sheetId, label) {
     log(Log.Level.INFO, 'syncWithGmail');
-    var sheet = Gmail.Sheet.forSheetId(sheetId);
+    var sheet = TrackingSheet.forSheetId(sheetId);
     var searchQuery = Gmail.labelSearchTerm(label) + ' -' + Gmail.labelSearchTerm(Gmail.NO_TRACK_LABEL);
     log(Log.Level.INFO, searchQuery);
     var threads = GmailApp.search(searchQuery);
@@ -190,7 +190,7 @@ Gmail.init = function() {
       log(Log.Level.INFO, label + ': ' + (i + 1) + ' / ' + threads.length + ': ' + subject);
       var threadId = thread.getId();
       threadIdsInLabel.push(threadId);
-      var row = sheet.getRowForId(threadId);
+      var row = sheet.getRowForThreadId(threadId);
       row.setDataValidation(TrackingSheet.COLUMNS.ACTION, Gmail.getActions(thread));
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, subject);
@@ -253,32 +253,6 @@ Gmail.init = function() {
     log(Log.Level.INFO, 'Synced with ' + label);
   }
   
-  function labelProperty(sheetId) {
-    return 'label:' + sheetId;
-  }
-  
-  function setLabelForSheet(sheetId, label) {
-    PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
-  }
-  
-  function clearLabelForSheet(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
-  }
-  
-  function getLabelForSheet(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
-  }
-  
-  function getAllLabels() {
-    var ret = [];
-    var labels = GmailApp.getUserLabels(); 
-    for (var i = 0; i < labels.length; i++) {
-      var label = labels[i];
-      ret.push(label.getName());
-    }
-    return JSON.stringify(ret);
-  }
-  
   Gmail.syncSheet = function(sheetId) {
     var label = getLabelForSheet(sheetId);
     if (!label) {
@@ -287,6 +261,32 @@ Gmail.init = function() {
     }
     Gmail.syncWithGmail(sheetId, label);
   }
+}
+  
+function labelProperty(sheetId) {
+  return 'label:' + sheetId;
+}
+
+function setLabelForSheet(sheetId, label) {
+  PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
+}
+
+function clearLabelForSheet(sheetId) {
+  PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
+}
+
+function getLabelForSheet(sheetId) {
+  return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
+}
+
+function getAllLabels() {
+  var ret = [];
+  var labels = GmailApp.getUserLabels(); 
+  for (var i = 0; i < labels.length; i++) {
+    var label = labels[i];
+    ret.push(label.getName());
+  }
+  return JSON.stringify(ret);
 }
 
 function syncSheetWithGmail(sheetId) {
