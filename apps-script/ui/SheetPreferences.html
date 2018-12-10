@@ -299,7 +299,6 @@
         if (activeSheetId != Global.getSheetId()) {
           Global.setMessage('Getting sheet preferences');
           function preferencesSuccessHandler(preferencesStr) {
-            console.log(preferencesStr);
             let preferences = JSON.parse(preferencesStr);
             Global.setSheetId(activeSheetId);
             Global.setSheetName(preferences.sheetName);
