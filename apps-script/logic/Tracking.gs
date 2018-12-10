@@ -21,25 +21,6 @@ Tracking.init = function() {
     log(Log.Level.INFO, 'Set up tracking');
   }
 }
-  
-function trackedProperty(sheetId) {
-  return 'tracked:' + sheetId;
-}
-
-function setTrackedForSheet(sheetId, tracked) {
-  PropertiesService.getScriptProperties().setProperty(trackedProperty(sheetId), tracked ? 'true' : 'false');
-  if (tracked) {
-    organizeTracking(sheetId);
-  }
-}
-
-function clearTrackedForSheet(sheetId) {
-  PropertiesService.getScriptProperties().deleteProperty(trackedProperty(sheetId));
-}
-
-function getTrackedForSheet(sheetId) {
-  return PropertiesService.getScriptProperties().getProperty(trackedProperty(sheetId)) === 'true';
-}
 
   
 function organizeAllTracking() {

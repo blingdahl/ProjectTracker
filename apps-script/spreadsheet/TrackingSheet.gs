@@ -62,6 +62,16 @@ TrackingSheet.init = function() {
     return row;
   }
   
+  TrackingSheet.Sheet.prototype.organize = function() {
+    var rows = this.getRows();
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.COLUMNS.PRIORITIES);
+    }
+    this.sortBy(TrackingSheet.COLUMNS.PRIORITY);
+    log(Log.Level.INFO, 'Set up tracking');
+  }
+  
   TrackingSheet.forSheet = function(sheet) {
     if (!TrackingSheet.sheetIdToSheet[sheet.getSheetId()]) {
       TrackingSheet.sheetIdToSheet[sheet.getSheetId()] = new TrackingSheet.Sheet(sheet);
@@ -75,13 +85,13 @@ TrackingSheet.init = function() {
     for (var i = 0; i < sheets.length; i++) {
       var sheet = sheets[i];
       if (sheet.getSheetId() == sheetId) {
-        return TrackingSheet.forSheet(sheet);
+        return TrackingSheet.Sheet.forSheet(sheet);
       }
     }
     throw new Error('Sheet not found for ' + sheetId);
   }
   
-  TrackingSheet.getAll = function() {
+  TrackingSheet.Sheet.getAll = function() {
     var sheets = SpreadsheetApp.getActive().getSheets();
     var ret = [];
     sheets.forEach(function(sheet) {
@@ -94,15 +104,11 @@ TrackingSheet.init = function() {
         var headerCell = headerRow.offset(0, columnOffset);
         if (headerCell.getValue() === TrackingSheet.COLUMNS.PRIORITY) {
           log(Log.Level.INFO, 'Tracking sheet: ' + sheet.getSheetName());
-          ret.push(TrackingSheet.forSheet(sheet));
+          ret.push(TrackingSheet.Sheet.forSheet(sheet));
           break;
         }
       }
     });
     return ret;
-  }
-  
-  Tracking.isTracked = function(sheetId) {
-    
   }
 }

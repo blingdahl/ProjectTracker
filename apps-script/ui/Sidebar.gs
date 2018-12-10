@@ -1,10 +1,7 @@
 function showPreferencesSidebar() {
-  var template = HtmlService.createTemplateFromFile('ui/SheetPreferences');
+  var template = HtmlService.createTemplateFromFile('SheetPreferences');
   var sheet = SpreadsheetApp.getActiveSheet();
-  var sheetId = sheet.getSheetId();
   template.sheetName = sheet.getName();
-  template.sheetId = sheetId;
-  template.label = getLabelForSheet(sheetId);
-  template.isTracked = getTrackedForSheet(sheetId) ? 'true' : 'false';
+  template.sheetId = sheet.getSheetId();
   SpreadsheetApp.getUi().showSidebar(template.evaluate().setTitle('Preferences'));
 }

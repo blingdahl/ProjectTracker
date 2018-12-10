@@ -11,29 +11,25 @@ Spreadsheet.init = function() {
   
   log(Log.Level.INFO, 'Spreadsheet.init()');
   
-  Spreadsheet.getActiveSheetId = function() {
-    log(Log.Level.FINER, 'getActiveSheetId');
-    return SpreadsheetApp.getActiveSheet().getSheetId();
+  Spreadsheet.ColumnDefinitions = function() {
+    this.columnNamesInOrder = [];
   }
   
-  Spreadsheet.hyperlinkFormula = function(url, text) {
-    return '=hyperlink("' + url + '", "' + text + '")'
-  };
-  
-  Spreadsheet.getUrlFromHyperlinkFormula = function(formula) {
-    return formula.substring(formula.indexOf('"') + 1, formula.lastIndexOf(',') - 1);
-  };
-  
-  Spreadsheet.Sheet = function(sheet, columns) {
-    this.sheet = sheet;
-    this.columns = new Spreadsheet.Columns(sheet);
-    this.columns.createColumnsIfMissing(columns);
-    this.dataRange = this.sheet.getDataRange();
-    this.rows = [];
-    this.rowsById = null;
-    this.cache = new Cache.Sheet();
-    this.cache.seed(this.dataRange.getValues(), this.dataRange.getFormulas());
+  Spreadsheet.ColumnDefinitions.prototype.addColumn = function(key, header) {
+    this.columnNamesInOrder.push(header);
+    this[key] = header;
+    return this;
   }
+  
+  Spreadsheet.Sheet = function(sheet, columnDefinitions) {
+      this.sheet = sheet;
+      this.columns = new Spreadsheet.Columns(sheet, columnDefinitions);
+      this.dataRange = this.sheet.getDataRange();
+      this.rows = [];
+      this.rowsById = null;
+      this.cache = new Cache.Sheet();
+      this.cache.seed(this.dataRange.getValues(), this.dataRange.getFormulas());
+    }
   
   Spreadsheet.Sheet.prototype.getSheetName = function() {
     return this.sheet.getSheetName();
@@ -53,11 +49,11 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Sheet.prototype.clearData = function() {
     log(Log.Level.INFO, 'clearData');
-    if (this.getDataRange().getNumRows() <= 1) {
+    if (this.sheet.getDataRange().getNumRows() <= 1) {
       log(Log.Level.INFO, 'Nothing to clear');
       return;
     }
-    this.sheet.deleteRows(2, this.getDataRange().getNumRows() - 1);
+    this.sheet.deleteRows(2, this.sheet.getDataRange().getNumRows() - 1);
     log(Log.Level.INFO, 'Cleared');
   }
   
@@ -65,7 +61,8 @@ Spreadsheet.init = function() {
     return this.cache.getItem(rowOffset, function() {
       return new Spreadsheet.Row(
         function() { return this.sheet.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
-        this.columns, this.cache.getRowCache(rowOffset), opt_isNew === true);
+        this.columns, this.cache.getRowCache(rowOffset),
+          opt_isNew === true);
     }.bind(this));
   }
   
@@ -83,13 +80,17 @@ Spreadsheet.init = function() {
     return this.getRow(rows.length + 1, true);
   }
   
-  Spreadsheet.Sheet.prototype.removeRow = function(row) {
-    this.sheet.deleteRow(row.getRowNumber());
-    this.clearCache();
-  }
-  
-  Spreadsheet.Sheet.prototype.clearCache = function() {
-    return this.cache.clear();
+  Spreadsheet.Sheet.prototype.removeRows = function(positions) {
+    for (var i = 0; i < positions.length; i++) {
+      positions[i] = parseInt(positions[i]);
+    }
+    positions.sort();
+    for (var i = positions.length - 1; i >= 0; i--) {
+      var position = positions[i];
+      log(Log.Level.INFO, 'Removing row at position ' + position);
+      this.sheet.deleteRow(position);
+    }
+    this.cache.clear();
   }
   
   Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
@@ -102,9 +103,11 @@ Spreadsheet.init = function() {
   
   // Spreadsheet.Columns
   
-  Spreadsheet.Columns = function(sheet) {
+  Spreadsheet.Columns = function(sheet, columnDefinitions) {
     this.sheet = sheet;
+    this.columnDefinitions = columnDefinitions;
     this.refreshHeaders();
+    this.createColumnsIfMissing(columnDefinitions);
   };
   
   Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnName) {
@@ -119,8 +122,8 @@ Spreadsheet.init = function() {
     }
   };
   
-  Spreadsheet.Columns.prototype.createColumnsIfMissing = function(columnNames) {
-    columnNames.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
+  Spreadsheet.Columns.prototype.createColumnsIfMissing = function(columnDefinitions) {
+    columnDefinitions.columnNamesInOrder.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
     this.sheet.setFrozenRows(1)
     this.refreshHeaders();
   };
