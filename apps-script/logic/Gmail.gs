@@ -234,7 +234,7 @@ Gmail.init = function() {
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
-      row.setValue(TrackingSheet.COLUMNS.DATE, thread.getLastMessageDate());
+      row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());
     }
     var rows = sheet.getRows();
     for (var i = 0; i < rows.length; i++) {

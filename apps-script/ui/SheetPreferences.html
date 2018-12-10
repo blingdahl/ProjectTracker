@@ -18,27 +18,61 @@
         color: red;
       }
     </style>
-    <h1 data-sheet-id="<?= sheetId ?>">Preferences for <?= sheetName ?></h1>
-    <div class="labelPicker" style="display: none">
-      <div class="displayMode">
-        <span class="labelName"></span>
-        <button class="chooseButton">Choose...</button>
-        <button class="removeButton">Remove</button>
-      </div>
-      <div class="selectMode">
-        <select class="labelSelect">
-        </select>
-        <button class="selectButton">Select</button>
-        <button class="cancelButton">Cancel</button>
-      </div>
+    <h1 data-sheet-id="<?= sheetId ?>" data-is-tracked="<?= isTracked ?>">Preferences for <?= sheetName ?></h1>
+    <div class="untracked" style="display: none">
+      <button class="trackButton">Track sheet</button>
     </div>
-    <button class="syncButton">Sync</button>
+    <div class="tracked" style="display: none">
+      <div class="labelPicker">
+        <div class="labelDisplayMode" style="display: none">
+          <span class="labelName" data-label-name="<?= label ?>"></span>
+          <button class="chooseLabelButton">Choose...</button>
+          <button class="removeLabelButton">Remove</button>
+        </div>
+        <div class="labelSelectMode" style="display: none">
+          <select class="labelSelect">
+          </select>
+          <button class="selectLabelButton">Select</button>
+          <button class="cancelLabelButton">Cancel</button>
+        </div>
+      </div>
+      <button class="syncWithGmailButton">Sync</button>
+    </div>
     <div class="message"></div>
     <div class="error"></div>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
   let MODE = {'SELECT': 1, 'DISPLAY': 2};
+  
+  class AlternatingVisibility {
+    constructor() {
+      this.jqMap = {};
+    }
+    
+    map(key, jqs) {
+      this.jqMap[String(key)] = jqs;
+      return this;
+    }
+    
+    setVisible(visibleKey) {
+      visibleKey = String(visibleKey);
+      console.log('setVisible(' + visibleKey + ')');
+      if (!this.jqMap[visibleKey]) {
+        throw new Error('Invalid key: ' + visibleKey);
+      }
+      let keys = Object.keys(this.jqMap);
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        let jq = this.jqMap[key];
+        if (visibleKey === key) {
+          jq.show();
+        } else {
+          jq.hide();
+        }
+      }
+    }
+  }
   
   class LabelPicker {
     static getSelectElement() {
@@ -69,28 +103,26 @@
     }
     
     static getCurrLabel() {
-      return LabelPicker.getLabelNameElt().attr('data-label-name');
+      return Preferences.getGlobalAttr('data-label-name');
     }
     
     static setCurrLabel(label) {
-      LabelPicker.getLabelNameElt().attr('data-label-name', label);
+      return Preferences.setGlobalAttr('data-label-name', label);
     }
   
     static setMode(mode) {
       if (mode == MODE.SELECT) {
-        $('.selectMode').show();
-        $('.displayMode').hide();
+        LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.SELECT)
       } else if (mode == MODE.DISPLAY) {
+        LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.DISPLAY)
         let labelName = this.getCurrLabel();
         $('.labelName').text(labelName || 'No label');
-        $('.displayMode').show();
-        $('.selectMode').hide();
         if (labelName) {
-          $('.removeButton').show();
-          $('.syncButton').show();
+          $('.removeLabelButton').show();
+          $('.syncWithGmailButton').show();
         } else {
-          $('.removeButton').hide();
-          $('.syncButton').hide();
+          $('.removeLabelButton').hide();
+          $('.syncWithGmailButton').hide();
         }
       } else {
         throw new Error('Unexpected mode: ' + mode);
@@ -108,44 +140,87 @@
     }
   }
   
-  class Preferences {
-    static getSheetId() {
-      return $('[data-sheet-id]').attr('data-sheet-id');
-    }
-    
-    static populateSelect() {
+  LabelPicker.DISPLAY_MODE_VISIBILITY = new AlternatingVisibility().
+      map(MODE.SELECT, $('.labelSelectMode')).
+      map(MODE.DISPLAY, $('.labelDisplayMode'));
+  
+  class Gmail {
+    static populateLabelSelect() {
       LabelPicker.clearSelectOptions('Populating...');
       google.script.run.withSuccessHandler(function(labels) {
         LabelPicker.populateSelect(JSON.parse(labels));
       }).getAllLabels();
     }
     
-    static chooseClicked() {
-      Preferences.populateSelect();
+    static chooseLabelClicked() {
+      Gmail.populateLabelSelect();
       LabelPicker.setMode(MODE.SELECT);
     }
     
-    static removeClicked() {
+    static removeLabelClicked() {
       LabelPicker.clearCurrLabel();
       google.script.run.clearLabelForSheet(Preferences.getSheetId());
       LabelPicker.setMode(MODE.DISPLAY);
     }
     
-    static cancelClicked() {
+    static cancelLabelClicked() {
       LabelPicker.setMode(MODE.DISPLAY);
     }
     
-    static selectClicked() {
+    static selectLabelClicked() {
       google.script.run.setLabelForSheet(Preferences.getSheetId(), LabelPicker.updateCurrLabelFromSelect());
       LabelPicker.setMode(MODE.DISPLAY);
     }
 
+    static syncWithGmailClicked() {
+      Preferences.setMessage('Syncing...');
+      Preferences.setError('');
+      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).syncSheetWithGmail(Preferences.getSheetId());
+    }
+    
+    static addListeners() {
+      $('.chooseLabelButton').click(Gmail.chooseLabelClicked);
+      $('.removeLabelButton').click(Gmail.removeLabelClicked);
+      $('.cancelLabelButton').click(Gmail.cancelLabelClicked);
+      $('.selectLabelButton').click(Gmail.selectLabelClicked);
+      $('.syncWithGmailButton').click(Gmail.syncWithGmailClicked);
+    }
+  }
+  
+  class Preferences {
+    static getGlobalAttr(attrName) {
+      return $('[' + attrName + ']').attr(attrName);
+    }
+  
+    static setGlobalAttr(attrName, value) {
+      $('[' + attrName + ']').attr(attrName, value);
+    }
+  
+    static getSheetId() {
+      return Preferences.getGlobalAttr('data-sheet-id');
+    }
+
+    static isTracked() {
+      return Preferences.getGlobalAttr('data-is-tracked');
+    }
+    
+    static setTracked(tracked) {
+      Preferences.setGlobalAttr('data-is-tracked', String(tracked));
+      google.script.run.setTrackedForSheet(Preferences.getSheetId(), tracked);
+    }
+    
+    static updateVisibilities() {
+      Preferences.TRACKED_VISIBILITY.setVisible(Preferences.isTracked());
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+    
+    static trackClicked() {
+      Preferences.setTracked(true);
+      Preferences.updateVisibilities();
+    }
+
     static init() {
-      google.script.run.withSuccessHandler(function(label) {
-        LabelPicker.setCurrLabel(label);
-        LabelPicker.setMode(MODE.DISPLAY);
-        $('.labelPicker').show();
-      }).getLabelForSheet(Preferences.getSheetId());
+      Preferences.updateVisibilities();
     }
 
     static setMessage(msg) {
@@ -159,21 +234,17 @@
     static handleFailure(msg) {
       Preferences.setError(msg);
     }
-
-    static syncClicked() {
-      Preferences.setMessage('Syncing...');
-      Preferences.setError('');
-      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).syncSheetWithGmail(Preferences.getSheetId());
-    }
     
     static addListeners() {
-      $('.chooseButton').click(Preferences.chooseClicked);
-      $('.removeButton').click(Preferences.removeClicked);
-      $('.cancelButton').click(Preferences.cancelClicked);
-      $('.selectButton').click(Preferences.selectClicked);
-      $('.syncButton').click(Preferences.syncClicked);
+      $('.trackButton').click(Preferences.trackClicked);
+      Gmail.addListeners();
     }
   }
+  
+  
+  Preferences.TRACKED_VISIBILITY = new AlternatingVisibility().
+      map(true, $('.tracked')).
+      map(false, $('.untracked'));
   
   Preferences.currSheetId = null;
   
@@ -182,5 +253,3 @@
   
   </script>
 </html>
-
-
