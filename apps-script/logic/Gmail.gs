@@ -154,6 +154,8 @@ Gmail.init = function() {
         return Spreadsheet.hyperlinkFormula(url, url.replace('http://', ''));
       } else if (url.startsWith('https://goto.google.com/')) {
         return Spreadsheet.hyperlinkFormula(url, url.replace('https://goto.google.com/', 'go/'));
+      } else if (url.startsWith('http://track.spe.schoolmessenger.com')) {
+        return Spreadsheet.hyperlinkFormula(url, 'Link');
       }
     }
     var goLinks = Gmail.extractGoLinks(messages[0].getBody());
@@ -300,26 +302,31 @@ Gmail.init = function() {
 }
   
 function labelProperty(sheetId) {
+  Gmail.init();
   return Gmail.labelProperty(sheetId);
 }
 
 function setLabelForSheet(sheetId, label) {
+  Gmail.init();
   Gmail.setLabelForSheet(sheetId, label);
 }
 
 function clearLabelForSheet(sheetId) {
+  Gmail.init();
   Gmail.clearLabelForSheet(sheetId);
 }
 
 function getLabelForSheet(sheetId) {
+  Gmail.init();
   return Gmail.getLabelForSheet(sheetId);
 }
 
 function getAllLabels() {
+  Gmail.init();
   return JSON.stringify(Gmail.getAllLabels());
 }
 
-function syncSheet(sheetId) {
+function syncSheetWithGmail(sheetId) {
   Gmail.init();
   Gmail.syncSheet(sheetId);
   return 'Done';
