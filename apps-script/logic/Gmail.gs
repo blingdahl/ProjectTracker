@@ -261,35 +261,65 @@ Gmail.init = function() {
     }
     Gmail.syncWithGmail(sheetId, label);
   }
+  
+  Gmail.labelProperty = function(sheetId) {
+    return 'label:' + sheetId;
+  }
+  
+  Gmail.setLabelForSheet = function(sheetId, label) {
+    PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
+  }
+  
+  Gmail.clearLabelForSheet = function(sheetId) {
+    PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
+  }
+  
+  Gmail.getLabelForSheet = function(sheetId) {
+    return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
+  }
+  
+  Gmail.getAllLabels = function() {
+    var ret = [];
+    var labels = GmailApp.getUserLabels(); 
+    for (var i = 0; i < labels.length; i++) {
+      var label = labels[i];
+      ret.push(label.getName());
+    }
+    return ret;
+  }
+  
+  Gmail.syncAllSheetsWithGmail = function() {
+    var sheets = SpreadsheetApp.getActive().getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+      var label = getLabelForSheet(sheets[i].getSheetId());
+      if (label) {
+        Gmail.syncWithGmail(sheets[i].getSheetId(), label);
+      }
+    }
+  }
 }
   
 function labelProperty(sheetId) {
-  return 'label:' + sheetId;
+  return Gmail.labelProperty(sheetId);
 }
 
 function setLabelForSheet(sheetId, label) {
-  PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
+  Gmail.setLabelForSheet(sheetId, label);
 }
 
 function clearLabelForSheet(sheetId) {
-  PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
+  Gmail.clearLabelForSheet(sheetId);
 }
 
 function getLabelForSheet(sheetId) {
-  return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
+  return Gmail.getLabelForSheet(sheetId);
 }
 
 function getAllLabels() {
-  var ret = [];
-  var labels = GmailApp.getUserLabels(); 
-  for (var i = 0; i < labels.length; i++) {
-    var label = labels[i];
-    ret.push(label.getName());
-  }
-  return JSON.stringify(ret);
+  return JSON.stringify(Gmail.getAllLabels());
 }
 
-function syncSheetWithGmail(sheetId) {
+function syncSheet(sheetId) {
   Gmail.init();
   Gmail.syncSheet(sheetId);
   return 'Done';
@@ -302,11 +332,5 @@ function syncCurrentSheetWithGmail() {
 
 function syncAllSheetsWithGmail() {
   Gmail.init();
-  var sheets = SpreadsheetApp.getActive().getSheets();
-  for (var i = 0; i < sheets.length; i++) {
-    var label = getLabelForSheet(sheets[i].getSheetId());
-    if (label) {
-      Gmail.syncWithGmail(sheets[i].getSheetId(), label);
-    }
-  }
+  Gmail.syncAllSheetsWithGmail();
 }

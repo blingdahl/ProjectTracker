@@ -20,39 +20,64 @@ Tracking.init = function() {
     trackingSheet.sortBy(TrackingSheet.COLUMNS.PRIORITY);
     log(Log.Level.INFO, 'Set up tracking');
   }
-}
 
-function trackedProperty(sheetId) {
-  return 'tracked:' + sheetId;
-}
-
-function setTrackedForSheet(sheetId, tracked) {
-  PropertiesService.getScriptProperties().setProperty(trackedProperty(sheetId), tracked ? 'true' : 'false');
-  if (tracked) {
-    organizeTracking(sheetId);
+  Tracking.trackedProperty = function(sheetId) {
+    return 'tracked:' + sheetId;
+  }
+  
+  Tracking.setTrackedForSheet = function(sheetId, tracked) {
+    PropertiesService.getScriptProperties().setProperty(Tracking.trackedProperty(sheetId), tracked ? 'true' : 'false');
+    if (tracked) {
+      organizeTracking(sheetId);
+    }
+  }
+  
+  Tracking.clearTrackedForSheet = function(sheetId) {
+    PropertiesService.getScriptProperties().deleteProperty(Tracking.trackedProperty(sheetId));
+  }
+  
+  Tracking.getTrackedForSheet = function(sheetId) {
+    return PropertiesService.getScriptProperties().getProperty(Tracking.trackedProperty(sheetId)) === 'true';
+  }
+  
+  Tracking.organizeAllTracking = function() {
+    TrackingSheet.getAll().forEach(function (trackingSheet) { trackingSheet.organize(); });
+  }
+  
+  Tracking.organizeTracking = function(sheetId) {
+    Tracking.organize(TrackingSheet.forSheetId(sheetId));
+  }
+  
+  Tracking.organizeTrackingOnCurrentSheet = function() {
+    organizeTracking(Spreadsheet.getActiveSheetId());
   }
 }
 
+function setTrackedForSheet(sheetId, tracked) {
+  Tracking.init();
+  Tracking.setTrackedForSheet(sheetId, tracked);
+}
+
 function clearTrackedForSheet(sheetId) {
-  PropertiesService.getScriptProperties().deleteProperty(trackedProperty(sheetId));
+  Tracking.clearTrackedForSheet(sheetId);
 }
 
 function getTrackedForSheet(sheetId) {
-  return PropertiesService.getScriptProperties().getProperty(trackedProperty(sheetId)) === 'true';
+  return Tracking.getTrackedForSheet(sheetId);
 }
 
 function organizeAllTracking() {
-	Tracking.init();
-	TrackingSheet.getAll().forEach(function (trackingSheet) { trackingSheet.organize(); });
+  Tracking.init();
+  Tracking.organizeAllTracking();
 }
 
 function organizeTracking(sheetId) {
   Tracking.init();
-  Tracking.organize(TrackingSheet.forSheetId(sheetId));
+  Tracking.organizeTracking(sheetId);
   return 'Organized';
 }
 
 function organizeTrackingOnCurrentSheet() {
   Tracking.init();
-  organizeTracking(Spreadsheet.getActiveSheetId());
+  Tracking.organizeTrackingOnCurrentSheet();
 }
