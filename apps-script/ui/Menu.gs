@@ -1,11 +1,11 @@
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Project Tracker').
-      addItem('Open preferences...', 'showPreferencesSidebar').
-      addItem('Sync Sheet with Gmail', 'syncCurrentSheetWithGmail').
-      addItem('Sync All Sheet with Gmail', 'syncAllSheetsWithGmail').
-      addItem('Organize tracking', 'organizeTrackingOnCurrentSheet').
-      addItem('Organize all tracking', 'organizeAllTracking').
-      addItem('Update overview', 'updateOverview').
-      addItem('Do all the things!', 'doAllTheThings').
-      addToUi();
+  addItem('Gmail: Open preferences...', 'showPreferencesSidebar').
+  addItem('Gmail: Sync Sheet', 'syncCurrentSheetWithGmail').
+  addItem('Gmail: Sync All Sheets', 'syncAllSheetsWithGmail').
+  addItem('Tracking: Organize sheet', 'organizeTrackingOnCurrentSheet').
+  addItem('Tracking: Organize all sheets', 'organizeAllTracking').
+  addItem('Tracking: Update overview', 'updateOverview').
+  addItem('Tracking: Do all the things!', 'doAllTheThings').
+  addToUi();
 }
