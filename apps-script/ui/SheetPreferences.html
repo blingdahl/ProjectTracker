@@ -101,19 +101,25 @@
     }
 
     static setMessage(msg) {
+      Global.clearError();
       $('.message').text(msg);
     }
 
     static clearMessage() {
-      Global.setMessage('');
+      if ($('.message').text() !== '') {
+        Global.setMessage('');
+      }
     }
 
     static setError(msg) {
+      Global.clearMessage();
       $('.error').text(msg);
     }
 
     static clearError(msg) {
-      Global.setError('');
+      if ($('.error').text() !== '') {
+        Global.setError('');
+      }
     }
   }
   
