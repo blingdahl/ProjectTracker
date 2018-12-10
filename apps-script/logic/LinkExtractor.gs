@@ -1,22 +1,29 @@
 var LinkExtractor = {};
 
-function PrefixMatcher(prefixes) {
-  this.prefixes = prefixes;
+function PrefixMatcher() {
+  this.prefixMap = {};
 }
 
-PrefixMatcher.prototype.matches = function(s) {
-  for (var i = 0; i < this.prefixes.length; i++) {
-    if (s.startsWith(this.prefixes[i])) {
-      return true;
+PrefixMatcher.prototype.add = function(prefix, linkText) {
+  this.prefixMap[prefix] = linkText;
+  return this;
+}
+
+PrefixMatcher.prototype.matchingLinkText = function(s) {
+  var prefixes = Object.keys(this.prefixMap);
+  for (var i = 0; i < prefixes.length; i++) {
+    var prefix = prefixes[i];
+    if (s.startsWith(prefix)) {
+      return this.prefixMap[prefix];
     }
   }
 }
 
-LinkExtractor.PREFIX_MATCHER = new PrefixMatcher([
-    'http://track.spe.schoolmessenger.com/',
-    'https://www.fablevisionlearning.com/',
-    'https://photos.app.goo.gl/RmuB7fzChAj1kDn86'
-]);
+LinkExtractor.PREFIX_MATCHER = new PrefixMatcher().
+    add('http://track.spe.schoolmessenger.com/', 'School Messenger').
+    add('https://www.fablevisionlearning.com/', 'FableVision').
+    add('https://photos.app.goo.gl/', 'Photos').
+    add('https://app.smartsheet.com/b/home', 'SmartSheet');
 
 LinkExtractor.extractBugId = function(subject) {
   var issueIndex = subject.indexOf('Issue ');
@@ -83,14 +90,15 @@ LinkExtractor.extractLinkFormula = function(thread) {
       } else {
         return Spreadsheet.hyperlinkFormula(url, 'Link')
       }
-    } else if (url.startsWith('https://app.smartsheet.com/b/home')) {
-      return Spreadsheet.hyperlinkFormula(url, 'Smartsheet');
     } else if (url.startsWith('http://go/')) {
       return Spreadsheet.hyperlinkFormula(url, url.replace('http://', ''));
     } else if (url.startsWith('https://goto.google.com/')) {
       return Spreadsheet.hyperlinkFormula(url, url.replace('https://goto.google.com/', 'go/'));
-    } else if (LinkExtractor.PREFIX_MATCHER.matches(url)) {
-      return Spreadsheet.hyperlinkFormula(url, 'Link');
+    } else {
+      var linkText = LinkExtractor.PREFIX_MATCHER.matchingLinkText(url);
+      if (linkText) {
+        return Spreadsheet.hyperlinkFormula(url, linkText);
+      }
     }
   }
   var goLinks = LinkExtractor.extractGoLinks(messages[0].getBody());
