@@ -235,10 +235,10 @@
       Preferences.setError(msg);
     }
 
-    static organizedClicked() {
+    static organizeClicked() {
       Preferences.setMessage('Organizing...');
       Preferences.setError('');
-      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).syncSheetWithGmail(Preferences.getSheetId());
+      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).organizeTracking(Preferences.getSheetId());
     }
     
     static addListeners() {

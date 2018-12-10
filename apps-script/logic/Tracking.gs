@@ -47,11 +47,12 @@ function organizeAllTracking() {
 }
 
 function organizeTracking(sheetId) {
-	Tracking.init();
-	Tracking.organize(TrackingSheet.forSheetId(sheetId));
+  Tracking.init();
+  Tracking.organize(TrackingSheet.forSheetId(sheetId));
+  return 'Organized';
 }
 
 function organizeTrackingOnCurrentSheet() {
-	Tracking.init();
-	organizeTracking(Spreadsheet.getActiveSheetId());
+  Tracking.init();
+  organizeTracking(Spreadsheet.getActiveSheetId());
 }
