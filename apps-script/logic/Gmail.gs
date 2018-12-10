@@ -234,7 +234,7 @@ Gmail.init = function() {
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
-      row.setValue(TrackingSheet.COLUMNS.DATE, thread.getLastMessageDate());
+      row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());
     }
     var rows = sheet.getRows();
     for (var i = 0; i < rows.length; i++) {
@@ -246,10 +246,10 @@ Gmail.init = function() {
       }
     }
     for (var i = 0; i < threadIdsToRemove.length; i++) {
-      sheet.removeRow(sheet.getRowForId(threadIdsToRemove[i]));
+      sheet.removeRow(sheet.getRowForThreadId(threadIdsToRemove[i]));
     }
     // The last sort here will be the primary sort order.
-    sheet.sortBy(TrackingSheet.COLUMNS.DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
+    sheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     log(Log.Level.INFO, 'Synced with ' + label);
   }
   

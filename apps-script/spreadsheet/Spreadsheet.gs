@@ -21,46 +21,46 @@ Spreadsheet.init = function() {
     return this;
   }
   
-  Spreadsheet.Sheet = function(sheet, columnDefinitions) {
-      this.sheet = sheet;
-      this.columns = new Spreadsheet.Columns(sheet, columnDefinitions);
-      this.dataRange = this.sheet.getDataRange();
+  Spreadsheet.Sheet = function(nativeSheet, columnDefinitions) {
+      this.nativeSheet = nativeSheet;
+      this.columns = new Spreadsheet.Columns(nativeSheet, columnDefinitions);
       this.rows = [];
       this.rowsById = null;
       this.cache = new Cache.Sheet();
-      this.cache.seed(this.dataRange.getValues(), this.dataRange.getFormulas());
+      this.cache.seed(this.getDataRange().getValues(), this.getDataRange().getFormulas());
     }
   
   Spreadsheet.Sheet.prototype.getSheetName = function() {
-    return this.sheet.getSheetName();
+    return this.nativeSheet.getSheetName();
   }
   
   Spreadsheet.Sheet.prototype.getSheetId = function() {
-    return this.sheet.getSheetId();
+    return this.nativeSheet.getSheetId();
   }
   
   Spreadsheet.Sheet.prototype.getDataRange = function() {
-    return this.sheet.getDataRange();
+    return this.nativeSheet.getDataRange();
   }
   
   Spreadsheet.Sheet.prototype.getUrl = function() {
-    return '#gid=' + this.sheet.getSheetId();
+    return '#gid=' + this.nativeSheet.getSheetId();
   }
   
   Spreadsheet.Sheet.prototype.clearData = function() {
     log(Log.Level.INFO, 'clearData');
-    if (this.sheet.getDataRange().getNumRows() <= 1) {
+    if (this.nativeSheet.getDataRange().getNumRows() <= 1) {
       log(Log.Level.INFO, 'Nothing to clear');
       return;
     }
-    this.sheet.deleteRows(2, this.sheet.getDataRange().getNumRows() - 1);
+    this.nativeSheet.deleteRows(2, this.getDataRange().getNumRows() - 1);
     log(Log.Level.INFO, 'Cleared');
   }
   
   Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
+    // TODO(lindahl) Get better more better
     return this.cache.getItem(rowOffset, function() {
       return new Spreadsheet.Row(
-        function() { return this.sheet.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
+        function() { return this.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
         this.columns, this.cache.getRowCache(rowOffset),
           opt_isNew === true);
     }.bind(this));
@@ -80,31 +80,27 @@ Spreadsheet.init = function() {
     return this.getRow(rows.length + 1, true);
   }
   
-  Spreadsheet.Sheet.prototype.removeRows = function(positions) {
-    for (var i = 0; i < positions.length; i++) {
-      positions[i] = parseInt(positions[i]);
-    }
-    positions.sort();
-    for (var i = positions.length - 1; i >= 0; i--) {
-      var position = positions[i];
-      log(Log.Level.INFO, 'Removing row at position ' + position);
-      this.sheet.deleteRow(position);
-    }
-    this.cache.clear();
+  Spreadsheet.Sheet.prototype.clearCache = function() {
+    return this.cache.clear();
+  }
+  
+  Spreadsheet.Sheet.prototype.removeRow = function(row) {
+    this.nativeSheet.deleteRow(row.getRowNumber());
+    this.clearCache();
   }
   
   Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
     var ascending = (opt_ascending === undefined) ? true : opt_ascending;
     var columnOffset = this.columns.getColumnOffset(columnHeader);
-    this.sheet.sort(columnOffset + 1, ascending);
+    this.nativeSheet.sort(columnOffset + 1, ascending);
     this.cache.clear();
     return this;
   }
   
   // Spreadsheet.Columns
   
-  Spreadsheet.Columns = function(sheet, columnDefinitions) {
-    this.sheet = sheet;
+  Spreadsheet.Columns = function(nativeSheet, columnDefinitions) {
+    this.nativeSheet = nativeSheet;
     this.columnDefinitions = columnDefinitions;
     this.refreshHeaders();
     this.createColumnsIfMissing(columnDefinitions);
@@ -112,7 +108,7 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnName) {
     if (this.getColumnOffset(columnName) === undefined) {
-      var dataRange = this.sheet.getDataRange();
+      var dataRange = this.nativeSheet.getDataRange();
       var headerCell = dataRange.offset(0, 0, 1, 1);
       if (headerCell.getValue() != '') {
         headerCell = dataRange.offset(0, dataRange.getNumColumns(), 1, 1);
@@ -124,12 +120,12 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Columns.prototype.createColumnsIfMissing = function(columnDefinitions) {
     columnDefinitions.columnNamesInOrder.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
-    this.sheet.setFrozenRows(1)
+    this.nativeSheet.setFrozenRows(1)
     this.refreshHeaders();
   };
   
   Spreadsheet.Columns.prototype.refreshHeaders = function() {
-    var headerRow = this.sheet.getDataRange();
+    var headerRow = this.nativeSheet.getDataRange();
     this.headers = [];
     this.mapping = {};
     for (var columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
