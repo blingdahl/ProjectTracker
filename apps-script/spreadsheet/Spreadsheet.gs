@@ -22,13 +22,11 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet = function(nativeSheet, columnDefinitions) {
-      this.nativeSheet = nativeSheet;
-      this.columns = new Spreadsheet.Columns(nativeSheet, columnDefinitions);
-      this.rows = [];
-      this.rowsById = null;
-      this.cache = new Cache.Sheet();
-      this.cache.seed(this.getDataRange().getValues(), this.getDataRange().getFormulas());
-    }
+    this.nativeSheet = nativeSheet;
+    this.columns = new Spreadsheet.Columns(nativeSheet, columnDefinitions);
+    this.cache = new Cache.Sheet(this.getAllValues.bind(this), this.getAllFormulas.bind(this),
+                                 this.getValuesForRow.bind(this), this.getFormulasForRow.bind(this));
+  }
   
   Spreadsheet.Sheet.prototype.getSheetName = function() {
     return this.nativeSheet.getSheetName();
@@ -46,24 +44,45 @@ Spreadsheet.init = function() {
     return '#gid=' + this.nativeSheet.getSheetId();
   }
   
+  Spreadsheet.Sheet.prototype.getAllValues = function() {
+    return this.getDataRange().getValues();
+  }
+  
+  Spreadsheet.Sheet.prototype.getAllFormulas = function() {
+    return this.getDataRange().getFormulas();
+  }
+  
+  Spreadsheet.Sheet.prototype.getNativeRow = function(rowOffset) {
+    return this.nativeSheet.getRange(rowOffset + 1, 1);
+  }
+  
+  Spreadsheet.Sheet.prototype.getValuesForRow = function(rowOffset) {
+    return this.getNativeRow(rowOffset).getValues()[0];
+  }
+  
+  Spreadsheet.Sheet.prototype.getFormulasForRow = function(rowOffset) {
+    return this.getNativeRow(rowOffset).getFormulas()[0];
+  }
+  
   Spreadsheet.Sheet.prototype.clearData = function() {
-    log(Log.Level.INFO, 'clearData');
     if (this.nativeSheet.getDataRange().getNumRows() <= 1) {
       log(Log.Level.INFO, 'Nothing to clear');
       return;
     }
     this.nativeSheet.deleteRows(2, this.getDataRange().getNumRows() - 1);
+    this.clearCache();
     log(Log.Level.INFO, 'Cleared');
   }
   
+  Spreadsheet.Sheet.prototype.createRowObject = function(nativeRow, columns, rowCache, opt_isNew) {
+    return new Spreadsheet.Row(nativeRow, columns, rowCache, opt_isNew === true);
+  }
+  
   Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
-    // TODO(lindahl) Get better more better
-    return this.cache.getItem(rowOffset, function() {
-      return new Spreadsheet.Row(
-        function() { return this.getDataRange().offset(rowOffset, 0, 1); }.bind(this),
-        this.columns, this.cache.getRowCache(rowOffset),
-          opt_isNew === true);
-    }.bind(this));
+    return this.createRowObject(this.getNativeRow(rowOffset),
+                                this.columns,
+                                this.cache.getRowCache(rowOffset),
+                                opt_isNew);
   }
   
   Spreadsheet.Sheet.prototype.getRows = function() {
@@ -87,7 +106,7 @@ Spreadsheet.init = function() {
   Spreadsheet.Sheet.prototype.removeRow = function(row) {
     this.nativeSheet.deleteRow(row.getRowNumber());
     this.clearCache();
-  }
+  };
   
   Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
     var ascending = (opt_ascending === undefined) ? true : opt_ascending;
@@ -95,7 +114,11 @@ Spreadsheet.init = function() {
     this.nativeSheet.sort(columnOffset + 1, ascending);
     this.cache.clear();
     return this;
-  }
+  };
+  
+  Spreadsheet.Sheet.prototype.toString = function() {
+    return 'Spreadsheet.Sheet';
+  };
   
   // Spreadsheet.Columns
   
@@ -142,49 +165,37 @@ Spreadsheet.init = function() {
     return this.mapping[columnName];
   };
   
+  Spreadsheet.Columns.prototype.toString = function() {
+    return 'Spreadsheet.Columns';
+  };
+  
   // Spreadsheet.Row
   
-  Spreadsheet.Row = function(rowRangeCallback, columns, rowCache, isNew) {
-    log(Log.Level.FINE, 'Creating Row object');
-    this.rowRangeCallback = rowRangeCallback;
-    this.rowRange = null;
+  Spreadsheet.Row = function(nativeRow, columns, rowCache, isNew) {
+    this.nativeRow = nativeRow;
     this.columns = columns;
     this.rowCache = rowCache;
     this.isNew = isNew;
   };
   
-  Spreadsheet.Row.prototype.column_ = function(columnHeader) {
-    log(Log.Level.FINE, 'column_(' + columnHeader + ')');
-    return this.columns.getColumnOffset(columnHeader);
-  };
-  
-  Spreadsheet.Row.prototype.getRowRange = function() {
-    if (!this.rowRange) {
-      log(Log.Level.FINE, 'Generating row range');
-      this.rowRange = this.rowRangeCallback();
-      log(Log.Level.FINE, 'Generated row range');
-      if (this.rowRange.getNumRows() != 1) {
-        throw 'Not a row: ' + range.getA1Notation();
-      }
-    }
-    return this.rowRange;
+  Spreadsheet.Row.prototype.getNativeRow = function() {
+    return this.nativeRow;
   };
   
   Spreadsheet.Row.prototype.getCell = function(columnHeader) {
-    log(Log.Level.FINE, 'getCell(' + columnHeader + ')');
-    return this.getRowRange().offset(0, this.column_(columnHeader), 1, 1);
+    return this.getNativeRow().offset(0, this.columns.getColumnOffset(columnHeader), 1, 1);
   };
   
   Spreadsheet.Row.prototype.getA1Notation = function(columnHeader) {
     return this.getCell(columnHeader).getA1Notation();
   };
   
+  Spreadsheet.Row.prototype.clearCache = function(columnHeader) {
+    return this.rowCache.clear();
+  };
+  
   Spreadsheet.Row.prototype.getValue = function(columnHeader) {
-    var value =  this.rowCache.getValue(this.column_(columnHeader), function() {
-      return this.getCell(columnHeader).getValue();
-    }.bind(this));
-    log(Log.Level.FINER, 'Value for ' + columnHeader + ': ' + value);
-    return value;
+    return this.rowCache.getValue(this.columns.getColumnOffset(columnHeader));
   };
   
   Spreadsheet.Row.prototype.getBooleanValue = function(columnHeader) {
@@ -197,14 +208,12 @@ Spreadsheet.init = function() {
       return;
     }
     this.getCell(columnHeader).setValue(val);
-    this.rowCache.setValue(this.column_(columnHeader), val);
+    this.clearCache();
     return this;
   };
   
   Spreadsheet.Row.prototype.getFormula = function(columnHeader) {
-    return this.rowCache.getFormula(columnHeader, function() {
-      return this.getCell(columnHeader).getFormula();
-    }.bind(this));
+    return this.rowCache.getFormula(this.columns.getColumnOffset(columnHeader));
   };
   
   Spreadsheet.Row.prototype.setFormula = function(columnHeader, formula) {
@@ -212,12 +221,12 @@ Spreadsheet.init = function() {
       return;
     }
     this.getCell(columnHeader).setFormula(formula);
-    this.rowCache.setFormula(this.column_(columnHeader), formula);
+    this.rowCache.clear();
     return this;
   };
   
   Spreadsheet.Row.prototype.getRowNumber = function() {
-    return this.getRowRange().getRow();
+    return this.getNativeRow().getRow();
   };
   
   Spreadsheet.Row.prototype.getRowOffset = function() {
@@ -251,6 +260,9 @@ Spreadsheet.init = function() {
     cell.setDataValidation(SpreadsheetApp.newDataValidation().setAllowInvalid(false).requireValueInList(options).build());
   };
   
+  Spreadsheet.Row.prototype.toString = function() {
+    return 'Spreadsheet.Row';
+  };
   
   Spreadsheet.getActiveSheetId = function() {
     log(Log.Level.FINER, 'getActiveSheetId');

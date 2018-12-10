@@ -8,76 +8,95 @@ Cache.init = function() {
   
   Cache.initialized = true;
   
-  Cache.Row = function() {
-    log(Log.Level.FINER, 'Creating cache');
-    this.values = {};
-    this.formulas = {};
+  Cache.Sheet = function(fetchAllValuesFn, fetchAllFormulasFn, fetchRowValuesFn, fetchRowFormulasFn) {
+    this.values = null;
+    this.formulas = null;
+    this.fetchAllValuesFn = fetchAllValuesFn;
+    this.fetchAllFormulasFn = fetchAllFormulasFn;
+    this.fetchRowValuesFn = fetchRowValuesFn;
+    this.fetchRowFormulasFn = fetchRowFormulasFn;
+  };
+  
+  Cache.Sheet.prototype.precache = function() {
+    this.values = this.fetchAllValuesFn();
+    this.formulas = this.fetchAllFormulasFn();
   }
   
-  Cache.Row.prototype.seed = function(values, formulas) {
-    for (var i = 0; i < values.length; i++) {
-      this.values[i] = values[i];
-      this.formulas[i] = formulas[i];
+  Cache.Sheet.prototype.getValue = function(rowOffset, columnOffset) {
+    if (this.values === null) {
+      this.values = [];
     }
-  };
-  
-  Cache.Row.prototype.setValue = function(columnOffset, value) {
-    this.values[columnOffset] = value;
-  };
-  
-  Cache.Row.prototype.getValue = function(columnOffset, fn) {
-    if (!this.values[columnOffset]) {
-      this.values[columnOffset] = fn();
+    if (this.values[rowOffset] === undefined) {
+      this.values[rowOffset] = this.fetchRowValuesFn(rowOffset);
     }
-    return this.values[columnOffset];
+    return this.values[rowOffset][columnOffset] || '';
   };
   
-  Cache.Row.prototype.setFormula = function(columnOffset, formula) {
-    this.formulas[columnOffset] = formula;
-  };
-  
-  Cache.Row.prototype.getFormula = function(columnOffset, fn) {
-    if (!this.formulas[columnOffset]) {
-      this.formulas[columnOffset] = fn();
+  Cache.Sheet.prototype.getFormula = function(rowOffset, columnOffset) {
+    if (this.formulas === null) {
+      this.formulas = [];
     }
-    return this.formulas[columnOffset];
+    if (this.formulas[rowOffset] === undefined) {
+      this.formulas[rowOffset] = this.fetchRowFormulasFn(rowOffset);
+    }
+    return this.formulas[rowOffset][columnOffset] || '';
   };
   
-  Cache.Row.prototype.clear = function() {
-    this.values = [];
-    this.formulas = [];
-  };
-  
-  Cache.Sheet = function() {
-    this.items = [];
-    this.rowCaches = [];
-  };
+  Cache.Sheet.prototype.clearRow = function(rowOffset) {
+    if (this.values) {
+      this.values[rowOffset] = undefined;
+    }
+    if (this.formulas) {
+      this.formulas[rowOffset] = undefined;
+    }
+  }
   
   Cache.Sheet.prototype.getRowCache = function(rowOffset) {
-    log(Log.Level.FINEST, 'Getting row item at offset ' + rowOffset);
-    if (!this.rowCaches[rowOffset]) {
-      log(Log.Level.FINER, 'Creating row cache');
-      this.rowCaches[rowOffset] = new Cache.Row();
-    }
-    return this.rowCaches[rowOffset];
-  };
-  
-  Cache.Sheet.prototype.seed = function(values, formulas) {
-    for (var rowOffset = 0; rowOffset < values.length; rowOffset++) {
-      this.getRowCache(rowOffset).seed(values[rowOffset], formulas[rowOffset]);
-    }
-  };
-  
-  Cache.Sheet.prototype.getItem = function(rowOffset, fn) {
-    log(Log.Level.FINEST, 'Getting item at offset ' + rowOffset);
-    if (!this.items[rowOffset]) {
-      log(Log.Level.FINER, 'Creating item');
-      this.items[rowOffset] = fn();
-    }
-    return this.items[rowOffset];
+    return new Cache.Row(
+      function(columnOffset) { return this.getValue(rowOffset, columnOffset); }.bind(this),
+      function(columnOffset) { return this.getFormula(rowOffset, columnOffset); }.bind(this),
+        function() { this.clearRow(rowOffset); }.bind(this));
   };
   
   Cache.Sheet.prototype.clear = function() {
-    this.rowCaches.forEach(function(rowCache) { rowCache.clear() });
+    this.values = null;
+    this.formulas = null;
   };
+  
+  Cache.Sheet.prototype.getRowOffsetsForColumnValue = function(columnOffset, value) {
+    this.precache();
+    var ret = [];
+    for (var rowOffset = 0; rowOffset < this.values.length; rowOffset++) {
+      if (this.values[rowOffset][columnOffset] === value) {
+        ret.push(rowOffset);
+      }
+    }
+    return ret;
+  };
+  
+  Cache.Sheet.prototype.toString = function() {
+    return 'Cache.Sheet';
+  };
+  
+  Cache.Row = function(getValueFn, getFormulaFn, clearFn) {
+    this.getValueFn = getValueFn;
+    this.getFormulaFn = getFormulaFn;
+    this.clearFn = clearFn;
+  }
+  
+  Cache.Row.prototype.getValue = function(columnOffset) {
+    return this.getValueFn(columnOffset);
+  }
+  
+  Cache.Row.prototype.getFormula = function(columnOffset) {
+    return this.getFormulaFn(columnOffset);
+  }
+  
+  Cache.Row.prototype.clear = function() {
+    return this.clearFn();
+  }
+  
+  Cache.Row.prototype.toString = function() {
+    return 'Cache.Row';
+  }
 }

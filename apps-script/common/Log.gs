@@ -4,6 +4,13 @@ function log(level, s) {
   }
 }
 
+function logMatrix(level, a) {
+  for (var i = 0; i < values.length; i++) {
+    log(Log.Level.INFO, 'i: ' + i);
+    log(Log.Level.INFO, 'values(' + values[i].length + ' of them): ' + values[i]);
+  }
+}
+
 var Log = {};
 
 Log.Level = {};
