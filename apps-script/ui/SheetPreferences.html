@@ -38,6 +38,7 @@
       </div>
       <button class="syncWithGmailButton">Sync with Gmail</button>
       <button class="organizeButton">Organize</button>
+      <button class="testButton" style="display: none">Test</button>
     </div>
     <div class="message"></div>
     <div class="error"></div>
@@ -240,14 +241,20 @@
       Preferences.setError('');
       google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).organizeTracking(Preferences.getSheetId());
     }
+
+    static testClicked() {
+      Preferences.setMessage('Testing...');
+      Preferences.setError('');
+      google.script.run.withSuccessHandler(Preferences.setMessage).withFailureHandler(Preferences.handleFailure).getActiveSheetId();
+    }
     
     static addListeners() {
       $('.trackButton').click(Preferences.trackClicked);
       $('.organizeButton').click(Preferences.organizeClicked);
+      $('.testButton').click(Preferences.organizeClicked);
       Gmail.addListeners();
     }
   }
-  
   
   Preferences.TRACKED_VISIBILITY = new AlternatingVisibility().
       map(true, $('.tracked')).

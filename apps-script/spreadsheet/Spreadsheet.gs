@@ -263,12 +263,12 @@ Spreadsheet.init = function() {
   Spreadsheet.Row.prototype.toString = function() {
     return 'Spreadsheet.Row';
   };
-  
+
   Spreadsheet.getActiveSheetId = function() {
     log(Log.Level.FINER, 'getActiveSheetId');
     return SpreadsheetApp.getActiveSheet().getSheetId();
   };
-  
+
   Spreadsheet.hyperlinkFormula = function(url, text) {
     return '=hyperlink("' + url + '", "' + text + '")'
   };
@@ -278,3 +278,7 @@ Spreadsheet.init = function() {
   };
 }
 
+function getActiveSheetId() {
+  Spreadsheet.init();
+  return Spreadsheet.getActiveSheetId();
+}
