@@ -18,14 +18,19 @@
         color: red;
       }
     </style>
-    <h1 data-sheet-id="<?= sheetId ?>" data-is-tracked="<?= isTracked ?>">Preferences for <span data-sheet-name="<?= sheetName ?>"></span></h1>
+    <div class="global" style="display: none" 
+        data-sheet-id="<?= sheetId ?>"
+        data-sheet-name="<?= sheetName ?>" 
+        data-is-tracked="<?= isTracked ?>"
+        ata-label-name="<?= label ?>"></div>    
+    <h1><span class="sheetName"></span></h1>
     <div class="untracked" style="display: none">
       <button class="trackButton">Track sheet</button>
     </div>
     <div class="tracked" style="display: none">
       <div class="labelPicker">
         <div class="labelDisplayMode" style="display: none">
-          <span class="labelName" data-label-name="<?= label ?>"></span>
+          <span class="labelName"></span>
           <button class="chooseLabelButton">Choose...</button>
           <button class="removeLabelButton">Remove</button>
         </div>
@@ -39,6 +44,11 @@
       <button class="syncWithGmailButton">Sync with Gmail</button>
       <button class="organizeButton">Organize</button>
       <button class="testButton" style="display: none">Test</button>
+      <hr>
+      <h1>All Sheets</h1>
+      <button class="syncAllWithGmailButton">Sync All with Gmail</button>
+      <button class="organizeAllButton">Organize All</button>
+      <button class="updateOverviewButton">UpdateOverview</button>
     </div>
     <div class="message"></div>
     <div class="error"></div>
@@ -48,20 +58,16 @@
   let MODE = {'SELECT': 1, 'DISPLAY': 2};
   
   class Global {
-    static getElt(attrName) {
-      return $('[' + attrName + ']');
+    static getElt() {
+      return $('.global');
     }
   
     static getAttr(attrName) {
-      return Global.getElt(attrName).attr(attrName);
+      return Global.getElt().attr(attrName);
     }
   
     static setAttr(attrName, value) {
-      Global.getElt(attrName).attr(attrName, value);
-    }
-    
-    static getSheetNameElt() {
-      return Global.getElt('data-sheet-name');
+      Global.getElt().attr(attrName, value);
     }
     
     static getSheetName() {
@@ -121,10 +127,14 @@
         Global.setError('');
       }
     }
+    
+    // TODO(lindahl) Retry timeout: "ScriptError: Exceeded maximum execution time"
+    // TODO(lindahl) Swallow 409: "NetworkError: Connection failure due to HTTP 409"
   }
   
   class AlternatingVisibility {
-    constructor() {
+    constructor(name) {
+      this.name = name;
       this.jqMap = {};
     }
     
@@ -134,6 +144,8 @@
     }
     
     setVisible(visibleKey) {
+      console.log('For ' + this.name);
+      console.log('setVisible(' + visibleKey + ')');
       visibleKey = String(visibleKey);
       if (!this.jqMap[visibleKey]) {
         throw new Error('Invalid key: ' + visibleKey);
@@ -185,14 +197,8 @@
       } else if (mode == MODE.DISPLAY) {
         LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.DISPLAY)
         let labelName = Global.getCurrLabel();
-        $('.labelName').text(labelName || 'No label');
-        if (labelName) {
-          $('.removeLabelButton').show();
-          $('.syncWithGmailButton').show();
-        } else {
-          $('.removeLabelButton').hide();
-          $('.syncWithGmailButton').hide();
-        }
+        LabelPicker.getLabelNameElt().text(labelName || 'No label');
+        LabelPicker.LABEL_BUTTON_VISIBILITY.setVisible(!!labelName);
       } else {
         throw new Error('Unexpected mode: ' + mode);
       }
@@ -205,9 +211,13 @@
     }
   }
   
-  LabelPicker.DISPLAY_MODE_VISIBILITY = new AlternatingVisibility().
+  LabelPicker.DISPLAY_MODE_VISIBILITY = new AlternatingVisibility('DisplayMode').
       map(MODE.SELECT, $('.labelSelectMode')).
       map(MODE.DISPLAY, $('.labelDisplayMode'));
+  
+  LabelPicker.LABEL_BUTTON_VISIBILITY = new AlternatingVisibility('LabelButton').
+      map(true, $('.removeLabelButton,.syncWithGmailButton')).
+      map(false, $('.noButtonExisting'));
   
   class Gmail {
     static populateLabelSelect() {
@@ -258,8 +268,13 @@
       google.script.run.setTrackedForSheet(Global.getSheetId(), tracked);
     }
     
+    static getSheetNameElt() {
+      return $('.sheetName');
+    }
+    
     static updateVisibilities() {
-      Global.getSheetNameElt().text(Global.getSheetName());
+      console.log('updateVisibilities()');
+      Preferences.getSheetNameElt().text(Global.getSheetName());
       Preferences.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
       LabelPicker.setMode(MODE.DISPLAY);
       Global.clearMessage();
@@ -272,13 +287,14 @@
     }
 
     static init() {
+      console.log('init()');
       Preferences.updateVisibilities();
     }
 
     static organizeClicked() {
       Global.setMessage('Organizing...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organizeTracking(Preferences.getSheetId());
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
     }
 
     static testClicked() {
@@ -313,7 +329,7 @@
     }
   }
   
-  Preferences.TRACKED_VISIBILITY = new AlternatingVisibility().
+  Preferences.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
       map(true, $('.tracked')).
       map(false, $('.untracked'));
   

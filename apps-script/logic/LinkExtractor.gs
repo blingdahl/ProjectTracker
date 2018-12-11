@@ -23,7 +23,8 @@ LinkExtractor.PREFIX_MATCHER = new PrefixMatcher().
     add('http://track.spe.schoolmessenger.com/', 'School Messenger').
     add('https://www.fablevisionlearning.com/', 'FableVision').
     add('https://photos.app.goo.gl/', 'Photos').
-    add('https://app.smartsheet.com/b/home', 'SmartSheet');
+    add('https://app.smartsheet.com/b/home', 'SmartSheet').
+    add('https://drive.google.com/', 'Drive');
 
 LinkExtractor.extractBugId = function(subject) {
   var issueIndex = subject.indexOf('Issue ');
@@ -67,7 +68,11 @@ LinkExtractor.extractGoLinks = function(content) {
 }
 
 LinkExtractor.extractLinkFormula = function(thread) {
-  var bugId = LinkExtractor.extractBugId(thread.getFirstMessageSubject());
+  var message = thread.getFirstMessageSubject();
+  if (!message) {
+    return null;
+  }
+  var bugId = LinkExtractor.extractBugId(message);
   if (bugId) {
     return Spreadsheet.hyperlinkFormula('http://b/' + bugId, 'b/' + bugId);
   }
