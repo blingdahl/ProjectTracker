@@ -32,28 +32,29 @@
         data-is-tracked="<?= isTracked ?>"
         ata-label-name="<?= label ?>"></div>   
     <div class="message"></div>
-    <div class="error"></div> 
-    <h1><span class="sheetName"></span> sheet</h1>
-    <div class="untracked" style="display: none">
+    <div class="error"></div>
+    <div class="sheetController">
+      <h1><span class="sheetName"></span> sheet</h1>
+      <div class="untracked" style="display: none">
       <button class="trackButton">Track sheet</button>
-    </div>
-    <div class="tracked" style="display: none">
-      <div class="labelPicker">
-        <div class="labelDisplayMode" style="display: none">
-          <span class="labelName"></span>
-          <button class="chooseLabelButton">Choose...</button>
-          <button class="removeLabelButton">Remove</button>
-        </div>
-        <div class="labelSelectMode" style="display: none">
-          <select class="labelSelect">
-          </select>
-          <button class="selectLabelButton">Select</button>
-          <button class="cancelLabelButton">Cancel</button>
-        </div>
       </div>
-      <button class="syncWithGmailButton">Sync with Gmail</button>
-      <button class="organizeButton">Organize</button>
-      <button class="testButton" style="display: none">Test</button>
+      <div class="tracked" style="display: none">
+        <div class="labelPicker">
+          <div class="labelDisplayMode" style="display: none">
+            <span class="labelName"></span>
+            <button class="chooseLabelButton">Choose...</button>
+            <button class="removeLabelButton">Remove</button>
+          </div>
+          <div class="labelSelectMode" style="display: none">
+            <select class="labelSelect">
+            </select>
+            <button class="selectLabelButton">Select</button>
+            <button class="cancelLabelButton">Cancel</button>
+          </div>
+        </div>
+        <button class="syncWithGmailButton">Sync with Gmail</button>
+        <button class="organizeButton">Organize</button>
+        </div>
       </div>
       <h1>All Sheets</h1>
       <button class="syncAllWithGmailButton">Sync All with Gmail</button>
@@ -135,10 +136,10 @@
         Global.setError('');
       }
     }
-    
-    // TODO(lindahl) Retry timeout: "ScriptError: Exceeded maximum execution time"
-    // TODO(lindahl) Swallow 409: "NetworkError: Connection failure due to HTTP 409"
   }
+    
+  // TODO(lindahl) Retry timeout: "ScriptError: Exceeded maximum execution time"
+  // TODO(lindahl) Swallow 409: "NetworkError: Connection failure due to HTTP 409"
   
   class AlternatingVisibility {
     constructor(name) {
@@ -266,18 +267,9 @@
       Global.clearError();
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncAllSheetsWithGmail();
     }
-    
-    static addListeners() {
-      $('.chooseLabelButton').click(Gmail.chooseLabelClicked);
-      $('.removeLabelButton').click(Gmail.removeLabelClicked);
-      $('.cancelLabelButton').click(Gmail.cancelLabelClicked);
-      $('.selectLabelButton').click(Gmail.selectLabelClicked);
-      $('.syncWithGmailButton').click(Gmail.syncWithGmailClicked);
-      $('.syncAllWithGmailButton').click(Gmail.syncAllWithGmailClicked);
-    }
   }
   
-  class Preferences {
+  class SheetController {
     static setTracked(tracked) {
       Global.setIsTracked(tracked);
       google.script.run.setTrackedForSheet(Global.getSheetId(), tracked);
@@ -287,31 +279,70 @@
       return $('.sheetName');
     }
     
-    static updateVisibilities() {
-      console.log('updateVisibilities()');
-      Preferences.getSheetNameElt().text(Global.getSheetName());
-      Preferences.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
+    static hide() {
+      $('.sheetController').hide();
+    }
+    
+    static show() {
+      SheetController.getSheetNameElt().text(Global.getSheetName());
+      SheetController.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
       LabelPicker.setMode(MODE.DISPLAY);
-      Global.clearMessage();
-      Global.clearError();
+      $('.sheetController').show();
     }
     
     static trackClicked() {
-      Preferences.setTracked(true);
-      Preferences.updateVisibilities();
+      SheetController.setTracked(true);
+      SheetController.show();
     }
 
     static init() {
       console.log('init()');
-      Preferences.updateVisibilities();
+      SheetController.show();
     }
 
     static organizeClicked() {
       Global.setMessage('Organizing...');
-      Global.clearError();
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
     }
-
+    
+    static addListeners() {
+      $('.chooseLabelButton').click(SheetController.chooseLabelClicked);
+      $('.removeLabelButton').click(SheetController.removeLabelClicked);
+      $('.cancelLabelButton').click(SheetController.cancelLabelClicked);
+      $('.selectLabelButton').click(SheetController.selectLabelClicked);
+      $('.syncWithGmailButton').click(SheetController.syncWithGmailClicked);
+    }
+    
+    static checkActiveSheetId() {
+      function getActiveSheetIdSuccessHandler(activeSheetId) {
+        if (activeSheetId != Global.getSheetId()) {
+          SheetController.hide();
+          function preferencesSuccessHandler(preferencesStr) {
+            let preferences = JSON.parse(preferencesStr);
+            Global.setSheetId(activeSheetId);
+            Global.setSheetName(preferences.sheetName);
+            Global.setIsTracked(preferences.isTracked);
+            Global.setCurrLabel(preferences.label);
+            SheetController.show();
+          }
+          google.script.run.withSuccessHandler(preferencesSuccessHandler).withFailureHandler(Global.setError).getPreferencesForSheet(activeSheetId);
+        }
+      }
+      google.script.run.withSuccessHandler(getActiveSheetIdSuccessHandler).withFailureHandler(Global.setError).getActiveSheetId();
+    }
+    
+    static init() {
+      SheetController.addListeners();
+      SheetController.show();
+      window.setInterval(SheetController.checkActiveSheetId, 5000);
+    }
+  }
+  
+  SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
+      map(true, $('.tracked')).
+      map(false, $('.untracked'));
+  
+  class GlobalController {
     static organizeAllClicked() {
       Global.setMessage('Organizing all...');
       Global.clearError();
@@ -324,56 +355,26 @@
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).updateOverview();
     }
 
-    static updateOverviewClicked() {
+    static doAllTheThingsClicked() {
       Global.setMessage('Doing all the things...');
       Global.clearError();
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).doAllTheThings();
     }
 
-    static testClicked() {
-      Global.setMessage('Testing...');
-      Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).getActiveSheetId();
-    }
-    
     static addListeners() {
-      $('.trackButton').click(Preferences.trackClicked);
-      $('.organizeButton').click(Preferences.organizeClicked);
-      $('.organizeAllButton').click(Preferences.organizeAllClicked);
-      $('.updateOverviewButton').click(Preferences.updateOverviewClicked);
-      $('.doAllTheThingsButton').click(Preferences.doAllTheThingsClicked);
-      $('.testButton').click(Preferences.testClicked);
-      Gmail.addListeners();
+      $('.syncAllWithGmailButton').click(GlobalController.syncAllWithGmailClicked);
+      $('.organizeAllButton').click(GlobalController.organizeAllClicked);
+      $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
+      $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
     }
     
-    static checkActiveSheetId() {
-      function getActiveSheetIdSuccessHandler(activeSheetId) {
-        if (activeSheetId != Global.getSheetId()) {
-          Global.setMessage('Getting sheet preferences');
-          function preferencesSuccessHandler(preferencesStr) {
-            let preferences = JSON.parse(preferencesStr);
-            Global.setSheetId(activeSheetId);
-            Global.setSheetName(preferences.sheetName);
-            Global.setIsTracked(preferences.isTracked);
-            Global.setCurrLabel(preferences.label);
-            Preferences.updateVisibilities();
-          }
-          google.script.run.withSuccessHandler(preferencesSuccessHandler).withFailureHandler(Global.setError).getPreferencesForSheet(activeSheetId);
-        }
-      }
-      google.script.run.withSuccessHandler(getActiveSheetIdSuccessHandler).withFailureHandler(Global.setError).getActiveSheetId();
+    static init() {
+      GlobalController.addListeners();
     }
   }
   
-  Preferences.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
-      map(true, $('.tracked')).
-      map(false, $('.untracked'));
-  
-  Preferences.currSheetId = null;
-
-  Preferences.addListeners();
-  Preferences.init();
-  window.setInterval(Preferences.checkActiveSheetId, 5000);
+  SheetController.init();
+  GlobalController.init();
   
   </script>
 </html>
