@@ -1,7 +1,7 @@
 function showPreferencesSidebar() {
   Gmail.init();
   Tracking.init();
-  var template = HtmlService.createTemplateFromFile('ui/SheetPreferences');
+  var template = HtmlService.createTemplateFromFile('ui/Controls');
   var sheet = SpreadsheetApp.getActiveSheet();
   var sheetId = sheet.getSheetId();
   template.sheetName = sheet.getName();
