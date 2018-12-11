@@ -30,7 +30,9 @@
         data-sheet-id="<?= sheetId ?>"
         data-sheet-name="<?= sheetName ?>" 
         data-is-tracked="<?= isTracked ?>"
-        ata-label-name="<?= label ?>"></div>    
+        ata-label-name="<?= label ?>"></div>   
+    <div class="message"></div>
+    <div class="error"></div> 
     <h1><span class="sheetName"></span> sheet</h1>
     <div class="untracked" style="display: none">
       <button class="trackButton">Track sheet</button>
@@ -52,13 +54,12 @@
       <button class="syncWithGmailButton">Sync with Gmail</button>
       <button class="organizeButton">Organize</button>
       <button class="testButton" style="display: none">Test</button>
+      </div>
       <h1>All Sheets</h1>
       <button class="syncAllWithGmailButton">Sync All with Gmail</button>
       <button class="organizeAllButton">Organize All</button>
-      </div>
-      <button class="updateOverviewButton">UpdateOverview</button>
-    <div class="message"></div>
-    <div class="error"></div>
+      <button class="updateOverviewButton">Update Overview</button>
+      <button class="doAllTheThingsButton">Do all the things!</button>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
@@ -323,6 +324,12 @@
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).updateOverview();
     }
 
+    static updateOverviewClicked() {
+      Global.setMessage('Doing all the things...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).doAllTheThings();
+    }
+
     static testClicked() {
       Global.setMessage('Testing...');
       Global.clearError();
@@ -334,6 +341,7 @@
       $('.organizeButton').click(Preferences.organizeClicked);
       $('.organizeAllButton').click(Preferences.organizeAllClicked);
       $('.updateOverviewButton').click(Preferences.updateOverviewClicked);
+      $('.doAllTheThingsButton').click(Preferences.doAllTheThingsClicked);
       $('.testButton').click(Preferences.testClicked);
       Gmail.addListeners();
     }
@@ -365,7 +373,7 @@
 
   Preferences.addListeners();
   Preferences.init();
-  window.setInterval(Preferences.checkActiveSheetId, 1000);
+  window.setInterval(Preferences.checkActiveSheetId, 5000);
   
   </script>
 </html>

@@ -276,6 +276,17 @@ Spreadsheet.init = function() {
   Spreadsheet.getUrlFromHyperlinkFormula = function(formula) {
     return formula.substring(formula.indexOf('"') + 1, formula.lastIndexOf(',') - 1);
   };
+  
+  Spreadsheet.getNativeSheet = function(sheetId) {
+    var sheets = SpreadsheetApp.getActive().getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+      var sheet = sheets[i];
+      if (sheet.getSheetId() == sheetId) {
+        return sheet;
+      }
+    }
+    throw new Error('Sheet not found: ' + sheetId);
+  }
 }
 
 function getActiveSheetId() {

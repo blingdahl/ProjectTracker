@@ -13,9 +13,9 @@ Overview.init = function() {
   
   Overview.update = function() {
     log(Log.Level.INFO, 'Overview.update()');
-    var overviewSheet = Overview.Sheet.get();
+    var overviewSheet = OverviewSheet.get();
     overviewSheet.clearData();
-    var trackingSheets = Tracking.Sheet.getAll();
+    var trackingSheets = TrackingSheet.getAll();
     trackingSheets.forEach(function(trackingSheet) {
       if (trackingSheet.getSheetId() === overviewSheet.getSheetId()) {
         return;

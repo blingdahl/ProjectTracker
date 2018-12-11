@@ -19,6 +19,7 @@ TrackingSheet.init = function() {
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
       .addColumn('ACTION', 'Action')
+      .addColumn('TO_DO', 'To Do')
       .addColumn('INBOX', 'Inbox')
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
       .addColumn('NOTES', 'Notes')
@@ -42,7 +43,7 @@ TrackingSheet.init = function() {
     var ret = [];
     rowOffsets.forEach(function(rowOffset) {
       ret.push(this.getRow(rowOffset));
-    });
+    }.bind(this));
     return ret;
   }
   
@@ -68,14 +69,7 @@ TrackingSheet.init = function() {
   }
   
   TrackingSheet.forSheetId = function(sheetId) {
-    var sheets = SpreadsheetApp.getActive().getSheets();
-    for (var i = 0; i < sheets.length; i++) {
-      var sheet = sheets[i];
-      if (sheet.getSheetId() == sheetId) {
-        return TrackingSheet.forSheet(sheet);
-      }
-    }
-    throw new Error('Sheet not found for ' + sheetId);
+    return TrackingSheet.forSheet(Spreadsheet.getNativeSheet(sheetId));
   }
   
   TrackingSheet.getAll = function() {

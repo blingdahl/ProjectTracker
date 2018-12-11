@@ -106,7 +106,7 @@ Gmail.init = function() {
     var threadIdsToRemove = [];
     for (var i = 0; i < threads.length; i++) {
       var thread = threads[i];
-      var subject = thread.getFirstMessageSubject();
+      var subject = thread.getFirstMessageSubject() || '(No Subject)';
       log(Log.Level.INFO, label + ': ' + (i + 1) + ' / ' + threads.length + ': ' + subject);
       var threadId = thread.getId();
       threadIdsInLabel.push(threadId);

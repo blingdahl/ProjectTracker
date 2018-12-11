@@ -22,7 +22,7 @@ OverviewSheet.init = function() {
   OverviewSheet.initialized = true;
   
   OverviewSheet.Sheet = function(sheet) {
-    OverviewSheet.Sheet.call(this, sheet, OverviewSheet.Sheet.COLUMNS);
+    Spreadsheet.Sheet.call(this, sheet, OverviewSheet.COLUMNS);
   }
   OverviewSheet.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
   
@@ -34,13 +34,13 @@ OverviewSheet.init = function() {
     function copyFormulaFromTrackingRow(trackingColumnName, overviewColumnName) {
       overviewRow.setFormula(overviewColumnName, trackingRow.getFormula(trackingColumnName));
     };
-    copyFromTrackingRow(Tracking.COLUMN_NAMES.PRIORITY, Overview.COLUMN_NAMES.PRIORITY);
-    copyFromTrackingRow(Tracking.COLUMN_NAMES.ITEM, Overview.COLUMN_NAMES.ITEM);
-    copyFromTrackingRow(Tracking.COLUMN_NAMES.STATUS, Overview.COLUMN_NAMES.STATUS);
-    copyFromTrackingRow(Tracking.COLUMN_NAMES.NOTES, Overview.COLUMN_NAMES.NOTES);
-    copyFromTrackingRow(Tracking.COLUMN_NAMES.LINK, Overview.COLUMN_NAMES.LINK);
-    copyFormulaFromTrackingRow(Tracking.COLUMN_NAMES.EMAIL, Overview.COLUMN_NAMES.EMAIL);
-    overviewRow.setFormula(Overview.COLUMN_NAMES.SHEET, sheetFormula);
+    copyFromTrackingRow(TrackingSheet.COLUMNS.PRIORITY, OverviewSheet.COLUMNS.PRIORITY);
+    copyFromTrackingRow(TrackingSheet.COLUMNS.ITEM, OverviewSheet.COLUMNS.ITEM);
+    copyFromTrackingRow(TrackingSheet.COLUMNS.STATUS, OverviewSheet.COLUMNS.STATUS);
+    copyFromTrackingRow(TrackingSheet.COLUMNS.NOTES, OverviewSheet.COLUMNS.NOTES);
+    copyFromTrackingRow(TrackingSheet.COLUMNS.LINK, OverviewSheet.COLUMNS.LINK);
+    copyFormulaFromTrackingRow(TrackingSheet.COLUMNS.EMAIL, OverviewSheet.COLUMNS.EMAIL);
+    overviewRow.setFormula(OverviewSheet.COLUMNS.SHEET, sheetFormula);
   }
   
   OverviewSheet.Sheet.prototype.addRowsFromTrackingSheet = function(trackingSheet, priority) {
@@ -50,11 +50,11 @@ OverviewSheet.init = function() {
     }.bind(this));
   }
   
-  OverviewSheet.Sheet.get = function() {
+  OverviewSheet.get = function() {
     var sheet = SpreadsheetApp.getActive().getSheetByName('Overview');
     if (!sheet) {
       sheet = SpreadsheetApp.getActive().insertSheet('Overview');
     }
-    return new Overview.Sheet(sheet);
+    return new OverviewSheet.Sheet(sheet);
   }
 }

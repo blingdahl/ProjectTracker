@@ -11,7 +11,7 @@ Organize.init = function() {
   
   Organize.initialized = true;
 
-  Organize.organize = function(trackingSheet) {
+  Organize.organizeSheet = function(trackingSheet) {
     var rows = trackingSheet.getRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
@@ -22,11 +22,11 @@ Organize.init = function() {
   }
   
   Organize.organizeAll = function() {
-    TrackingSheet.getAll().forEach(function (trackingSheet) { Organize.organize(trackingSheet); });
+    TrackingSheet.getAll().forEach(function (trackingSheet) { Organize.organizeSheet(trackingSheet); });
   }
   
   Organize.organize = function(sheetId) {
-    Organize.organize(TrackingSheet.forSheetId(sheetId));
+    Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
   
   Organize.organizeOnCurrentSheet = function() {
