@@ -17,13 +17,21 @@
       error {
         color: red;
       }
+      
+      .labelPicker {
+        margin-bottom: 10px;
+      }
+      
+      h1 {
+        margin-top: 30px;
+      }
     </style>
     <div class="global" style="display: none" 
         data-sheet-id="<?= sheetId ?>"
         data-sheet-name="<?= sheetName ?>" 
         data-is-tracked="<?= isTracked ?>"
         ata-label-name="<?= label ?>"></div>    
-    <h1><span class="sheetName"></span></h1>
+    <h1><span class="sheetName"></span> sheet</h1>
     <div class="untracked" style="display: none">
       <button class="trackButton">Track sheet</button>
     </div>
@@ -44,12 +52,11 @@
       <button class="syncWithGmailButton">Sync with Gmail</button>
       <button class="organizeButton">Organize</button>
       <button class="testButton" style="display: none">Test</button>
-      <hr>
       <h1>All Sheets</h1>
       <button class="syncAllWithGmailButton">Sync All with Gmail</button>
       <button class="organizeAllButton">Organize All</button>
+      </div>
       <button class="updateOverviewButton">UpdateOverview</button>
-    </div>
     <div class="message"></div>
     <div class="error"></div>
   </body>
@@ -252,6 +259,12 @@
       Global.clearError();
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncSheetWithGmail(Global.getSheetId());
     }
+
+    static syncAllWithGmailClicked() {
+      Global.setMessage('Syncing all...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncAllSheetsWithGmail();
+    }
     
     static addListeners() {
       $('.chooseLabelButton').click(Gmail.chooseLabelClicked);
@@ -259,6 +272,7 @@
       $('.cancelLabelButton').click(Gmail.cancelLabelClicked);
       $('.selectLabelButton').click(Gmail.selectLabelClicked);
       $('.syncWithGmailButton').click(Gmail.syncWithGmailClicked);
+      $('.syncAllWithGmailButton').click(Gmail.syncAllWithGmailClicked);
     }
   }
   
@@ -297,6 +311,18 @@
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
     }
 
+    static organizeAllClicked() {
+      Global.setMessage('Organizing all...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organizeAll();
+    }
+
+    static updateOverviewClicked() {
+      Global.setMessage('Updating overview...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).updateOverview();
+    }
+
     static testClicked() {
       Global.setMessage('Testing...');
       Global.clearError();
@@ -306,6 +332,8 @@
     static addListeners() {
       $('.trackButton').click(Preferences.trackClicked);
       $('.organizeButton').click(Preferences.organizeClicked);
+      $('.organizeAllButton').click(Preferences.organizeAllClicked);
+      $('.updateOverviewButton').click(Preferences.updateOverviewClicked);
       $('.testButton').click(Preferences.testClicked);
       Gmail.addListeners();
     }
