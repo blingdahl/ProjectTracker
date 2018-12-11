@@ -132,6 +132,10 @@
     }
 
     static setError(msg) {
+      if (msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
+        Global.log(msg);
+        return;
+      }
       Global.clearMessage();
       $('.error').text(msg);
     }
@@ -140,6 +144,10 @@
       if ($('.error').text() !== '') {
         Global.setError('');
       }
+    }
+    
+    static log(msg) {
+      console.log(msg);
     }
   }
     
@@ -285,7 +293,7 @@
     }
 
     static organizeClicked() {
-      Global.setMessage('Organizing...');
+      Global.setMessage('Organizing ' + Global.getSheetName() + ' sheet...');
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
     }
     
@@ -299,7 +307,7 @@
     }
 
     static syncWithGmailClicked() {
-      Global.setMessage('Syncing...');
+      Global.setMessage('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getCurrLabel() + ' label...');
       Global.clearError();
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncSheetWithGmail(Global.getSheetId());
     }
@@ -334,7 +342,7 @@
           google.script.run.withSuccessHandler(preferencesSuccessHandler).withFailureHandler(Global.setError).getPreferencesForSheet(activeSheetId);
         }
       }
-      google.script.run.withSuccessHandler(getActiveSheetIdSuccessHandler).withFailureHandler(Global.setError).getActiveSheetId();
+      google.script.run.withSuccessHandler(getActiveSheetIdSuccessHandler).withFailureHandler(Global.log).getActiveSheetId();
     }
     
     static init() {
