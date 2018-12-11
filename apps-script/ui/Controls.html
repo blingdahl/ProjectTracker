@@ -22,6 +22,12 @@
         margin-bottom: 10px;
       }
       
+      .labelName {
+        text-decoration: underline;
+        color: blue;
+        cursor: pointer;
+      }
+      
       h1 {
         margin-top: 30px;
       }
@@ -30,7 +36,7 @@
         data-sheet-id="<?= sheetId ?>"
         data-sheet-name="<?= sheetName ?>" 
         data-is-tracked="<?= isTracked ?>"
-        ata-label-name="<?= label ?>"></div>   
+        data-label-name="<?= label ?>"></div>   
     <div class="message"></div>
     <div class="error"></div>
     <div class="sheetController">
@@ -42,7 +48,6 @@
         <div class="labelPicker">
           <div class="labelDisplayMode" style="display: none">
             <span class="labelName"></span>
-            <button class="chooseLabelButton">Choose...</button>
             <button class="removeLabelButton">Remove</button>
           </div>
           <div class="labelSelectMode" style="display: none">
@@ -206,7 +211,7 @@
       } else if (mode == MODE.DISPLAY) {
         LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.DISPLAY)
         let labelName = Global.getCurrLabel();
-        LabelPicker.getLabelNameElt().text(labelName || 'No label');
+        LabelPicker.getLabelNameElt().text(labelName || 'Choose label...');
         LabelPicker.LABEL_BUTTON_VISIBILITY.setVisible(!!labelName);
       } else {
         throw new Error('Unexpected mode: ' + mode);
@@ -236,36 +241,10 @@
       }).getAllLabels();
     }
     
-    static chooseLabelClicked() {
-      Gmail.populateLabelSelect();
-      LabelPicker.setMode(MODE.SELECT);
-    }
-    
     static removeLabelClicked() {
       Global.clearCurrLabel();
       google.script.run.clearLabelForSheet(Global.getSheetId());
       LabelPicker.setMode(MODE.DISPLAY);
-    }
-    
-    static cancelLabelClicked() {
-      LabelPicker.setMode(MODE.DISPLAY);
-    }
-    
-    static selectLabelClicked() {
-      google.script.run.setLabelForSheet(Global.getSheetId(), LabelPicker.updateCurrLabelFromSelect());
-      LabelPicker.setMode(MODE.DISPLAY);
-    }
-
-    static syncWithGmailClicked() {
-      Global.setMessage('Syncing...');
-      Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncSheetWithGmail(Global.getSheetId());
-    }
-
-    static syncAllWithGmailClicked() {
-      Global.setMessage('Syncing all...');
-      Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncAllSheetsWithGmail();
     }
   }
   
@@ -281,6 +260,11 @@
     
     static hide() {
       $('.sheetController').hide();
+    }
+    
+    static labelNameClicked() {
+      Gmail.populateLabelSelect();
+      LabelPicker.setMode(MODE.SELECT);
     }
     
     static show() {
@@ -305,12 +289,34 @@
       google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
     }
     
+    static cancelLabelClicked() {
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+    
+    static selectLabelClicked() {
+      google.script.run.setLabelForSheet(Global.getSheetId(), LabelPicker.updateCurrLabelFromSelect());
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+
+    static syncWithGmailClicked() {
+      Global.setMessage('Syncing...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncSheetWithGmail(Global.getSheetId());
+    }
+
+    static syncAllWithGmailClicked() {
+      Global.setMessage('Syncing all...');
+      Global.clearError();
+      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncAllSheetsWithGmail();
+    }
+    
     static addListeners() {
-      $('.chooseLabelButton').click(SheetController.chooseLabelClicked);
+      $('.labelName').click(SheetController.labelNameClicked);
       $('.removeLabelButton').click(SheetController.removeLabelClicked);
       $('.cancelLabelButton').click(SheetController.cancelLabelClicked);
       $('.selectLabelButton').click(SheetController.selectLabelClicked);
       $('.syncWithGmailButton').click(SheetController.syncWithGmailClicked);
+      $('.organizeButton').click(SheetController.organizeClicked);
     }
     
     static checkActiveSheetId() {
@@ -334,7 +340,7 @@
     static init() {
       SheetController.addListeners();
       SheetController.show();
-      window.setInterval(SheetController.checkActiveSheetId, 5000);
+      window.setInterval(SheetController.checkActiveSheetId, 1000);
     }
   }
   
