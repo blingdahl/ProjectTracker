@@ -91,9 +91,9 @@ Gmail.init = function() {
   Gmail.syncWithGmail = function(sheetId, label, maxThreads) {
     log(Log.Level.INFO, 'syncWithGmail');
     var sheet = TrackingSheet.forSheetId(sheetId);
-    var searchQuery = Gmail.labelSearchTerm(label) + ' -' + Gmail.labelSearchTerm(Gmail.NO_TRACK_LABEL);
+    var searchQuery = Label.searchTerm(label) + ' -' + Label.searchTerm(Gmail.NO_TRACK_LABEL);
     log(Log.Level.INFO, searchQuery);
-    var threads = GmailApp.search(searchQuery).slice(0, maxThreads + 1);
+    var threads = GmailApp.search(searchQuery).slice(0, maxThreads);
     var noTrackLabel = Label.getUserDefined(Gmail.NO_TRACK_LABEL, true);
     log(Log.Level.INFO, threads.length + ' threads');
     var threadIdsInLabel = [];

@@ -182,6 +182,9 @@
     }
     
     retryOnTimeout() {
+      if (!ALLOW_RETRIES) {
+        return this;
+      }
       return this.withFailureHandler(function(errorMsg) {
             if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
               console.log(errorMsg);
@@ -206,6 +209,8 @@
       this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_).withFailureHandler(this.handleFailure_));
     }
   }
+  
+  RpcConfig.ALLOW_RETRIES = false;
   
   class AlternatingVisibility {
     constructor(name) {
@@ -319,7 +324,7 @@
       LabelPicker.clearSelectOptions('Populating...');
       LabelPicker.getMaxThreadsElement().val(Global.getMaxThreads());
       new RpcConfig(runner => runner.getAllLabels()).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(successMsg => LabelPicker.populateSelect(JSON.parse(successMsg))).
           callRpc();
     }
@@ -329,7 +334,7 @@
     static setTracked(tracked) {
       Global.setIsTracked(tracked);
       new RpcConfig(runner => runner.setTrackedForSheet(Global.getSheetId(), tracked)).
-          //retryOnTimeout().
+          retryOnTimeout().
           callRpc();
     }
     
@@ -366,7 +371,7 @@
     static organizeClicked() {
       Global.showMessage('Organizing ' + Global.getSheetName() + ' sheet...');
       new RpcConfig(runner => runner.organize(Global.getSheetId())).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
@@ -377,7 +382,7 @@
     
     static saveClicked() {
       new RpcConfig(runner => runner.setLabelForSheet(Global.getSheetId(), LabelPicker.updateLabelFromSelect(), LabelPicker.updateMaxThreadsFromInput())).
-          //retryOnTimeout().
+          retryOnTimeout().
           callRpc();
       LabelPicker.setMode(MODE.DISPLAY);
     }
@@ -392,7 +397,7 @@
       Global.showMessage('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getLabel() + ' label...');
       Global.clearError();
       new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
@@ -401,7 +406,7 @@
       Global.showMessage('Syncing all...');
       Global.clearError();
       new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
@@ -440,13 +445,13 @@
             SheetController.show();
           }
           new RpcConfig(runner => runner.getPreferencesForSheet(activeSheetId)).
-              //retryOnTimeout().
+              retryOnTimeout().
               withSuccessHandler(preferencesSuccessHandler).
               callRpc();
         }
       }
       new RpcConfig(runner => runner.getActiveSheetId()).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(getActiveSheetIdSuccessHandler).
           callRpc();
     }
@@ -477,7 +482,7 @@
       Global.showMessage('Organizing all...');
       Global.clearError();
       new RpcConfig(runner => runner.organizell()).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
@@ -486,7 +491,7 @@
       Global.showMessage('Updating overview...');
       Global.clearError();
       new RpcConfig(runner => runner.updateOverview()).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
@@ -495,7 +500,7 @@
       Global.showMessage('Doing all the things...');
       Global.clearError();
       new RpcConfig(runner => runner.doAllTheThings()).
-          //retryOnTimeout().
+          retryOnTimeout().
           withSuccessHandler(Global.showMessage).
           callRpc();
     }
