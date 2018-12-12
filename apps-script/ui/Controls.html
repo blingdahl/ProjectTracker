@@ -81,9 +81,9 @@
       <button class="updateOverviewButton">Update Overview</button>
       <button class="doAllTheThingsButton">Do all the things!</button>
       <div class="toggleRefreshing">
-        <span class="stopRefreshing">Stop refreshing</span>
-        <span class="startRefreshing" style="display: none">Start Refreshing</span>
-        <span class="refreshNow" style="display: none">Refresh now</span>
+        <span class="stopRefreshing" style="display: none">Stop auto-refresh</span>
+        <span class="startRefreshing">Start auto-refresh</span>
+        <span class="refreshNow">Refresh now</span>
       </div>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -356,7 +356,12 @@
     }
     
     static show() {
-      SheetController.getSheetNameElt().text(Global.getSheetName());
+      let sheetName = Global.getSheetName();
+      if (sheetName === 'Overview') {
+        SheetController.hide();
+        return;
+      }
+      SheetController.getSheetNameElt().text(sheetName);
       SheetController.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
       LabelPicker.setMode(MODE.DISPLAY);
       $('.sheetController').show();
@@ -476,7 +481,7 @@
     }
   }
   
-  SheetController.refresh = true;
+  SheetController.refresh = false;
   
   SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
       map(true, $('.tracked')).
