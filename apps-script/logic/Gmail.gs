@@ -91,7 +91,7 @@ Gmail.init = function() {
     }
   }
   
-  Gmail.syncWithGmail = function(sheetId, label) {
+  Gmail.syncWithGmail = function(sheetId, label, maxThreads) {
     log(Log.Level.INFO, 'syncWithGmail');
     var sheet = TrackingSheet.forSheetId(sheetId);
     var searchQuery = Gmail.labelSearchTerm(label) + ' -' + Gmail.labelSearchTerm(Gmail.NO_TRACK_LABEL);
@@ -174,24 +174,41 @@ Gmail.init = function() {
   }
   
   Gmail.syncSheet = function(sheetId) {
-    var label = getLabelForSheet(sheetId);
+    var label = Gmail.getLabelForSheet(sheetId);
     if (!label) {
       Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
       return;
     }
-    Gmail.syncWithGmail(sheetId, label);
+    var maxThreads = Gmail.getMaxThreadsForSheet(sheetId);
+    Gmail.syncWithGmail(sheetId, label, maxThreads);
+  }
+  
+  Gmail.maxThreadsProperty = function(sheetId) {
+    return 'maxThreads:' + sheetId;
+  }
+  
+  Gmail.setMaxThreadsForSheet = function(sheetId, maxThreads) {
+    PropertiesService.getScriptProperties().setProperty(Gmail.maxThreadsProperty(sheetId), maxThreads);
+  }
+  
+  Gmail.clearMaxThreadsForSheet = function(sheetId) {
+    PropertiesService.getScriptProperties().deleteProperty(Gmail.maxThreadsProperty(sheetId));
+  }
+  
+  Gmail.getMaxThreadsForSheet = function(sheetId) {
+    return PropertiesService.getScriptProperties().getProperty(Gmail.maxThreadsProperty(sheetId)) || Gmail.DEFAULT_MAX_THREADS;
   }
   
   Gmail.labelProperty = function(sheetId) {
     return 'label:' + sheetId;
   }
   
-  Gmail.setLabelForSheet = function(sheetId, label) {
-    PropertiesService.getScriptProperties().setProperty(labelProperty(sheetId), label);
+  Gmail.setLabelForSheet = function(sheetId, label, max) {
+    PropertiesService.getScriptProperties().setProperty(Gmail.labelProperty(sheetId), label);
   }
   
   Gmail.clearLabelForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(labelProperty(sheetId));
+    PropertiesService.getScriptProperties().deleteProperty(Gmail.labelProperty(sheetId));
   }
   
   Gmail.getLabelForSheet = function(sheetId) {
@@ -217,6 +234,20 @@ Gmail.init = function() {
       }
     }
   }
+  
+  Gmail.renameLabel = function(sheetId, toLabelName) {
+    if (!toLabelName) {
+      throw new Error('No toLabelName');
+    }
+    var currLabel = GmailApp.getUserLabelByName(Gmail.getLabelForSheet(sheetId));
+    var threads = currLabel.getThreads();
+    var newLabel = GmailApp.createLabel(toLabelName);
+    newLabel.addToThreads(threads)
+    !currLabel.removeFromThreads(threads);
+    Gmail.setLabelForSheet(sheetId, toLabelName);
+  }
+  
+  Gmail.DEFAULT_MAX_THREADS = 50;
 }
   
 function labelProperty(sheetId) {
@@ -224,9 +255,10 @@ function labelProperty(sheetId) {
   return Gmail.labelProperty(sheetId);
 }
 
-function setLabelForSheet(sheetId, label) {
+function setLabelForSheet(sheetId, label, maxThreads) {
   Gmail.init();
   Gmail.setLabelForSheet(sheetId, label);
+  Gmail.setMaxThreadsForSheet(sheetId, maxThreads);
 }
 
 function clearLabelForSheet(sheetId) {
@@ -237,6 +269,21 @@ function clearLabelForSheet(sheetId) {
 function getLabelForSheet(sheetId) {
   Gmail.init();
   return Gmail.getLabelForSheet(sheetId);
+}
+
+function setMaxThreadsForSheet(sheetId, maxThreads) {
+  Gmail.init();
+  Gmail.setMaxThreadsForSheet(sheetId, maxThreads);
+}
+
+function clearMaxThreadsForSheet(sheetId) {
+  Gmail.init();
+  Gmail.clearMaxThreadsForSheet(sheetId);
+}
+
+function getMaxThreadsForSheet(sheetId) {
+  Gmail.init();
+  return Gmail.getMaxThreadsForSheet(sheetId);
 }
 
 function getAllLabels() {
@@ -258,4 +305,9 @@ function syncCurrentSheetWithGmail() {
 function syncAllSheetsWithGmail() {
   Gmail.init();
   Gmail.syncAllSheetsWithGmail();
+}
+
+function renameLabel(sheetId, toLabelName) {
+  Gmail.init();
+  Gmail.renameLabel(sheetId, toLabelName);
 }

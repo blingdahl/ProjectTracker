@@ -28,15 +28,27 @@
         cursor: pointer;
       }
       
+      .toggleRefreshing {
+        font-size: 8px;
+        text-decoration: underline;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      
+      .maxThreads {
+        width: 30px;
+      }
+      
       h1 {
         margin-top: 30px;
       }
     </style>
     <div class="global" style="display: none" 
-        data-sheet-id="<?= sheetId ?>"
-        data-sheet-name="<?= sheetName ?>" 
-        data-is-tracked="<?= isTracked ?>"
-        data-label-name="<?= label ?>"></div>   
+        data-sheet-id="<?= preferences.sheetId ?>"
+        data-sheet-name="<?= preferences.sheetName ?>" 
+        data-is-tracked="<?= preferences.isTracked ?>"
+        data-label-name="<?= preferences.label ?>"
+        data-max-threads="<?= preferences.maxThreads ?>"></div>   
     <div class="message"></div>
     <div class="error"></div>
     <div class="sheetController">
@@ -49,11 +61,13 @@
           <div class="labelDisplayMode" style="display: none">
             <span class="labelName"></span>
             <button class="removeLabelButton">Remove</button>
+            <button class="renameLabelButton">Rename</button>
           </div>
           <div class="labelSelectMode" style="display: none">
             <select class="labelSelect">
             </select>
-            <button class="selectLabelButton">Select</button>
+            <input type="text" class="maxThreads">
+            <button class="saveButton">Save</button>
             <button class="cancelLabelButton">Cancel</button>
           </div>
         </div>
@@ -66,6 +80,7 @@
       <button class="organizeAllButton">Organize All</button>
       <button class="updateOverviewButton">Update Overview</button>
       <button class="doAllTheThingsButton">Do all the things!</button>
+      <div class="toggleRefreshing"><div class="stopRefreshing">Stop refreshing</div><div class="startRefreshing" style="display: none">Start Refreshing</div></div>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
@@ -108,30 +123,38 @@
       Global.setAttr('data-is-tracked', String(tracked));
     }
     
-    static getCurrLabel() {
+    static getLabel() {
       return Global.getAttr('data-label-name');
     }
     
-    static setCurrLabel(label) {
+    static setLabel(label) {
       return Global.setAttr('data-label-name', label);
     }
     
-    static clearCurrLabel() {
-      Global.setCurrLabel(null);
+    static getMaxThreads() {
+      return Global.getAttr('data-max-threads');
+    }
+    
+    static setMaxThreads(maxThreads) {
+      return Global.setAttr('data-max-threads', maxThreads);
+    }
+    
+    static clearLabel() {
+      Global.setLabel(null);
     }
 
-    static setMessage(msg) {
+    static showMessage(msg) {
       Global.clearError();
       $('.message').text(msg);
     }
 
     static clearMessage() {
       if ($('.message').text() !== '') {
-        Global.setMessage('');
+        Global.showMessage('');
       }
     }
 
-    static setError(msg) {
+    static showError(msg) {
       if (msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
         Global.log(msg);
         return;
@@ -142,12 +165,45 @@
 
     static clearError(msg) {
       if ($('.error').text() !== '') {
-        Global.setError('');
+        Global.showError('');
       }
     }
     
     static log(msg) {
       console.log(msg);
+    }
+  }
+  
+  class RpcConfig {
+    constructor(callFn) {
+      this.callFn = callFn;
+      this.handleSuccess_ = Global.log;
+      this.handleFailure_ = Global.log;
+    }
+    
+    retryOnTimeout() {
+      return this.withFailureHandler(function(errorMsg) {
+            if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
+              console.log(errorMsg);
+              this.callRpc();
+              return;
+              Global.showError(errorMsg);
+            }
+          }.bind(this));
+    }
+    
+    withSuccessHandler(handleSuccess) {
+      this.handleSuccess_ = handleSuccess;
+      return this;
+    }
+    
+    withFailureHandler(handleFailure) {
+      this.handleFailure_ = handleFailure;
+      return this;
+    }
+    
+    callRpc() {
+      this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_).withFailureHandler(this.handleFailure_));
     }
   }
     
@@ -190,6 +246,10 @@
       return $('.labelSelect');
     }
 
+    static getMaxThreadsElement() {
+      return $('.maxThreads');
+    }
+
     static clearSelectOptions(initialOptionText) {
       LabelPicker.getSelectElement().find('option').remove();
       LabelPicker.getSelectElement().append($('<option />').text(initialOptionText));
@@ -197,7 +257,7 @@
     
     static populateSelect(labels) {
       LabelPicker.clearSelectOptions('Select Label');
-      let currLabel = Global.getCurrLabel();
+      let currLabel = Global.getLabel();
       labels.sort();
       for (let i = 0; i < labels.length; i++) {
         let label = labels[i];
@@ -218,18 +278,34 @@
         LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.SELECT)
       } else if (mode == MODE.DISPLAY) {
         LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.DISPLAY)
-        let labelName = Global.getCurrLabel();
-        LabelPicker.getLabelNameElt().text(labelName || 'Choose label...');
+        let labelName = Global.getLabel();
+        LabelPicker.getLabelNameElt().text(labelName ? (labelName + ' (' + Global.getMaxThreads() + ' threads max)') : 'Choose label...');
         LabelPicker.LABEL_BUTTON_VISIBILITY.setVisible(!!labelName);
       } else {
         throw new Error('Unexpected mode: ' + mode);
       }
     }
     
-    static updateCurrLabelFromSelect() {
+    static updateLabelFromSelect() {
       let ret = LabelPicker.getSelectElement().val();
-      Global.setCurrLabel(ret);
+      Global.setLabel(ret);
+      Global.setMaxThreads(LabelPicker.getMaxThreadsElement().val());
       return ret;
+    }
+    
+    static updateMaxFieldsFromInput() {
+      let ret = LabelPicker.getMaxThreadsElement().val();
+      Global.setMaxThreads(ret);
+      return ret;
+    }
+    
+    static renameLabel(newLabel) {
+      Global.showMessage('Renaming label ' + Global.getLabel() + ' to ' + newLabel);
+      new RpcConfig(runner => runner.renameLabel(Global.getSheetId(), newLabel)).
+          withSuccessHandler(Global.showMessage).
+          callRpc();
+      Global.setLabel(newLabel);
+      LabelPicker.setMode(MODE.DISPLAY);
     }
   }
   
@@ -238,28 +314,26 @@
       map(MODE.DISPLAY, $('.labelDisplayMode'));
   
   LabelPicker.LABEL_BUTTON_VISIBILITY = new AlternatingVisibility('LabelButton').
-      map(true, $('.removeLabelButton,.syncWithGmailButton')).
+      map(true, $('.removeLabelButton,.syncWithGmailButton,.renameLabelButton')).
       map(false, $('.noButtonExisting'));
   
   class Gmail {
     static populateLabelSelect() {
       LabelPicker.clearSelectOptions('Populating...');
-      google.script.run.withSuccessHandler(function(labels) {
-        LabelPicker.populateSelect(JSON.parse(labels));
-      }).getAllLabels();
-    }
-    
-    static removeLabelClicked() {
-      Global.clearCurrLabel();
-      google.script.run.clearLabelForSheet(Global.getSheetId());
-      LabelPicker.setMode(MODE.DISPLAY);
+      LabelPicker.getMaxThreadsElement().val(Global.getMaxThreads());
+      new RpcConfig(runner => runner.getAllLabels()).
+          retryOnTimeout().
+          withSuccessHandler(successMsg => LabelPicker.populateSelect(JSON.parse(successMsg))).
+          callRpc();
     }
   }
   
   class SheetController {
     static setTracked(tracked) {
       Global.setIsTracked(tracked);
-      google.script.run.setTrackedForSheet(Global.getSheetId(), tracked);
+      new RpcConfig(runner => runner.setTrackedForSheet(Global.getSheetId(), tracked)).
+          retryOnTimeout().
+          callRpc();
     }
     
     static getSheetNameElt() {
@@ -293,41 +367,70 @@
     }
 
     static organizeClicked() {
-      Global.setMessage('Organizing ' + Global.getSheetName() + ' sheet...');
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organize(Global.getSheetId());
+      Global.showMessage('Organizing ' + Global.getSheetName() + ' sheet...');
+      new RpcConfig(runner => runner.organize(Global.getSheetId())).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
     }
     
     static cancelLabelClicked() {
       LabelPicker.setMode(MODE.DISPLAY);
     }
     
-    static selectLabelClicked() {
-      google.script.run.setLabelForSheet(Global.getSheetId(), LabelPicker.updateCurrLabelFromSelect());
+    static saveClicked() {
+      new RpcConfig(runner => runner.setLabelForSheet(Global.getSheetId(), LabelPicker.updateLabelFromSelect(), LabelPicker.updateMaxThreadsFromInput())).
+          retryOnTimeout().
+          callRpc();
+      LabelPicker.setMode(MODE.DISPLAY);
+    }
+    
+    static removeLabelClicked() {
+      Global.clearLabel();
+      new RpcConfig(runner => runner.clearLabelForSheet(Global.getSheetId())).callRpc();
       LabelPicker.setMode(MODE.DISPLAY);
     }
 
     static syncWithGmailClicked() {
-      Global.setMessage('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getCurrLabel() + ' label...');
+      Global.showMessage('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getLabel() + ' label...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncSheetWithGmail(Global.getSheetId());
+      new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
     }
 
     static syncAllWithGmailClicked() {
-      Global.setMessage('Syncing all...');
+      Global.showMessage('Syncing all...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).syncAllSheetsWithGmail();
+      new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
+    }
+
+    static renameLabelClicked() {
+      let newLabel = window.prompt('New label name?');
+      if (newLabel) {
+        LabelPicker.renameLabel(newLabel);
+      }
     }
     
     static addListeners() {
       $('.labelName').click(SheetController.labelNameClicked);
+      $('.trackButton').click(SheetController.trackClicked);
+      $('.renameLabelButton').click(SheetController.renameLabelClicked);
       $('.removeLabelButton').click(SheetController.removeLabelClicked);
       $('.cancelLabelButton').click(SheetController.cancelLabelClicked);
-      $('.selectLabelButton').click(SheetController.selectLabelClicked);
+      $('.saveButton').click(SheetController.saveClicked);
       $('.syncWithGmailButton').click(SheetController.syncWithGmailClicked);
       $('.organizeButton').click(SheetController.organizeClicked);
     }
     
     static checkActiveSheetId() {
+      if (!SheetController.refresh) {
+        return;
+      }
       function getActiveSheetIdSuccessHandler(activeSheetId) {
         if (activeSheetId != Global.getSheetId()) {
           SheetController.hide();
@@ -336,13 +439,24 @@
             Global.setSheetId(activeSheetId);
             Global.setSheetName(preferences.sheetName);
             Global.setIsTracked(preferences.isTracked);
-            Global.setCurrLabel(preferences.label);
+            Global.setLabel(preferences.label);
             SheetController.show();
           }
-          google.script.run.withSuccessHandler(preferencesSuccessHandler).withFailureHandler(Global.setError).getPreferencesForSheet(activeSheetId);
+          new RpcConfig(runner => runner.getPreferencesForSheet(activeSheetId)).
+              retryOnTimeout().
+              withSuccessHandler(preferencesSuccessHandler).
+              callRpc();
         }
       }
-      google.script.run.withSuccessHandler(getActiveSheetIdSuccessHandler).withFailureHandler(Global.log).getActiveSheetId();
+      new RpcConfig(runner => runner.getActiveSheetId()).
+          retryOnTimeout().
+          withSuccessHandler(getActiveSheetIdSuccessHandler).
+          callRpc();
+    }
+    
+    static toggleRefreshing() {
+      SheetController.refresh = !SheetController.refresh;
+      SheetController.REFRESH_VISIBILITY.setVisible(SheetController.refresh);
     }
     
     static init() {
@@ -352,27 +466,45 @@
     }
   }
   
+  SheetController.refresh = true;
+  
   SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
       map(true, $('.tracked')).
       map(false, $('.untracked'));
+  SheetController.REFRESH_VISIBILITY = new AlternatingVisibility('Refresh').
+      map(true, $('.stopRefreshing')).
+      map(false, $('.startRefreshing'));
   
   class GlobalController {
     static organizeAllClicked() {
-      Global.setMessage('Organizing all...');
+      Global.showMessage('Organizing all...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).organizeAll();
+      new RpcConfig(runner => runner.organizell()).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
     }
 
     static updateOverviewClicked() {
-      Global.setMessage('Updating overview...');
+      Global.showMessage('Updating overview...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).updateOverview();
+      new RpcConfig(runner => runner.updateOverview()).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
     }
 
     static doAllTheThingsClicked() {
-      Global.setMessage('Doing all the things...');
+      Global.showMessage('Doing all the things...');
       Global.clearError();
-      google.script.run.withSuccessHandler(Global.setMessage).withFailureHandler(Global.setError).doAllTheThings();
+      new RpcConfig(runner => runner.doAllTheThings()).
+          retryOnTimeout().
+          withSuccessHandler(Global.showMessage).
+          callRpc();
+    }
+    
+    static toggleRefreshingClicked() {
+      SheetController.toggleRefreshing();
     }
 
     static addListeners() {
@@ -380,6 +512,7 @@
       $('.organizeAllButton').click(GlobalController.organizeAllClicked);
       $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
       $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
+      $('.toggleRefreshing').click(GlobalController.toggleRefreshingClicked);
     }
     
     static init() {
