@@ -71,8 +71,8 @@
             <button class="cancelLabelButton">Cancel</button>
           </div>
         </div>
-        <button class="syncWithGmailButton">Sync with Gmail</button>
-        <button class="organizeButton">Organize</button>
+        <button class="syncWithGmailButton" data-templated-name="Sync {sheetName} with Gmail" data-no-templated-name="Synct with Gmail"></button>
+        <button class="organizeButton" data-templated-name="Organize {sheetName}" data-no-templated-name="Synct with Gmail"></button>
         </div>
       </div>
       <h1>All Sheets</h1>
@@ -355,6 +355,17 @@
       LabelPicker.setMode(MODE.SELECT);
     }
     
+    static updateTemplatedText(sheetName) {
+      $('[data-templated-name]').each(function() {
+        let jq = $(this);
+        if (sheetName) {
+          jq.text(jq.attr('data-templated-name').replace(/{sheetName}/g, sheetName));
+        } else {
+          jq.text(jq.attr('data-no-templated-name'));
+        }
+      });
+    }
+    
     static show() {
       let sheetName = Global.getSheetName();
       if (sheetName === 'Overview') {
@@ -363,6 +374,7 @@
       }
       SheetController.getSheetNameElt().text(sheetName);
       SheetController.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
+      SheetController.updateTemplatedText(sheetName);
       LabelPicker.setMode(MODE.DISPLAY);
       $('.sheetController').show();
     }
