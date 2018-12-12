@@ -1,6 +1,6 @@
 function log(level, s) {
   if (level >= Log.level) {
-    Logger.log(Log.levelString(level), ':', s);
+    Logger.log(Log.levelString(level) + ':' + s);
   }
 }
 
@@ -10,6 +10,16 @@ function logMatrix(level, a) {
     log(Log.Level.INFO, 'values(' + values[i].length + ' of them): ' + values[i]);
   }
 }
+
+function logStart(name, args) {
+  log(Log.Level.INFO, 'Starting ' + name + '(' + args.join(',') + ')');
+}
+
+function logStop(name, args) {
+  log(Log.Level.INFO, 'Finished ' + name + '(' + args.join(',') + ')');
+}
+
+
 
 var Log = {};
 

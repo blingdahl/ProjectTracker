@@ -34,6 +34,9 @@ Label.init = function() {
 }
 
 function getAllLabels() {
+  logStart('getAllLabels', []);
   Label.init();
-  return JSON.stringify(Label.getAllLabelNames());
+  var ret = JSON.stringify(Label.getAllLabelNames());
+  logStop('getAllLabels', []);
+  return ret;
 }

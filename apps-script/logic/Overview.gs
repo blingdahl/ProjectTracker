@@ -35,7 +35,8 @@ Overview.init = function() {
 }
 
 function updateOverview() {
-  log(Log.Level.INFO, 'updateOverview');
+  logStart('updateOverview', []);
   Overview.init();
   Overview.update();
+  logStart('updateOverview', []);
 }

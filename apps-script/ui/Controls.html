@@ -182,7 +182,7 @@
     }
     
     retryOnTimeout() {
-      if (!ALLOW_RETRIES) {
+      if (!RpcConfig.ALLOW_RETRIES) {
         return this;
       }
       return this.withFailureHandler(function(errorMsg) {

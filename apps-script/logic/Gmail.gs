@@ -235,58 +235,83 @@ Gmail.init = function() {
 }
   
 function labelProperty(sheetId) {
+  logStart('labelProperty', [sheetId]);
   Gmail.init();
   return Gmail.labelProperty(sheetId);
+  logStop('labelProperty', [sheetId]);
 }
 
 function setLabelForSheet(sheetId, label, maxThreads) {
+  logStart('labelProperty', [sheetId, label, maxThreads]);
   Gmail.init();
   Gmail.setLabelForSheet(sheetId, label);
   Gmail.setMaxThreadsForSheet(sheetId, maxThreads);
+  logStop('labelProperty', [sheetId, label, maxThreads]);
 }
 
 function clearLabelForSheet(sheetId) {
+  logStart('clearLabelForSheet', [sheetId]);
   Gmail.init();
   Gmail.clearLabelForSheet(sheetId);
+  logStop('clearLabelForSheet', [sheetId]);
 }
 
 function getLabelForSheet(sheetId) {
+  logStart('getLabelForSheet', [sheetId]);
   Gmail.init();
-  return Gmail.getLabelForSheet(sheetId);
+  var ret = Gmail.getLabelForSheet(sheetId);
+  logStop('getLabelForSheet', [sheetId]);
+  return ret;
 }
 
 function setMaxThreadsForSheet(sheetId, maxThreads) {
+  logStart('setMaxThreadsForSheet', [sheetId, maxThreads]);
   Gmail.init();
   Gmail.setMaxThreadsForSheet(sheetId, maxThreads);
+  logStop('setMaxThreadsForSheet', [sheetId, maxThreads]);
 }
 
 function clearMaxThreadsForSheet(sheetId) {
+  logStart('clearMaxThreadsForSheet', [sheetId]);
   Gmail.init();
   Gmail.clearMaxThreadsForSheet(sheetId);
+  logStop('clearMaxThreadsForSheet', [sheetId]);
 }
 
 function getMaxThreadsForSheet(sheetId) {
+  logStart('getMaxThreadsForSheet', [sheetId]);
   Gmail.init();
-  return Gmail.getMaxThreadsForSheet(sheetId);
+  var ret = Gmail.getMaxThreadsForSheet(sheetId);
+  logStop('getMaxThreadsForSheet', [sheetId]);
+  return ret;
 }
 
 function syncSheetWithGmail(sheetId) {
+  logStart('syncSheetWithGmail', [sheetId]);
   Gmail.init();
   Gmail.syncSheet(sheetId);
+  logStop('syncSheetWithGmail', [sheetId]);
   return 'Done';
 }
 
 function syncCurrentSheetWithGmail() {
+  logStart('syncCurrentSheetWithGmail', []);
   Gmail.init();
   Gmail.syncSheet(Spreadsheet.getActiveSheetId());
+  logStop('syncCurrentSheetWithGmail', []);
 }
 
 function syncAllSheetsWithGmail() {
+  logStart('syncAllSheetsWithGmail', []);
   Gmail.init();
   Gmail.syncAllSheetsWithGmail();
+  logStop('syncAllSheetsWithGmail', []);
 }
 
 function renameLabel(sheetId, toLabelName) {
+  logStart('renameLabel', [sheetId, toLabelName]);
+  log(Log.Level.INFO, 'renameLabel(' + [sheetId, toLabelName].join(',') + ')');
   Gmail.init();
   Gmail.renameLabel(sheetId, toLabelName);
+  logStop('renameLabel', [sheetId, toLabelName]);
 }

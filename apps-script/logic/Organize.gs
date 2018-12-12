@@ -29,7 +29,7 @@ Organize.init = function() {
     Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
   
-  Organize.organizeOnCurrentSheet = function() {
+  Organize.organizeCurrentSheet = function() {
     Organize.organize(Spreadsheet.getActiveSheetId());
   }
 }
@@ -40,12 +40,16 @@ function organizeAll() {
 }
 
 function organize(sheetId) {
+  logStart('organize', [sheetId]);
   Organize.init();
   Organize.organize(sheetId);
+  logStop('organize', [sheetId]);
   return 'Organized';
 }
 
-function organizeOnCurrentSheet() {
+function organizeCurrentSheet() {
+  logStart('organizeCurrentSheet', [sheetId]);
   Organize.init();
-  Organize.organizeOnCurrentSheet();
+  Organize.organizeCurrentSheet();
+  logStop('organizeCurrentSheet', [sheetId]);
 }
