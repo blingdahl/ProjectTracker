@@ -21,6 +21,7 @@ Gmail.init = function() {
   }
   
   TrackingSheet.init();
+  Label.init();
   log(Log.Level.INFO, 'Gmail.init()');
   
   Gmail.initialized = true;
@@ -79,10 +80,6 @@ Gmail.init = function() {
     log(Log.Level.INFO, 'Stopped tracking: ' + subject);
   }
   
-  Gmail.labelSearchTerm = function(label) {
-    return 'label:' + label.replace(' ', '-');
-  }
-  
   Gmail.getActions = function(thread) {
     if (thread.isInInbox()) {
       return Gmail.ACTIONS_IN_INBOX;
@@ -96,11 +93,8 @@ Gmail.init = function() {
     var sheet = TrackingSheet.forSheetId(sheetId);
     var searchQuery = Gmail.labelSearchTerm(label) + ' -' + Gmail.labelSearchTerm(Gmail.NO_TRACK_LABEL);
     log(Log.Level.INFO, searchQuery);
-    var threads = GmailApp.search(searchQuery);
-    var noTrackLabel = GmailApp.getUserLabelByName(Gmail.NO_TRACK_LABEL);
-    if (!noTrackLabel) {
-      noTrackLabel = GmailApp.createLabel(Gmail.NO_TRACK_LABEL);
-    }
+    var threads = GmailApp.search(searchQuery).slice(0, maxThreads + 1);
+    var noTrackLabel = Label.getUserDefined(Gmail.NO_TRACK_LABEL, true);
     log(Log.Level.INFO, threads.length + ' threads');
     var threadIdsInLabel = [];
     var threadIdsToRemove = [];
@@ -196,7 +190,7 @@ Gmail.init = function() {
   }
   
   Gmail.getMaxThreadsForSheet = function(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(Gmail.maxThreadsProperty(sheetId)) || Gmail.DEFAULT_MAX_THREADS;
+    return PropertiesService.getScriptProperties().getProperty(parseInt(Gmail.maxThreadsProperty(sheetId))) || Gmail.DEFAULT_MAX_THREADS;
   }
   
   Gmail.labelProperty = function(sheetId) {
@@ -215,16 +209,6 @@ Gmail.init = function() {
     return PropertiesService.getScriptProperties().getProperty(labelProperty(sheetId));
   }
   
-  Gmail.getAllLabels = function() {
-    var ret = [];
-    var labels = GmailApp.getUserLabels(); 
-    for (var i = 0; i < labels.length; i++) {
-      var label = labels[i];
-      ret.push(label.getName());
-    }
-    return ret;
-  }
-  
   Gmail.syncAllSheetsWithGmail = function() {
     var sheets = SpreadsheetApp.getActive().getSheets();
     for (var i = 0; i < sheets.length; i++) {
@@ -239,7 +223,7 @@ Gmail.init = function() {
     if (!toLabelName) {
       throw new Error('No toLabelName');
     }
-    var currLabel = GmailApp.getUserLabelByName(Gmail.getLabelForSheet(sheetId));
+    var currLabel = Label.getUserDefined(Gmail.getLabelForSheet(sheetId));
     var threads = currLabel.getThreads();
     var newLabel = GmailApp.createLabel(toLabelName);
     newLabel.addToThreads(threads)
@@ -284,11 +268,6 @@ function clearMaxThreadsForSheet(sheetId) {
 function getMaxThreadsForSheet(sheetId) {
   Gmail.init();
   return Gmail.getMaxThreadsForSheet(sheetId);
-}
-
-function getAllLabels() {
-  Gmail.init();
-  return JSON.stringify(Gmail.getAllLabels());
 }
 
 function syncSheetWithGmail(sheetId) {
