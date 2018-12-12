@@ -28,7 +28,7 @@
         cursor: pointer;
       }
       
-      .toggleRefreshing {
+      .startRefreshing, .stopRefreshing, .refreshNow {
         font-size: 8px;
         text-decoration: underline;
         cursor: pointer;
@@ -80,7 +80,11 @@
       <button class="organizeAllButton">Organize All</button>
       <button class="updateOverviewButton">Update Overview</button>
       <button class="doAllTheThingsButton">Do all the things!</button>
-      <div class="toggleRefreshing"><div class="stopRefreshing">Stop refreshing</div><div class="startRefreshing" style="display: none">Start Refreshing</div></div>
+      <div class="toggleRefreshing">
+        <span class="stopRefreshing">Stop refreshing</span>
+        <span class="startRefreshing" style="display: none">Start Refreshing</span>
+        <span class="refreshNow" style="display: none">Refresh now</span>
+      </div>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
@@ -429,10 +433,7 @@
       $('.organizeButton').click(SheetController.organizeClicked);
     }
     
-    static checkActiveSheetId() {
-      if (!SheetController.refresh) {
-        return;
-      }
+    static refreshNow() {
       function getActiveSheetIdSuccessHandler(activeSheetId) {
         if (activeSheetId != Global.getSheetId()) {
           SheetController.hide();
@@ -456,8 +457,15 @@
           callRpc();
     }
     
-    static toggleRefreshing() {
-      SheetController.refresh = !SheetController.refresh;
+    static checkActiveSheetId() {
+      if (!SheetController.refresh) {
+        return;
+      }
+      SheetController.refreshNow();
+    }
+    
+    static setRefreshing(refreshing) {
+      SheetController.refresh = refreshing;
       SheetController.REFRESH_VISIBILITY.setVisible(SheetController.refresh);
     }
     
@@ -475,7 +483,7 @@
       map(false, $('.untracked'));
   SheetController.REFRESH_VISIBILITY = new AlternatingVisibility('Refresh').
       map(true, $('.stopRefreshing')).
-      map(false, $('.startRefreshing'));
+      map(false, $('.startRefreshing,.refreshNow'));
   
   class GlobalController {
     static organizeAllClicked() {
@@ -505,8 +513,16 @@
           callRpc();
     }
     
-    static toggleRefreshingClicked() {
-      SheetController.toggleRefreshing();
+    static startRefreshingClicked() {
+      SheetController.setRefreshing(true);
+    }
+    
+    static stopRefreshingClicked() {
+      SheetController.setRefreshing(false);
+    }
+    
+    static refreshNowClicked() {
+      SheetController.refreshNow();
     }
 
     static addListeners() {
@@ -514,7 +530,9 @@
       $('.organizeAllButton').click(GlobalController.organizeAllClicked);
       $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
       $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
-      $('.toggleRefreshing').click(GlobalController.toggleRefreshingClicked);
+      $('.startRefreshing').click(GlobalController.startRefreshingClicked);
+      $('.stopRefreshing').click(GlobalController.stopRefreshingClicked);
+      $('.refreshNow').click(GlobalController.refreshNowClicked);
     }
     
     static init() {
