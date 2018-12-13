@@ -25,6 +25,7 @@ TrackingSheet.init = function() {
       .addColumn('NOTES', 'Notes')
       .addColumn('THREAD_ID', 'Thread ID')
       .addColumn('SUBJECT', 'Subject')
+      .addColumn('FROM', 'From')
       .addColumn('SCRIPT_NOTES', 'Script Notes');
   
   TrackingSheet.sheetIdToSheet = {};
