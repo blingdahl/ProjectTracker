@@ -20,6 +20,7 @@ Gmail.init = function() {
     return;
   }
   
+  Preferences.init();
   TrackingSheet.init();
   Label.init();
   log(Log.Level.INFO, 'Gmail.init()');
