@@ -118,7 +118,9 @@ Gmail.init = function() {
     var searchQuery = Label.searchTerm(label) + ' -' + Label.searchTerm(Gmail.NO_TRACK_LABEL);
     log(Log.Level.INFO, searchQuery);
     var gmailLabel = Label.getUserDefined(label);
-    var threads = GmailApp.search(searchQuery).slice(0, maxThreads);
+    var threads = GmailApp.search(searchQuery);
+    var totalCount = threads.length;
+    threads = threads.slice(0, maxThreads);
     var noTrackLabel = Label.getUserDefined(Gmail.NO_TRACK_LABEL, true);
     log(Log.Level.INFO, threads.length + ' threads');
     var otherLabels = Label.getSheetLabelNames();
@@ -211,6 +213,7 @@ Gmail.init = function() {
     // The last sort here will be the primary sort order.
     sheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     log(Log.Level.INFO, 'Synced with ' + label);
+    return totalCount;
   }
   
   Gmail.syncSheet = function(sheetId) {
@@ -219,8 +222,9 @@ Gmail.init = function() {
       Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
       return;
     }
-    var maxThreads = Gmail.getMaxThreadsForSheet(sheetId);
-    Gmail.syncWithGmail(sheetId, label, maxThreads);
+    var maxThreads = Label.getMaxThreadsForSheet(sheetId);
+    var totalCount = Gmail.syncWithGmail(sheetId, label, maxThreads);
+    return 'Synced ' + maxThreads + '/' + totalCount;
   }
   
   Gmail.syncAllSheetsWithGmail = function() {
@@ -249,9 +253,9 @@ Gmail.init = function() {
 function syncSheetWithGmail(sheetId) {
   logStart('syncSheetWithGmail', [sheetId]);
   Gmail.init();
-  Gmail.syncSheet(sheetId);
+  var ret = Gmail.syncSheet(sheetId);
   logStop('syncSheetWithGmail', [sheetId]);
-  return 'Done';
+  return ret;
 }
 
 function syncCurrentSheetWithGmail() {

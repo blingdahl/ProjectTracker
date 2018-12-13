@@ -187,7 +187,7 @@
     
     retryOnTimeout() {
       if (!RpcConfig.ALLOW_RETRIES) {
-        return this;
+        return this.withFailureHandler(Global.showError);
       }
       return this.withFailureHandler(function(errorMsg) {
             if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
