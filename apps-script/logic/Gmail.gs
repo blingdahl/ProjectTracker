@@ -217,20 +217,20 @@ Gmail.init = function() {
   }
   
   Gmail.syncSheet = function(sheetId) {
-    var label = Label.getLabelForSheet(sheetId);
+    var label = Preferences.getLabelNameForSheet(sheetId);
     if (!label) {
       Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
       return;
     }
-    var maxThreads = Label.getMaxThreadsForSheet(sheetId);
+    var maxThreads = Preferences.getMaxThreadsForSheet(sheetId);
     var totalCount = Gmail.syncWithGmail(sheetId, label, maxThreads);
-    return 'Synced ' + maxThreads + '/' + totalCount;
+    return 'Synced ' + Math.min(maxThreads, totalCount) + '/' + totalCount;
   }
   
   Gmail.syncAllSheetsWithGmail = function() {
     var sheets = SpreadsheetApp.getActive().getSheets();
     for (var i = 0; i < sheets.length; i++) {
-      var label = Label.getLabelForSheet(sheets[i].getSheetId());
+      var label = Preferences.getLabelNameForSheet(sheets[i].getSheetId());
       if (label) {
         Gmail.syncWithGmail(sheets[i].getSheetId(), label);
       }
@@ -241,7 +241,7 @@ Gmail.init = function() {
     if (!toLabelName) {
       throw new Error('No toLabelName');
     }
-    var currLabel = Label.getUserDefined(Label.getLabelForSheet(sheetId));
+    var currLabel = Label.getUserDefined(Preferences.getLabelNameForSheet(sheetId));
     var threads = currLabel.getThreads();
     var newLabel = GmailApp.createLabel(toLabelName);
     newLabel.addToThreads(threads)
