@@ -460,6 +460,7 @@
             Global.setSheetName(preferences.sheetName);
             Global.setIsTracked(preferences.isTracked);
             Global.setLabel(preferences.label);
+            Global.setMaxThreads(preferences.maxThreads);
             SheetController.show();
           }
           new RpcConfig(runner => runner.getPreferencesForSheet(activeSheetId)).

@@ -31,7 +31,12 @@ Gmail.init = function() {
     if (messages.length === 0) {
       return '';
     }
-    return messages[0].getFrom();
+    var from = messages[0].getFrom();
+    if (from.indexOf('<') > 5) {
+      from = from.substring(0, from.indexOf('<') - 1);
+    }
+    from = from.replace(/"/g, '');
+    return from;
   }
   
   Gmail.archive = function(thread, row, subject) {
@@ -218,22 +223,6 @@ Gmail.init = function() {
     Gmail.syncWithGmail(sheetId, label, maxThreads);
   }
   
-  Gmail.maxThreadsProperty = function(sheetId) {
-    return 'maxThreads:' + sheetId;
-  }
-  
-  Gmail.setMaxThreadsForSheet = function(sheetId, maxThreads) {
-    PropertiesService.getScriptProperties().setProperty(Gmail.maxThreadsProperty(sheetId), maxThreads);
-  }
-  
-  Gmail.clearMaxThreadsForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(Gmail.maxThreadsProperty(sheetId));
-  }
-  
-  Gmail.getMaxThreadsForSheet = function(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(parseInt(Gmail.maxThreadsProperty(sheetId))) || Gmail.DEFAULT_MAX_THREADS;
-  }
-  
   Gmail.syncAllSheetsWithGmail = function() {
     var sheets = SpreadsheetApp.getActive().getSheets();
     for (var i = 0; i < sheets.length; i++) {
@@ -253,32 +242,8 @@ Gmail.init = function() {
     var newLabel = GmailApp.createLabel(toLabelName);
     newLabel.addToThreads(threads)
     !currLabel.removeFromThreads(threads);
-    Gmail.setLabelForSheet(sheetId, toLabelName);
+    Label.setLabelForSheet(sheetId, toLabelName);
   }
-  
-  Gmail.DEFAULT_MAX_THREADS = 50;
-}
-
-function setMaxThreadsForSheet(sheetId, maxThreads) {
-  logStart('setMaxThreadsForSheet', [sheetId, maxThreads]);
-  Gmail.init();
-  Gmail.setMaxThreadsForSheet(sheetId, maxThreads);
-  logStop('setMaxThreadsForSheet', [sheetId, maxThreads]);
-}
-
-function clearMaxThreadsForSheet(sheetId) {
-  logStart('clearMaxThreadsForSheet', [sheetId]);
-  Gmail.init();
-  Gmail.clearMaxThreadsForSheet(sheetId);
-  logStop('clearMaxThreadsForSheet', [sheetId]);
-}
-
-function getMaxThreadsForSheet(sheetId) {
-  logStart('getMaxThreadsForSheet', [sheetId]);
-  Gmail.init();
-  var ret = Gmail.getMaxThreadsForSheet(sheetId);
-  logStop('getMaxThreadsForSheet', [sheetId]);
-  return ret;
 }
 
 function syncSheetWithGmail(sheetId) {
