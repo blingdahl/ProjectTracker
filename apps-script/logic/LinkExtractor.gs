@@ -84,7 +84,7 @@ LinkExtractor.extractLinkFormula = function(thread) {
   if (!urls || urls.length === 0) {
     return null;
   }
-  log(Log.Level.FINE, urls);
+  Log.fine(urls);
   for (var i = 0; i < urls.length; i++) {
     var url = urls[i];
     if (url.startsWith('https://docs.')) {

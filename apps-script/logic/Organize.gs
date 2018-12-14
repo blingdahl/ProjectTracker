@@ -7,7 +7,7 @@ Organize.init = function() {
   }
   
   TrackingSheet.init();
-  log(Log.Level.INFO, 'Organize.init()');
+  Log.info('Organize.init()');
   
   Organize.initialized = true;
 
@@ -18,7 +18,7 @@ Organize.init = function() {
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
     }
     trackingSheet.sortBy(TrackingSheet.COLUMNS.PRIORITY);
-    log(Log.Level.INFO, 'Organized');
+    Log.info('Organized');
   }
   
   Organize.organizeAll = function() {
@@ -40,16 +40,16 @@ function organizeAll() {
 }
 
 function organize(sheetId) {
-  logStart('organize', [sheetId]);
+  Log.start('organize', [sheetId]);
   Organize.init();
   Organize.organize(sheetId);
-  logStop('organize', [sheetId]);
+  Log.stop('organize', [sheetId]);
   return 'Organized';
 }
 
 function organizeCurrentSheet() {
-  logStart('organizeCurrentSheet', [sheetId]);
+  Log.start('organizeCurrentSheet', [sheetId]);
   Organize.init();
   Organize.organizeCurrentSheet();
-  logStop('organizeCurrentSheet', [sheetId]);
+  Log.stop('organizeCurrentSheet', [sheetId]);
 }

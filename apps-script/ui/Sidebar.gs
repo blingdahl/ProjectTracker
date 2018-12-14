@@ -1,5 +1,5 @@
 function showPreferencesSidebar() {
-  logStart('showPreferencesSidebar', []);
+  Log.start('showPreferencesSidebar', []);
   Gmail.init();
   Tracking.init();
   var template = HtmlService.createTemplateFromFile('ui/Controls');
@@ -7,15 +7,15 @@ function showPreferencesSidebar() {
   var sheetId = sheet.getSheetId();
   template.preferences = Preferences.getPreferencesForSheet(sheetId)
   SpreadsheetApp.getUi().showSidebar(template.evaluate().setTitle('Project Tracker'));
-  logStop('showPreferencesSidebar', []);
+  Log.stop('showPreferencesSidebar', []);
 }
 
 function getPreferencesForSheet(sheetId) {
-  logStart('getPreferencesForSheet', []);
+  Log.start('getPreferencesForSheet', []);
   Gmail.init();
   Tracking.init();
   var ret = JSON.stringify(Preferences.getPreferencesForSheet(sheetId)); 
-  logStop('getPreferencesForSheet', []);
+  Log.stop('getPreferencesForSheet', []);
   return ret;
 }
 

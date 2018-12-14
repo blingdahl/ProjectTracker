@@ -8,7 +8,7 @@ OverviewSheet.init = function() {
   
   Spreadsheet.init();
   TrackingSheet.init();
-  log(Log.Level.INFO, 'OverviewSheet.init()');
+  Log.info('OverviewSheet.init()');
 
   OverviewSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
       .addColumn('SHEET', 'Sheet')

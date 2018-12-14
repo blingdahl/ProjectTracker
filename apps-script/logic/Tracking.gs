@@ -8,7 +8,7 @@ Tracking.init = function() {
   
   Preferences.init();
   TrackingSheet.init();
-  log(Log.Level.INFO, 'Tracking.init()');
+  Log.info('Tracking.init()');
   
   Tracking.initialized = true;
 }

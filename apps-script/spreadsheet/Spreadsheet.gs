@@ -9,7 +9,7 @@ Spreadsheet.init = function() {
   Cache.init();
   Spreadsheet.initialized = true;
   
-  log(Log.Level.INFO, 'Spreadsheet.init()');
+  Log.info('Spreadsheet.init()');
   
   Spreadsheet.ColumnDefinitions = function() {
     this.columnNamesInOrder = [];
@@ -66,12 +66,12 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Sheet.prototype.clearData = function() {
     if (this.nativeSheet.getDataRange().getNumRows() <= 1) {
-      log(Log.Level.INFO, 'Nothing to clear');
+      Log.info('Nothing to clear');
       return;
     }
     this.nativeSheet.deleteRows(2, this.getDataRange().getNumRows() - 1);
     this.clearCache();
-    log(Log.Level.INFO, 'Cleared');
+    Log.info('Cleared');
   }
   
   Spreadsheet.Sheet.prototype.createRowObject = function(nativeRow, columns, rowCache, opt_isNew) {
@@ -253,12 +253,12 @@ Spreadsheet.init = function() {
       if (currentValues.length > 0) {
         function arraysEqual(a1, a2) {
           if (a1.length != a2.length) {
-            log(Log.Level.INFO, a1 + ' vs ' + a2);
+            Log.info(a1 + ' vs ' + a2);
             return false;
           }
           for (var i = 0; i < a1.length; i++) {
             if (a1[i] !== a2[i]) {
-              log(Log.Level.INFO, a1[i] + ' vs ' + a2[i]);
+              Log.info(a1[i] + ' vs ' + a2[i]);
               return false;
             }
           }
@@ -277,7 +277,7 @@ Spreadsheet.init = function() {
   };
 
   Spreadsheet.getActiveSheetId = function() {
-    log(Log.Level.FINER, 'getActiveSheetId');
+    Log.finer('getActiveSheetId');
     return SpreadsheetApp.getActiveSheet().getSheetId();
   };
 

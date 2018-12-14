@@ -10,7 +10,7 @@ TrackingSheet.init = function() {
   }
   
   Spreadsheet.init();
-  log(Log.Level.INFO, 'TrackingSheet.init()');
+  Log.info('TrackingSheet.init()');
   TrackingSheet.initialized = true;
 
   TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
@@ -78,7 +78,7 @@ TrackingSheet.init = function() {
     var ret = [];
     sheets.forEach(function(sheet) {
       if (sheet.getSheetName() == 'Overview') {
-        log(Log.Level.FINE, 'Not including Overview');
+        Log.fine('Not including Overview');
         return;
       }
       var headerRow = sheet.getDataRange().offset(0, 0, 1);

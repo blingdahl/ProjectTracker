@@ -7,12 +7,12 @@ Overview.init = function() {
   }
   
   OverviewSheet.init();
-  log(Log.Level.INFO, 'Overview.init()');
+  Log.info('Overview.init()');
   
   Overview.initialized = true;
   
   Overview.update = function() {
-    log(Log.Level.INFO, 'Overview.update()');
+    Log.info('Overview.update()');
     var overviewSheet = OverviewSheet.get();
     overviewSheet.clearData();
     var trackingSheets = TrackingSheet.getAll();
@@ -20,23 +20,23 @@ Overview.init = function() {
       if (trackingSheet.getSheetId() === overviewSheet.getSheetId()) {
         return;
       }
-      log(Log.Level.INFO, 'Adding P0 from ' + trackingSheet.getSheetName());
+      Log.info('Adding P0 from ' + trackingSheet.getSheetName());
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P0');
     });
     trackingSheets.forEach(function(trackingSheet) {
       if (trackingSheet.getSheetId() === overviewSheet.getSheetId()) {
         return;
       }
-      log(Log.Level.INFO, 'Adding P1 from ' + trackingSheet.getSheetName());
+      Log.info('Adding P1 from ' + trackingSheet.getSheetName());
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P1');
     });
-    log(Log.Level.INFO, 'Updated overview');
+    Log.info('Updated overview');
   }
 }
 
 function updateOverview() {
-  logStart('updateOverview', []);
+  Log.start('updateOverview', []);
   Overview.init();
   Overview.update();
-  logStart('updateOverview', []);
+  Log.start('updateOverview', []);
 }

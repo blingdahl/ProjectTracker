@@ -6,7 +6,7 @@ Label.init = function() {
     return;
   }
   
-  log(Log.Level.INFO, 'Label.init()');
+  Log.info('Label.init()');
   
   Label.initialized = true;
   
@@ -47,31 +47,31 @@ Label.init = function() {
 }
 
 function getAllLabels() {
-  logStart('getAllLabels', []);
+  Log.start('getAllLabels', []);
   Label.init();
   var ret = JSON.stringify(Label.getAllLabelNames());
-  logStop('getAllLabels', []);
+  Log.stop('getAllLabels', []);
   return ret;
 }
 
 function setMaxThreadsForSheet(sheetId, maxThreads) {
-  logStart('setMaxThreadsForSheet', [sheetId, maxThreads]);
+  Log.start('setMaxThreadsForSheet', [sheetId, maxThreads]);
   Label.init();
   Label.setMaxThreadsForSheet(sheetId, maxThreads);
-  logStop('setMaxThreadsForSheet', [sheetId, maxThreads]);
+  Log.stop('setMaxThreadsForSheet', [sheetId, maxThreads]);
 }
 
 function clearMaxThreadsForSheet(sheetId) {
-  logStart('clearMaxThreadsForSheet', [sheetId]);
+  Log.start('clearMaxThreadsForSheet', [sheetId]);
   Label.init();
   Label.clearMaxThreadsForSheet(sheetId);
-  logStop('clearMaxThreadsForSheet', [sheetId]);
+  Log.stop('clearMaxThreadsForSheet', [sheetId]);
 }
 
 function getMaxThreadsForSheet(sheetId) {
-  logStart('getMaxThreadsForSheet', [sheetId]);
+  Log.start('getMaxThreadsForSheet', [sheetId]);
   Label.init();
   var ret = Label.getMaxThreadsForSheet(sheetId);
-  logStop('getMaxThreadsForSheet', [sheetId]);
+  Log.stop('getMaxThreadsForSheet', [sheetId]);
   return ret;
 }
