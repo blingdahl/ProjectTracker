@@ -40,6 +40,11 @@ Spreadsheet.init = function() {
     return this.nativeSheet.getDataRange();
   }
   
+  Spreadsheet.Sheet.prototype.trimRows = function(rowsToKeep) {
+    Log.info('rowsToKeep: ' + rowsToKeep);
+    this.nativeSheet.deleteRows(rowsToKeep, this.nativeSheet.getMaxRows() - rowsToKeep);
+  }
+  
   Spreadsheet.Sheet.prototype.getUrl = function() {
     return '#gid=' + this.nativeSheet.getSheetId();
   }

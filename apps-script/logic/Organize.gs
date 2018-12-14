@@ -12,6 +12,9 @@ Organize.init = function() {
   Organize.initialized = true;
 
   Organize.organizeSheet = function(trackingSheet) {
+    var dataRows = trackingSheet.getDataRows();
+    var numRows = dataRows.slice(-1)[0].getRowNumber();
+    trackingSheet.trimRows(numRows + Organize.EXTRA_ROWS);
     var rows = trackingSheet.getAllRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
@@ -33,6 +36,8 @@ Organize.init = function() {
     Organize.organize(Spreadsheet.getActiveSheetId());
   }
 }
+
+Organize.EXTRA_ROWS = 10;
 
 function organizeAll() {
   Organize.init();
