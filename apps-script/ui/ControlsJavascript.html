@@ -55,6 +55,14 @@ class Global {
     return Global.setAttr('data-max-threads', maxThreads);
   }
   
+  static getAutoRefresh() {
+    return $('[data-auto-refresh]').attr('data-auto-refresh') === 'true';
+  }
+  
+  static setAutoRefresh(autoRefresh) {
+    return $('[data-auto-refresh]').attr('data-auto-refresh', String(autoRefresh));
+  }
+  
   static clearLabel() {
     Global.setLabel(null);
   }
@@ -71,7 +79,8 @@ class Global {
   }
 
   static showError(msg) {
-    if (msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
+    console.log(msg);
+    if (msg.startsWith && msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
       Global.log(msg);
       return;
     }
@@ -388,15 +397,16 @@ class SheetController {
   }
   
   static checkActiveSheetId() {
-    if (!SheetController.refresh) {
+    if (!Global.getAutoRefresh()) {
       return;
     }
     SheetController.refreshNow();
   }
   
-  static setRefreshing(refreshing) {
-    SheetController.refresh = refreshing;
-    SheetController.REFRESH_VISIBILITY.setVisible(SheetController.refresh);
+  static setAutoRefresh(autoRefresh) {
+    Global.setAutoRefresh(autoRefresh);
+    new RpcConfig(runner => runner.setAutoRefresh(autoRefresh)).
+        callRpc();
   }
   
   static init() {
@@ -411,9 +421,6 @@ SheetController.refresh = false;
 SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
     map(true, $('.tracked')).
     map(false, $('.untracked'));
-SheetController.REFRESH_VISIBILITY = new AlternatingVisibility('Refresh').
-    map(true, $('.stopRefreshing')).
-    map(false, $('.startRefreshing,.refreshNow'));
 
 class GlobalController {
   static organizeAllClicked() {
@@ -444,11 +451,11 @@ class GlobalController {
   }
   
   static startRefreshingClicked() {
-    SheetController.setRefreshing(true);
+    SheetController.setAutoRefresh(true);
   }
   
   static stopRefreshingClicked() {
-    SheetController.setRefreshing(false);
+    SheetController.setAutoRefresh(false);
   }
   
   static refreshNowClicked() {

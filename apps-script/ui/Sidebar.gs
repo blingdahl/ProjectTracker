@@ -6,6 +6,7 @@ function showPreferencesSidebar() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var sheetId = sheet.getSheetId();
   template.preferences = Preferences.getPreferencesForSheet(sheetId)
+  template.autoRefresh = Preferences.getAutoRefresh();
   SpreadsheetApp.getUi().showSidebar(template.evaluate().setTitle('Project Tracker'));
   Log.stop('showPreferencesSidebar', []);
 }

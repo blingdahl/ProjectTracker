@@ -75,6 +75,18 @@ Preferences.init = function() {
   Preferences.getTrackedForSheet = function(sheetId) {
     return PropertiesService.getScriptProperties().getProperty(Preferences.trackedProperty(sheetId)) === 'true';
   } 
+
+  Preferences.autoRefreshProperty = function() {
+    return 'autoRefresh';
+  }
+  
+  Preferences.setAutoRefresh = function(autoRefresh) {
+    PropertiesService.getScriptProperties().setProperty(Preferences.autoRefreshProperty(), autoRefresh ? 'true' : 'false');
+  }
+  
+  Preferences.getAutoRefresh = function(sheetId) {
+    return PropertiesService.getScriptProperties().getProperty(Preferences.autoRefreshProperty()) === 'true';
+  } 
   
   Preferences.getPreferencesForSheet = function(sheetId) {
     Log.start('getPreferencesForSheet', [sheetId]);
@@ -116,10 +128,10 @@ function getLabelForSheet(sheetId) {
 }
 
 function setTrackedForSheet(sheetId, tracked) {
-  Log.start('Tracking', [sheetId, tracked]);
+  Log.start('setTrackedForSheet', [sheetId, tracked]);
   Preferences.init();
   Preferences.setTrackedForSheet(sheetId, tracked);
-  Log.stop('Tracking', [sheetId, tracked]);
+  Log.stop('setTrackedForSheet', [sheetId, tracked]);
 }
 
 function getTrackedForSheet(sheetId) {
@@ -135,4 +147,19 @@ function clearLabelForSheet(sheetId) {
   Preferences.init();
   Preferences.clearLabelForSheet(sheetId);
   Log.stop('clearLabelForSheet', [sheetId]);
+}
+
+function setAutoRefresh(autoRefresh) {
+  Log.start('setAutoRefresh', [autoRefresh]);
+  Preferences.init();
+  Preferences.setAutoRefresh(autoRefresh);
+  Log.stop('setAutoRefresh', [autoRefresh]);
+}
+
+function getAutoRefresh() {
+  Log.start('getAutoRefresh', []);
+  Preferences.init();
+  var ret = Preferences.getAutoRefresh();
+  Log.stop('getAutoRefresh', []);
+  return ret;
 }
