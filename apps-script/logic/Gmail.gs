@@ -106,7 +106,7 @@ Gmail.init = function() {
   Gmail.getActions = function(otherLabels, thread) {
     var actions = [];
     if (thread.isInInbox()) {
-      actions = actions.concat(Gmail.ACTIONS_IN_INBOX).concat(changeLabelActions);
+      actions = actions.concat(Gmail.ACTIONS_IN_INBOX);
     } else {
       actions = actions.concat(Gmail.ACTIONS_ARCHIVED);
     }
