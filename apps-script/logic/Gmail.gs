@@ -22,6 +22,7 @@ Gmail.init = function() {
   
   Preferences.init();
   TrackingSheet.init();
+  Organize.init();
   Label.init();
   Log.info('Gmail.init()');
   
@@ -211,8 +212,8 @@ Gmail.init = function() {
       Log.info('Removing thread ' + threadIdsToRemove[i]);
       sheet.removeRow(sheet.getRowForThreadId(threadIdsToRemove[i]));
     }
+    Organize.organizeSheet(sheet);
     // The last sort here will be the primary sort order.
-    sheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     Log.info('Synced with ' + label);
     return totalCount;
   }

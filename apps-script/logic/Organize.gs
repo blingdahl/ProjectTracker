@@ -20,7 +20,7 @@ Organize.init = function() {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
     }
-    trackingSheet.sortBy(TrackingSheet.COLUMNS.PRIORITY);
+    trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     Log.info('Organized');
   }
   

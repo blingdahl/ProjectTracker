@@ -41,8 +41,9 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.trimRows = function(rowsToKeep) {
-    Log.info('rowsToKeep: ' + rowsToKeep);
-    this.nativeSheet.deleteRows(rowsToKeep, this.nativeSheet.getMaxRows() - rowsToKeep);
+    if (rowsToKeep < this.getAllRows().length) {
+      this.nativeSheet.deleteRows(rowsToKeep, this.nativeSheet.getMaxRows() - rowsToKeep);
+    }
   }
   
   Spreadsheet.Sheet.prototype.getUrl = function() {
