@@ -10,20 +10,32 @@ Preferences.init = function() {
   
   Preferences.initialized = true;
   
-  Preferences.labelProperty = function(sheetId) {
+  Preferences.getProperty = function(propertyName) {
+    return PropertiesService.getScriptProperties().getProperty(propertyName);
+  }
+  
+  Preferences.setProperty = function(propertyName, value) {
+    PropertiesService.getScriptProperties().setProperty(propertyName, value);
+  }
+  
+  Preferences.clearProperty = function(propertyName) {
+    PropertiesService.getScriptProperties().deleteProperty(propertyName);
+  }
+  
+  Preferences.labelPropertyName = function(sheetId) {
     return 'label:' + sheetId;
   }
   
   Preferences.setLabelForSheet = function(sheetId, labelName) {
-    PropertiesService.getScriptProperties().setProperty(Preferences.labelProperty(sheetId), labelName);
+    Preferences.setProperty(Preferences.labelPropertyName(sheetId), labelName);
   }
   
   Preferences.clearLabelForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(Preferences.labelProperty(sheetId));
+    PropertiesService.getScriptProperties().deleteProperty(Preferences.labelPropertyName(sheetId));
   }
   
   Preferences.getLabelNameForSheet = function(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(Preferences.labelProperty(sheetId));
+    return PropertiesService.getScriptProperties().getProperty(Preferences.labelPropertyName(sheetId));
   }
   
   Preferences.maxThreadsProperty = function(sheetId) {
@@ -108,13 +120,6 @@ function setTrackedForSheet(sheetId, tracked) {
   Preferences.init();
   Preferences.setTrackedForSheet(sheetId, tracked);
   logStop('Tracking', [sheetId, tracked]);
-}
-
-function clearTrackedForSheet(sheetId) {
-  logStart('clearTrackedForSheet', [sheetId]);
-  Preferences.init();
-  Preferences.clearTrackedForSheet(sheetId);
-  logStop('clearTrackedForSheet', [sheetId]);
 }
 
 function getTrackedForSheet(sheetId) {

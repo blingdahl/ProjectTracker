@@ -85,7 +85,7 @@ Spreadsheet.init = function() {
                                 opt_isNew);
   }
   
-  Spreadsheet.Sheet.prototype.getRows = function() {
+  Spreadsheet.Sheet.prototype.getDataRows = function() {
     var rows = [];
     for (var rowOffset = 1; rowOffset < this.getDataRange().getNumRows(); rowOffset++) {
       rows.push(this.getRow(rowOffset));
@@ -93,8 +93,16 @@ Spreadsheet.init = function() {
     return rows;
   }
   
+  Spreadsheet.Sheet.prototype.getAllRows = function() {
+    var rows = [];
+    for (var rowOffset = 1; rowOffset < this.nativeSheet.getMaxRows(); rowOffset++) {
+      rows.push(this.getRow(rowOffset));
+    }
+    return rows;
+  }
+  
   Spreadsheet.Sheet.prototype.addRow = function() {
-    var rows = this.getRows();
+    var rows = this.getDataRows();
     var rowOffset = rows.length + 1;
     return this.getRow(rows.length + 1, true);
   }
@@ -206,6 +214,10 @@ Spreadsheet.init = function() {
   Spreadsheet.Row.prototype.setValue = function(columnHeader, val) {
     if (this.getValue(columnHeader) == val) {
       return;
+    }
+    if (parseInt(val) != NaN) {
+      // TODO(lindahl) Don't do this if the number format is already @
+      this.getCell(columnHeader).setNumberFormat('@');
     }
     this.getCell(columnHeader).setValue(val);
     this.clearCache();

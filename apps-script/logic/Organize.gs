@@ -12,7 +12,7 @@ Organize.init = function() {
   Organize.initialized = true;
 
   Organize.organizeSheet = function(trackingSheet) {
-    var rows = trackingSheet.getRows();
+    var rows = trackingSheet.getAllRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
