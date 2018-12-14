@@ -21,7 +21,7 @@ Organize.init = function() {
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
     }
     trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
-    Log.info('Organized');
+    return 'Organized ' + trackingSheet.getSheetName();
   }
   
   Organize.organizeAll = function() {
@@ -29,11 +29,11 @@ Organize.init = function() {
   }
   
   Organize.organize = function(sheetId) {
-    Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
+    return Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
   
   Organize.organizeCurrentSheet = function() {
-    Organize.organize(Spreadsheet.getActiveSheetId());
+    return Organize.organize(Spreadsheet.getActiveSheetId());
   }
 }
 
@@ -47,9 +47,9 @@ function organizeAll() {
 function organize(sheetId) {
   Log.start('organize', [sheetId]);
   Organize.init();
-  Organize.organize(sheetId);
+  var ret = Organize.organize(sheetId);
   Log.stop('organize', [sheetId]);
-  return 'Organized';
+  return ret;
 }
 
 function organizeCurrentSheet() {

@@ -6,6 +6,7 @@ Preferences.init = function() {
     return;
   }
   
+  Spreadsheet.init();
   Log.info('Preferences.init()');
   
   Preferences.initialized = true;
@@ -84,7 +85,7 @@ Preferences.init = function() {
     PropertiesService.getScriptProperties().setProperty(Preferences.autoRefreshProperty(), autoRefresh ? 'true' : 'false');
   }
   
-  Preferences.getAutoRefresh = function(sheetId) {
+  Preferences.getAutoRefresh = function() {
     return PropertiesService.getScriptProperties().getProperty(Preferences.autoRefreshProperty()) === 'true';
   } 
   

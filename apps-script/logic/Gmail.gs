@@ -221,12 +221,12 @@ Gmail.init = function() {
   Gmail.syncSheet = function(sheetId) {
     var label = Preferences.getLabelNameForSheet(sheetId);
     if (!label) {
-      Browser.msgBox('No label for sheet: ' + Gmail.Sheet.forSheetId(sheetId).getSheetName());
+      Browser.msgBox('No label for sheet: ' + TrackingSheet.forSheetId(sheetId).getSheetName());
       return;
     }
     var maxThreads = Preferences.getMaxThreadsForSheet(sheetId);
     var totalCount = Gmail.syncWithGmail(sheetId, label, maxThreads);
-    return 'Synced ' + Math.min(maxThreads, totalCount) + '/' + totalCount;
+    return 'Synced ' + Math.min(maxThreads, totalCount) + '/' + totalCount + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
   }
   
   Gmail.syncAllSheetsWithGmail = function() {

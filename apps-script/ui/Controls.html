@@ -13,6 +13,7 @@
         data-max-threads="<?= preferences.maxThreads ?>"></div>   
     <div class="message"></div>
     <div class="error"></div>
+    <div class="rpcMessages"></div>
     <div class="sheetController">
       <h1><span class="sheetName"></span> sheet</h1>
       <div class="untracked" style="display: none">
@@ -41,12 +42,13 @@
       <button class="syncAllWithGmailButton">Sync All with Gmail</button>
       <button class="organizeAllButton">Organize All</button>
       <button class="updateOverviewButton">Update Overview</button>
-      <button class="doAllTheThingsButton">Do all the things!</button>
-      <div class="toggleRefreshing" data-auto-refresh="<?= this.autoRefresh ?>">
+      <button class="doAllTheThingsButton" style="display: none">Do all the things!</button>
+      <div class="toggleRefreshing" data-auto-refresh="<?= autoRefresh ?>">
         <span class="stopRefreshing">Stop auto-refresh</span>
         <span class="startRefreshing">Start auto-refresh</span>
         <span class="refreshNow">Refresh now</span>
       </div>
+      <span class="rerender">Re-render controls</span>
       <?!= include("ui/ControlsJavascript"); ?>
   </body>
 </html>

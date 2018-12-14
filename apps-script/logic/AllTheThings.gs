@@ -1,5 +1,5 @@
 function doAllTheThings() {
   syncAllSheetsWithGmail();
-  organizeAllTracking();
+  organizeAll();
   updateOverview();
 }

@@ -1,7 +1,7 @@
 function showPreferencesSidebar() {
   Log.start('showPreferencesSidebar', []);
-  Gmail.init();
   Tracking.init();
+  Preferences.init();
   var template = HtmlService.createTemplateFromFile('ui/Controls');
   var sheet = SpreadsheetApp.getActiveSheet();
   var sheetId = sheet.getSheetId();
@@ -13,8 +13,7 @@ function showPreferencesSidebar() {
 
 function getPreferencesForSheet(sheetId) {
   Log.start('getPreferencesForSheet', []);
-  Gmail.init();
-  Tracking.init();
+  Preferences.init();
   var ret = JSON.stringify(Preferences.getPreferencesForSheet(sheetId)); 
   Log.stop('getPreferencesForSheet', []);
   return ret;

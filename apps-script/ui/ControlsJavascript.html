@@ -79,7 +79,6 @@ class Global {
   }
 
   static showError(msg) {
-    console.log(msg);
     if (msg.startsWith && msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
       Global.log(msg);
       return;
@@ -102,15 +101,17 @@ class Global {
 class RpcConfig {
   constructor(callFn) {
     this.callFn = callFn;
-    this.handleSuccess_ = Global.log;
-    this.handleFailure_ = Global.log;
+    this.successOut_ = this.output.bind(this);
+    this.failureOut_ = this.output.bind(this);
+    this.successFn_ = null;
+    this.failureFn_ = null;
   }
   
   retryOnTimeout() {
     if (!RpcConfig.ALLOW_RETRIES) {
-      return this.withFailureHandler(Global.showError);
+      return this;
     }
-    return this.withFailureHandler(function(errorMsg) {
+    return this.logAll().withFailureFn(function(errorMsg) {
           if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
             console.log(errorMsg);
             this.callRpc();
@@ -120,18 +121,72 @@ class RpcConfig {
         }.bind(this));
   }
   
-  withSuccessHandler(handleSuccess) {
-    this.handleSuccess_ = handleSuccess;
+  logSuccess() {
+    this.successOut_ = Global.log;
     return this;
   }
   
-  withFailureHandler(handleFailure) {
-    this.handleFailure_ = handleFailure;
+  logFailure() {
+    this.failureOut_ = Global.log;
+    return this;
+  }
+  
+  logAll() {
+    return this.logSuccess().logFailure();
+  }
+  
+  ignoreSuccess() {
+    this.successOut_ = function() { };
+    return this;
+  }
+  
+  ignoreFailure() {
+    this.failureOut_ = function() { };
+    return this;
+  }
+  
+  ignoreAll() {
+    return this.ignoreSuccess().ignoreFailure();
+  }
+  
+  withSuccessFn(successFn) {
+    this.successFn_ = successFn;
+    return this;
+  }
+  
+  withFailureFn(failureFn) {
+    this.failureFn_ = failureFn;
+    return this;
+  }
+  
+  handleSuccess_(msg) {
+    this.successOut_(msg);
+    if (this.successFn_) {
+      this.successFn_(msg);
+    }
+    if (this.rpcDiv_) {
+      this.rpcDiv_.delay(30*1000).fadeOut('slow');
+    }
+  }
+  
+  handleFailure_(msg) {
+    this.failureOut_(msg);
+    if (this.failureFn_) {
+      this.failureFn_(msg);
+    }
+  }
+  
+  output(msg) {
+    if (!this.rpcDiv_) {
+      this.rpcDiv_ = $('<div />').addClass('rpcMessage');
+      $('.rpcMessages').append(this.rpcDiv_);
+    }
+    this.rpcDiv_.text(msg);
     return this;
   }
   
   callRpc() {
-    this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_).withFailureHandler(this.handleFailure_));
+    this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_.bind(this)).withFailureHandler(this.handleFailure_.bind(this)));
   }
 }
 
@@ -149,8 +204,6 @@ class AlternatingVisibility {
   }
   
   setVisible(visibleKey) {
-    console.log('For ' + this.name);
-    console.log('setVisible(' + visibleKey + ')');
     visibleKey = String(visibleKey);
     if (!this.jqMap[visibleKey]) {
       throw new Error('Invalid key: ' + visibleKey);
@@ -227,9 +280,8 @@ class LabelPicker {
   }
   
   static renameLabel(newLabel) {
-    Global.showMessage('Renaming label ' + Global.getLabel() + ' to ' + newLabel);
     new RpcConfig(runner => runner.renameLabel(Global.getSheetId(), newLabel)).
-        withSuccessHandler(Global.showMessage).
+        output('Renaming label ' + Global.getLabel() + ' to ' + newLabel).
         callRpc();
     Global.setLabel(newLabel);
     LabelPicker.setMode(MODE.DISPLAY);
@@ -250,7 +302,8 @@ class Gmail {
     LabelPicker.getMaxThreadsElement().val(Global.getMaxThreads());
     new RpcConfig(runner => runner.getAllLabels()).
         retryOnTimeout().
-        withSuccessHandler(successMsg => LabelPicker.populateSelect(JSON.parse(successMsg))).
+        logAll().
+        withSuccessFn(successMsg => LabelPicker.populateSelect(JSON.parse(successMsg))).
         callRpc();
   }
 }
@@ -311,10 +364,9 @@ class SheetController {
   }
 
   static organizeClicked() {
-    Global.showMessage('Organizing ' + Global.getSheetName() + ' sheet...');
     new RpcConfig(runner => runner.organize(Global.getSheetId())).
+        output('Organizing ' + Global.getSheetName() + ' sheet...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
   
@@ -336,20 +388,16 @@ class SheetController {
   }
 
   static syncWithGmailClicked() {
-    Global.showMessage('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getLabel() + ' label...');
-    Global.clearError();
     new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+        output('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getLabel() + ' label...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
 
   static syncAllWithGmailClicked() {
-    Global.showMessage('Syncing all...');
-    Global.clearError();
     new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+        output('Syncing all...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
 
@@ -386,13 +434,17 @@ class SheetController {
         }
         new RpcConfig(runner => runner.getPreferencesForSheet(activeSheetId)).
             retryOnTimeout().
-            withSuccessHandler(preferencesSuccessHandler).
+            ignoreSuccess().
+            logFailure().
+            withSuccessFn(preferencesSuccessHandler).
             callRpc();
       }
     }
     new RpcConfig(runner => runner.getActiveSheetId()).
         retryOnTimeout().
-        withSuccessHandler(getActiveSheetIdSuccessHandler).
+        ignoreSuccess().
+        logFailure().
+        withSuccessFn(getActiveSheetIdSuccessHandler).
         callRpc();
   }
   
@@ -424,29 +476,23 @@ SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
 
 class GlobalController {
   static organizeAllClicked() {
-    Global.showMessage('Organizing all...');
-    Global.clearError();
     new RpcConfig(runner => runner.organizell()).
+        output('Organizing all...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
 
   static updateOverviewClicked() {
-    Global.showMessage('Updating overview...');
-    Global.clearError();
     new RpcConfig(runner => runner.updateOverview()).
+        output('Updating overview...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
 
   static doAllTheThingsClicked() {
-    Global.showMessage('Doing all the things...');
-    Global.clearError();
     new RpcConfig(runner => runner.doAllTheThings()).
+        output('Doing all the things...').
         retryOnTimeout().
-        withSuccessHandler(Global.showMessage).
         callRpc();
   }
   
@@ -461,23 +507,32 @@ class GlobalController {
   static refreshNowClicked() {
     SheetController.refreshNow();
   }
-
-    static addListeners() {
-      $('.syncAllWithGmailButton').click(GlobalController.syncAllWithGmailClicked);
-      $('.organizeAllButton').click(GlobalController.organizeAllClicked);
-      $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
-      $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
-      $('.startRefreshing').click(GlobalController.startRefreshingClicked);
-      $('.stopRefreshing').click(GlobalController.stopRefreshingClicked);
-      $('.refreshNow').click(GlobalController.refreshNowClicked);
-    }
-    
-    static init() {
-      GlobalController.addListeners();
-    }
+  
+  static refreshNowClicked() {
+    SheetController.refreshNow();
   }
   
-  SheetController.init();
-  GlobalController.init();
+  static rerenderClicked() {
+    new RpcConfig(runner => runner.showPreferencesSidebar()).callRpc();
+  }
+
+  static addListeners() {
+    $('.syncAllWithGmailButton').click(GlobalController.syncAllWithGmailClicked);
+    $('.organizeAllButton').click(GlobalController.organizeAllClicked);
+    $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
+    $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
+    $('.startRefreshing').click(GlobalController.startRefreshingClicked);
+    $('.stopRefreshing').click(GlobalController.stopRefreshingClicked);
+    $('.refreshNow').click(GlobalController.refreshNowClicked);
+    $('.rerender').click(GlobalController.rerenderClicked);
+  }
+  
+  static init() {
+    GlobalController.addListeners();
+  }
+}
+  
+SheetController.init();
+GlobalController.init();
   
 </script>
