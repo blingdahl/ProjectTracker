@@ -31,8 +31,8 @@ Log.finest = function(s) {
   Log.log(Log.Level.FINEST, s);
 }
 
-Log.finest = function(s) {
-  Log.log(Log.Level.FINEST, s);
+Log.finer = function(s) {
+  Log.log(Log.Level.FINER, s);
 }
 
 Log.fine = function(s) {
