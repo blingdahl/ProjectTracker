@@ -7,6 +7,7 @@ AddUrl.init = function() {
   }
   
   TrackingSheet.init();
+  Organize.init();
   AddUrl.initialized = true;
   
   Log.info('AddUrl.init()');
@@ -19,6 +20,7 @@ AddUrl.init = function() {
     var newRow = trackingSheet.addRow();
     newRow.setValue(TrackingSheet.COLUMNS.ITEM, title);
     newRow.setFormula(TrackingSheet.COLUMNS.LINK, Spreadsheet.hyperlinkFormula(url, 'Link'));
+    Organize.organizeSheet(trackingSheet);
     return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
   }
 }
