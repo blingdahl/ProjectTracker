@@ -40,9 +40,14 @@ Spreadsheet.init = function() {
     return this.nativeSheet.getDataRange();
   }
   
-  Spreadsheet.Sheet.prototype.trimRows = function(rowsToKeep) {
+  Spreadsheet.Sheet.prototype.setNumRows = function(rowsToKeep) {
     if (rowsToKeep < this.getAllRows().length) {
       this.nativeSheet.deleteRows(rowsToKeep, this.nativeSheet.getMaxRows() - rowsToKeep);
+    } else if (rowsToKeep > this.getAllRows().length) {
+      var currNumRows = this.getAllRows().length;
+      for (var i = currNumRows + 1; i < rowsToKeep; i++) {
+        this.nativeSheet.insertRowAfter(i);
+      }
     }
   }
   
