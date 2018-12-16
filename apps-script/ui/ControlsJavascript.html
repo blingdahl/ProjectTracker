@@ -1,29 +1,564 @@
-var AddUrl = {};
-AddUrl.initialized = false;
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+let MODE = {'SELECT': 1, 'DISPLAY': 2};
 
-AddUrl.init = function() {
-  if (AddUrl.initialized) {
-    return;
+class Global {
+  static getElt() {
+    return $('.global');
+  }
+
+  static getAttr(attrName) {
+    return Global.getElt().attr(attrName);
+  }
+
+  static setAttr(attrName, value) {
+    Global.getElt().attr(attrName, value);
   }
   
-  TrackingSheet.init();
-  AddUrl.initialized = true;
+  static getSheetName() {
+    return Global.getAttr('data-sheet-name');
+  }
+
+  static setSheetName(name) {
+    return Global.setAttr('data-sheet-name', name);
+  }
+
+  static getSheetId() {
+    return Global.getAttr('data-sheet-id');
+  }
+
+  static setSheetId(sheetId) {
+    return Global.setAttr('data-sheet-id', sheetId);
+  }
+
+  static getIsTracked() {
+    return Global.getAttr('data-is-tracked');
+  }
   
-  Log.info('AddUrl.init()');
+  static setIsTracked(tracked) {
+    Global.setAttr('data-is-tracked', String(tracked));
+  }
   
-  AddUrl.addUrl = function(sheetId, url) {
-    var content = UrlFetchApp.fetch(url).getContentText();
-    var xmldoc = Xml.parse(content, true);
-    var title = xmldoc.html.head.getElements("title")[0].getText().replace(/\s+/g, ' ');
-    var trackingSheet = TrackingSheet.forSheetId(sheetId);
-    var newRow = trackingSheet.addRow();
-    newRow.setValue(TrackingSheet.COLUMNS.ITEM, title);
-    newRow.setFormula(TrackingSheet.COLUMNS.LINK, Spreadsheet.hyperlinkFormula(url, 'Link'));
-    return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
+  static getLabel() {
+    return Global.getAttr('data-label-name');
+  }
+  
+  static setLabel(label) {
+    return Global.setAttr('data-label-name', label);
+  }
+  
+  static getMaxThreads() {
+    return Global.getAttr('data-max-threads');
+  }
+  
+  static setMaxThreads(maxThreads) {
+    return Global.setAttr('data-max-threads', maxThreads);
+  }
+  
+  static getAutoRefresh() {
+    return $('[data-auto-refresh]').attr('data-auto-refresh') === 'true';
+  }
+  
+  static setAutoRefresh(autoRefresh) {
+    return $('[data-auto-refresh]').attr('data-auto-refresh', String(autoRefresh));
+  }
+  
+  static clearLabel() {
+    Global.setLabel(null);
+  }
+
+  static showMessage(msg) {
+    Global.clearError();
+    $('.message').text(msg);
+  }
+
+  static clearMessage() {
+    if ($('.message').text() !== '') {
+      Global.showMessage('');
+    }
+  }
+
+  static showError(msg) {
+    if (msg.startsWith && msg.startsWith('NetworkError: Connection failure due to HTTP ')) {
+      Global.log(msg);
+      return;
+    }
+    Global.clearMessage();
+    $('.error').text(msg);
+  }
+
+  static clearError(msg) {
+    if ($('.error').text() !== '') {
+      Global.showError('');
+    }
+  }
+  
+  static log(msg) {
+    console.log(msg);
   }
 }
 
-function addUrl(sheetId, url) {
-  AddUrl.init();
-  return AddUrl.addUrl(sheetId, url);
+class RpcConfig {
+  constructor(callFn) {
+    this.callFn = callFn;
+    this.successOut_ = this.output.bind(this);
+    this.failureOut_ = this.output.bind(this);
+    this.successFn_ = null;
+    this.failureFn_ = null;
+  }
+  
+  retryOnTimeout() {
+    if (!RpcConfig.ALLOW_RETRIES) {
+      return this;
+    }
+    return this.logAll().withFailureFn(function(errorMsg) {
+          if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
+            console.log(errorMsg);
+            this.callRpc();
+            return;
+            Global.showError(errorMsg);
+          }
+        }.bind(this));
+  }
+  
+  logSuccess() {
+    this.successOut_ = Global.log;
+    return this;
+  }
+  
+  logFailure() {
+    this.failureOut_ = Global.log;
+    return this;
+  }
+  
+  logAll() {
+    return this.logSuccess().logFailure();
+  }
+  
+  ignoreSuccess() {
+    this.successOut_ = function() { };
+    return this;
+  }
+  
+  ignoreFailure() {
+    this.failureOut_ = function() { };
+    return this;
+  }
+  
+  ignoreAll() {
+    return this.ignoreSuccess().ignoreFailure();
+  }
+  
+  withSuccessFn(successFn) {
+    this.successFn_ = successFn;
+    return this;
+  }
+  
+  withFailureFn(failureFn) {
+    this.failureFn_ = failureFn;
+    return this;
+  }
+  
+  removeRpcDiv_() {
+    if (this.rpcDiv_) {
+      this.rpcDiv_.fadeOut('slow');
+    }
+  }
+  
+  makeRemoveLogButton_() {
+    let removeLogButton = $('<div />').addClass('removeLogButton').text('✕');
+    removeLogButton.click(this.removeRpcDiv_.bind(this));
+    return removeLogButton;
+  }
+  
+  handleSuccess_(msg) {
+    this.successOut_(msg);
+    if (this.successFn_) {
+      this.successFn_(msg);
+    }
+    if (this.rpcDiv_) {
+      this.rpcDiv_.append(this.makeRemoveLogButton_());
+    }
+  }
+  
+  handleFailure_(msg) {
+    this.failureOut_(msg);
+    if (this.failureFn_) {
+      this.failureFn_(msg);
+    }
+    if (this.rpcDiv_) {
+      this.rpcDiv_.append(this.makeRemoveLogButton_());
+    }
+  }
+  
+  output(msg) {
+    if (!this.rpcDiv_) {
+      this.rpcDiv_ = $('<div />').addClass('rpcMessage');
+      $('.rpcMessages').append(this.rpcDiv_);
+    }
+    this.rpcDiv_.text(msg);
+    return this;
+  }
+  
+  callRpc() {
+    this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_.bind(this)).withFailureHandler(this.handleFailure_.bind(this)));
+  }
 }
+
+RpcConfig.ALLOW_RETRIES = false;
+
+class AlternatingVisibility {
+  constructor(name) {
+    this.name = name;
+    this.jqMap = {};
+  }
+  
+  map(key, jqs) {
+    this.jqMap[String(key)] = jqs;
+    return this;
+  }
+  
+  setVisible(visibleKey) {
+    visibleKey = String(visibleKey);
+    if (!this.jqMap[visibleKey]) {
+      throw new Error('Invalid key: ' + visibleKey);
+    }
+    let keys = Object.keys(this.jqMap);
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i];
+      let jq = this.jqMap[key];
+      if (visibleKey === key) {
+        jq.show();
+      } else {
+        jq.hide();
+      }
+    }
+  }
+}
+
+class LabelPicker {
+  static getSelectElement() {
+    return $('.labelSelect');
+  }
+
+  static getMaxThreadsElement() {
+    return $('.maxThreads');
+  }
+
+  static clearSelectOptions(initialOptionText) {
+    LabelPicker.getSelectElement().find('option').remove();
+    LabelPicker.getSelectElement().append($('<option />').text(initialOptionText));
+  }
+  
+  static populateSelect(labels) {
+    LabelPicker.clearSelectOptions('Select Label');
+    let currLabel = Global.getLabel();
+    labels.sort();
+    for (let i = 0; i < labels.length; i++) {
+      let label = labels[i];
+      let newOption = $('<option />').val(label).text(label);
+      LabelPicker.getSelectElement().append(newOption)
+      if (currLabel == label) {
+        newOption.prop('selected', true);
+      }
+    }
+  }
+
+  static getLabelNameElt() {
+    return $('.labelName');
+  }
+
+  static setMode(mode) {
+    if (mode == MODE.SELECT) {
+      LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.SELECT)
+    } else if (mode == MODE.DISPLAY) {
+      LabelPicker.DISPLAY_MODE_VISIBILITY.setVisible(MODE.DISPLAY)
+      let labelName = Global.getLabel();
+      LabelPicker.getLabelNameElt().text(labelName ? (labelName + ' (' + Global.getMaxThreads() + ' max)') : 'Choose label...');
+      LabelPicker.LABEL_BUTTON_VISIBILITY.setVisible(!!labelName);
+    } else {
+      throw new Error('Unexpected mode: ' + mode);
+    }
+  }
+  
+  static updateLabelFromSelect() {
+    let ret = LabelPicker.getSelectElement().val();
+    Global.setLabel(ret);
+    Global.setMaxThreads(LabelPicker.getMaxThreadsElement().val());
+    return ret;
+  }
+  
+  static updateMaxThreadsFromInput() {
+    let ret = LabelPicker.getMaxThreadsElement().val();
+    Global.setMaxThreads(ret);
+    return ret;
+  }
+  
+  static renameLabel(newLabel) {
+    new RpcConfig(runner => runner.renameLabel(Global.getSheetId(), newLabel)).
+        output('Renaming label ' + Global.getLabel() + ' to ' + newLabel).
+        callRpc();
+    Global.setLabel(newLabel);
+    LabelPicker.setMode(MODE.DISPLAY);
+  }
+}
+
+LabelPicker.DISPLAY_MODE_VISIBILITY = new AlternatingVisibility('DisplayMode').
+    map(MODE.SELECT, $('.labelSelectMode')).
+    map(MODE.DISPLAY, $('.labelDisplayMode'));
+
+LabelPicker.LABEL_BUTTON_VISIBILITY = new AlternatingVisibility('LabelButton').
+    map(true, $('.removeLabelButton,.syncWithGmailButton,.renameLabelButton')).
+    map(false, $('.noButtonExisting'));
+
+class Gmail {
+  static populateLabelSelect() {
+    LabelPicker.clearSelectOptions('Populating...');
+    LabelPicker.getMaxThreadsElement().val(Global.getMaxThreads());
+    new RpcConfig(runner => runner.getAllLabels()).
+        retryOnTimeout().
+        logAll().
+        withSuccessFn(successMsg => LabelPicker.populateSelect(JSON.parse(successMsg))).
+        callRpc();
+  }
+}
+
+class SheetController {
+  static setTracked(tracked) {
+    Global.setIsTracked(tracked);
+    new RpcConfig(runner => runner.setTrackedForSheet(Global.getSheetId(), tracked)).
+        retryOnTimeout().
+        callRpc();
+  }
+  
+  static getSheetNameElt() {
+    return $('.sheetName');
+  }
+  
+  static hide() {
+    $('.sheetController').hide();
+  }
+  
+  static labelNameClicked() {
+    Gmail.populateLabelSelect();
+    LabelPicker.setMode(MODE.SELECT);
+  }
+  
+  static updateTemplatedText(sheetName) {
+    $('[data-templated-name]').each(function() {
+      let jq = $(this);
+      if (sheetName) {
+        jq.text(jq.attr('data-templated-name').replace(/{sheetName}/g, sheetName));
+      } else {
+        jq.text(jq.attr('data-no-templated-name'));
+      }
+    });
+  }
+  
+  static show() {
+    let sheetName = Global.getSheetName();
+    if (sheetName === 'Overview') {
+      SheetController.hide();
+      return;
+    }
+    SheetController.getSheetNameElt().text(sheetName);
+    SheetController.TRACKED_VISIBILITY.setVisible(Global.getIsTracked());
+    SheetController.updateTemplatedText(sheetName);
+    LabelPicker.setMode(MODE.DISPLAY);
+    $('.sheetController').show();
+  }
+  
+  static trackClicked() {
+    SheetController.setTracked(true);
+    SheetController.show();
+  }
+
+  static init() {
+    console.log('init()');
+    SheetController.show();
+  }
+
+  static organizeClicked() {
+    new RpcConfig(runner => runner.organize(Global.getSheetId())).
+        output('Organizing ' + Global.getSheetName() + ' sheet...').
+        retryOnTimeout().
+        callRpc();
+  }
+  
+  static cancelLabelClicked() {
+    LabelPicker.setMode(MODE.DISPLAY);
+  }
+  
+  static saveClicked() {
+    new RpcConfig(runner => runner.setLabelForSheet(Global.getSheetId(), LabelPicker.updateLabelFromSelect(), LabelPicker.updateMaxThreadsFromInput())).
+        retryOnTimeout().
+        callRpc();
+    LabelPicker.setMode(MODE.DISPLAY);
+  }
+  
+  static removeLabelClicked() {
+    Global.clearLabel();
+    new RpcConfig(runner => runner.clearLabelForSheet(Global.getSheetId())).callRpc();
+    LabelPicker.setMode(MODE.DISPLAY);
+  }
+
+  static syncWithGmailClicked() {
+    new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+        output('Syncing ' + Global.getSheetName() + ' sheet with ' + Global.getLabel() + ' label...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static syncAllWithGmailClicked() {
+    new RpcConfig(runner => runner.syncSheetWithGmail(Global.getSheetId())).
+        output('Syncing all...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static renameLabelClicked() {
+    let newLabel = window.prompt('New label name?');
+    if (newLabel) {
+      LabelPicker.renameLabel(newLabel);
+    }
+  }
+
+  static addUrlClicked() {
+    let url = window.prompt('URL');
+    if (url) {
+      new RpcConfig(runner => runner.addUrl(Global.getSheetId(), url)).
+          output('Adding ' + url + ' to ' + Global.getSheetName() + '...').
+          retryOnTimeout().
+          callRpc();
+    }
+  }
+  
+  static addListeners() {
+    $('.labelName').click(SheetController.labelNameClicked);
+    $('.trackButton').click(SheetController.trackClicked);
+    $('.renameLabelButton').click(SheetController.renameLabelClicked);
+    $('.removeLabelButton').click(SheetController.removeLabelClicked);
+    $('.cancelLabelButton').click(SheetController.cancelLabelClicked);
+    $('.saveButton').click(SheetController.saveClicked);
+    $('.syncWithGmailButton').click(SheetController.syncWithGmailClicked);
+    $('.organizeButton').click(SheetController.organizeClicked);
+    $('.addUrlButton').click(SheetController.addUrlClicked);
+  }
+  
+  static refreshNow() {
+    function getActiveSheetIdSuccessHandler(activeSheetId) {
+      if (activeSheetId != Global.getSheetId()) {
+        SheetController.hide();
+        function preferencesSuccessHandler(preferencesStr) {
+          let preferences = JSON.parse(preferencesStr);
+          Global.setSheetId(activeSheetId);
+          Global.setSheetName(preferences.sheetName);
+          Global.setIsTracked(preferences.isTracked);
+          Global.setLabel(preferences.label);
+          Global.setMaxThreads(preferences.maxThreads);
+          SheetController.show();
+        }
+        new RpcConfig(runner => runner.getPreferencesForSheet(activeSheetId)).
+            retryOnTimeout().
+            ignoreSuccess().
+            logFailure().
+            withSuccessFn(preferencesSuccessHandler).
+            callRpc();
+      }
+    }
+    new RpcConfig(runner => runner.getActiveSheetId()).
+        retryOnTimeout().
+        ignoreSuccess().
+        logFailure().
+        withSuccessFn(getActiveSheetIdSuccessHandler).
+        callRpc();
+  }
+  
+  static checkActiveSheetId() {
+    if (!Global.getAutoRefresh()) {
+      return;
+    }
+    SheetController.refreshNow();
+  }
+  
+  static setAutoRefresh(autoRefresh) {
+    Global.setAutoRefresh(autoRefresh);
+    new RpcConfig(runner => runner.setAutoRefresh(autoRefresh)).
+        callRpc();
+  }
+  
+  static init() {
+    SheetController.addListeners();
+    SheetController.show();
+    window.setInterval(SheetController.checkActiveSheetId, 1000);
+  }
+}
+
+SheetController.refresh = false;
+
+SheetController.TRACKED_VISIBILITY = new AlternatingVisibility('Tracked').
+    map(true, $('.tracked')).
+    map(false, $('.untracked'));
+
+class GlobalController {
+  static organizeAllClicked() {
+    new RpcConfig(runner => runner.organizell()).
+        output('Organizing all...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static updateOverviewClicked() {
+    new RpcConfig(runner => runner.updateOverview()).
+        output('Updating overview...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static doAllTheThingsClicked() {
+    new RpcConfig(runner => runner.doAllTheThings()).
+        output('Doing all the things...').
+        retryOnTimeout().
+        callRpc();
+  }
+  
+  static startRefreshingClicked() {
+    SheetController.setAutoRefresh(true);
+  }
+  
+  static stopRefreshingClicked() {
+    SheetController.setAutoRefresh(false);
+  }
+  
+  static refreshNowClicked() {
+    SheetController.refreshNow();
+  }
+  
+  static refreshNowClicked() {
+    SheetController.refreshNow();
+  }
+  
+  static rerenderClicked() {
+    new RpcConfig(runner => runner.showPreferencesSidebar()).callRpc();
+  }
+
+  static addListeners() {
+    $('.syncAllWithGmailButton').click(GlobalController.syncAllWithGmailClicked);
+    $('.organizeAllButton').click(GlobalController.organizeAllClicked);
+    $('.updateOverviewButton').click(GlobalController.updateOverviewClicked);
+    $('.doAllTheThingsButton').click(GlobalController.doAllTheThingsClicked);
+    $('.startRefreshing').click(GlobalController.startRefreshingClicked);
+    $('.stopRefreshing').click(GlobalController.stopRefreshingClicked);
+    $('.refreshNow').click(GlobalController.refreshNowClicked);
+    $('.rerender').click(GlobalController.rerenderClicked);
+  }
+  
+  static init() {
+    GlobalController.addListeners();
+  }
+}
+  
+SheetController.init();
+GlobalController.init();
+  
+</script>
