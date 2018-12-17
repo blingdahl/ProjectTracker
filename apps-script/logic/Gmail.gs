@@ -230,7 +230,7 @@ Gmail.init = function() {
   }
   
   Gmail.syncAllSheetsWithGmail = function() {
-    var sheets = SpreadsheetApp.getActive().getSheets();
+    var sheets = Spreadsheet.getNativeSpreadsheet().getSheets();
     for (var i = 0; i < sheets.length; i++) {
       var label = Preferences.getLabelNameForSheet(sheets[i].getSheetId());
       if (label) {
@@ -258,13 +258,6 @@ function syncSheetWithGmail(sheetId) {
   var ret = Gmail.syncSheet(sheetId);
   Log.stop('syncSheetWithGmail', [sheetId]);
   return ret;
-}
-
-function syncCurrentSheetWithGmail() {
-  Log.start('syncCurrentSheetWithGmail', []);
-  Gmail.init();
-  Gmail.syncSheet(Spreadsheet.getActiveSheetId());
-  Log.stop('syncCurrentSheetWithGmail', []);
 }
 
 function syncAllSheetsWithGmail() {

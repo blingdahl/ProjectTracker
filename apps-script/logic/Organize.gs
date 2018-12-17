@@ -5,16 +5,16 @@ Organize.init = function() {
   if (Organize.initialized) {
     return;
   }
-  
+
   TrackingSheet.init();
   Log.info('Organize.init()');
-  
+
   Organize.initialized = true;
 
   Organize.organizeSheet = function(trackingSheet) {
     var dataRows = trackingSheet.getDataRows();
     var numRows = dataRows.slice(-1)[0].getRowNumber();
-    trackingSheet.trimRows(numRows + Organize.EXTRA_ROWS);
+    trackingSheet.setNumRows(numRows + Organize.EXTRA_ROWS);
     var rows = trackingSheet.getAllRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
@@ -31,10 +31,6 @@ Organize.init = function() {
   Organize.organize = function(sheetId) {
     return Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
-  
-  Organize.organizeCurrentSheet = function() {
-    return Organize.organize(Spreadsheet.getActiveSheetId());
-  }
 }
 
 Organize.EXTRA_ROWS = 10;
@@ -50,11 +46,4 @@ function organize(sheetId) {
   var ret = Organize.organize(sheetId);
   Log.stop('organize', [sheetId]);
   return ret;
-}
-
-function organizeCurrentSheet() {
-  Log.start('organizeCurrentSheet', [sheetId]);
-  Organize.init();
-  Organize.organizeCurrentSheet();
-  Log.stop('organizeCurrentSheet', [sheetId]);
 }

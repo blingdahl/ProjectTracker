@@ -34,7 +34,7 @@ Label.init = function() {
   
   Label.getSheetLabelNames = function() {
     var ret = [];
-    SpreadsheetApp.getActive().getSheets().forEach(function(sheet) {
+    Spreadsheet.getSpreadsheet().getNativeSheets().forEach(function(sheet) {
       var sheetId = sheet.getSheetId();
       var labelForSheet = Preferences.getLabelNameForSheet(sheetId);
       if (labelForSheet) {

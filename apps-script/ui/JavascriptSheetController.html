@@ -32,23 +32,6 @@ class SheetController {
   getSheetName() {
     return this.divJq.attr('data-sheet-name');
   }
-   
-  getIsTracked() {
-    return this.divJq.attr('data-is-tracked') === 'true';
-  }
-   
-  setIsTracked(tracked) {
-    this.divJq.attr('data-is-tracked', tracked ? 'true' : 'false');
-  }
-  
-  // SECTION:
-  // Logic
-  setTracked(tracked) {
-    this.setIsTracked(tracked);
-    new RpcConfig(runner => runner.setTrackedForSheet(this.getSheetId(), tracked)).
-        retryOnTimeout().
-        callRpc();
-  }
   
   hide() {
     this.divJq.hide();
@@ -79,11 +62,6 @@ class SheetController {
   // SECTION:
   // Click handlers
 
-  trackClicked() {
-    this.setTracked(true);
-    this.show();
-  }
-
   organizeClicked() {
     new RpcConfig(runner => runner.organize(this.getSheetId())).
         output('Organizing ' + this.getSheetName() + ' sheet...').
@@ -113,7 +91,6 @@ class SheetController {
   
   addListeners() {
     this.labelPicker.addListeners();
-    this.getTrackElement().click(this.trackClicked.bind(this));
     this.getSyncWithGmailElement().click(this.syncWithGmailClicked.bind(this));
     this.getOrganizeElement().click(this.organizeClicked.bind(this));
     this.getAddUrlElement().click(this.addUrlClicked.bind(this));

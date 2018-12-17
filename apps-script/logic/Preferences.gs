@@ -75,25 +75,13 @@ Preferences.init = function() {
   
   Preferences.getTrackedForSheet = function(sheetId) {
     return PropertiesService.getScriptProperties().getProperty(Preferences.trackedProperty(sheetId)) === 'true';
-  } 
+  }
 
-  Preferences.autoRefreshProperty = function() {
-    return 'autoRefresh';
-  }
-  
-  Preferences.setAutoRefresh = function(autoRefresh) {
-    PropertiesService.getScriptProperties().setProperty(Preferences.autoRefreshProperty(), autoRefresh ? 'true' : 'false');
-  }
-  
-  Preferences.getAutoRefresh = function() {
-    return PropertiesService.getScriptProperties().getProperty(Preferences.autoRefreshProperty()) === 'true';
-  } 
-  
   Preferences.getPreferencesForSheet = function(sheetId) {
     Log.start('getPreferencesForSheet', [sheetId]);
     Preferences.init();
     var ret = {'sheetId': sheetId,
-               'sheetName': Spreadsheet.getNativeSheet(sheetId).getName(),
+               'sheetName': Spreadsheet.getSpreadsheet().getNativeSheet(sheetId).getName(),
                'label': Preferences.getLabelNameForSheet(sheetId),
                'isTracked': Preferences.getTrackedForSheet(sheetId),
                'maxThreads': Preferences.getMaxThreadsForSheet(sheetId)};
@@ -148,19 +136,4 @@ function clearLabelForSheet(sheetId) {
   Preferences.init();
   Preferences.clearLabelForSheet(sheetId);
   Log.stop('clearLabelForSheet', [sheetId]);
-}
-
-function setAutoRefresh(autoRefresh) {
-  Log.start('setAutoRefresh', [autoRefresh]);
-  Preferences.init();
-  Preferences.setAutoRefresh(autoRefresh);
-  Log.stop('setAutoRefresh', [autoRefresh]);
-}
-
-function getAutoRefresh() {
-  Log.start('getAutoRefresh', []);
-  Preferences.init();
-  var ret = Preferences.getAutoRefresh();
-  Log.stop('getAutoRefresh', []);
-  return ret;
 }
