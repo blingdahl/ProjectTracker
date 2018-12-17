@@ -56,7 +56,7 @@ class LabelPicker {
 
   setMode(mode) {
     this.pickerJq.attr('data-mode', mode);
-    this.getLabelNameElement().text(this.getLabelName());
+    this.getLabelNameElement().text(this.getLabelName() || 'Label...');
   }
   
   populateSelect(labels) {
