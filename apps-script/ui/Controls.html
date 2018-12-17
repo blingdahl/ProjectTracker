@@ -8,36 +8,56 @@
     <div class="message"></div>
     <div class="error"></div>
     <div class="rpcMessages"></div>
-    <div class="sheetController"
-        data-sheet-id="<?= preferences.sheetId ?>"
-        data-sheet-name="<?= preferences.sheetName ?>" 
-        data-is-tracked="<?= preferences.isTracked ?>">
-      <h1 data-templated-name="{sheetName} sheet">??? sheet</h1>
-      <div class="untracked">
-      <button class="track" data-templated-name="Track {sheetName}">Track sheet</button>
-      </div>
-      <div class="tracked">
-      <div class="labelPicker"
-      data-label-name="<?= preferences.label ?>"
-      data-max-threads="<?= preferences.maxThreads ?>">
-      <div class="labelDisplayMode">
-      <span class="labelName"></span>
-      <button class="removeLabel labelOnly">Remove</button>
-      <button class="renameLabel labelOnly">Rename</button>
-      </div>
-      <div class="labelSelectMode">
-      <select class="selectLabel">
-      </select>
-      <input type="text" class="maxThreads">
-      <button class="saveLabel">Save</button>
-      <button class="cancelLabel">Cancel</button>
-      </div>
-      <button class="syncWithGmail labelOnly" data-templated-name="Sync {sheetName} with Gmail" data-no-templated-name="Sync with Gmail"></button>
-      </div>
-      <button class="organize" data-templated-name="Organize {sheetName}" data-no-templated-name="Organize"></button>
-      <button class="addUrl" data-templated-name="Add URL to {sheetName}" data-no-templated-name="Add URL"></button>
-      </div>
-    </div>
+    <table>
+      <tr>
+        <th>
+          Sheet
+        </th>
+        <th>
+          Tracking
+        </th>
+        <th>
+        </th>
+        <th>
+        </th>
+      </tr>
+      <tr class="sheetController"
+					data-sheet-id="<?= preferences.sheetId ?>"
+					data-sheet-name="<?= preferences.sheetName ?>" 
+					data-is-tracked="<?= preferences.isTracked ?>">
+				<td data-templated-name="{sheetName}">???</td>
+				<td>
+					<div class="untracked">
+						<a class="track">Track</a>
+					</div>
+					<div class="tracked">
+						<div class="labelPicker"
+								data-label-name="<?= preferences.label ?>"
+								data-max-threads="<?= preferences.maxThreads ?>">
+							<div class="labelDisplayMode">
+									<span class="labelName"></span>
+									<a class="removeLabel labelOnly">Remove</a>
+									<a class="renameLabel labelOnly">Rename</a>
+							</div>
+							<div class="labelSelectMode">
+									<select class="selectLabel">
+									</select>
+									<input type="text" class="maxThreads">
+									<a class="saveLabel">Save</a>
+									<a class="cancelLabel">Cancel</a>
+							</div>
+							<a class="syncWithGmail labelOnly">Sync with Gmail</a>
+					  </div>
+					</div>
+				</td>
+				<td>
+  				<a class="organize">Organize</a>
+  		  </td>
+  		  <td>
+            <a class="addUrl">Add URL</a>
+          </td>
+      </tr>
+    </table>
     <h1>All Sheets</h1>
     <button class="syncAllWithGmail">Sync All with Gmail</button>
     <button class="organizeAll">Organize All</button>
