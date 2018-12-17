@@ -22,7 +22,7 @@
     cursor: pointer;
   }
   
-  .startRefreshing, .stopRefreshing, .refreshNow, .rerender {
+  .rerender {
     font-size: 8px;
     text-decoration: underline;
     cursor: pointer;
@@ -42,6 +42,22 @@
   }
   
   [data-auto-refresh="false"] .stopRefreshing {
+    display: none;
+  }
+  
+  [data-mode="SELECT"] .labelDisplayMode {
+    display: none;
+  }
+  
+  [data-mode="DISPLAY"] .labelSelectMode {
+    display: none;
+  }
+  
+  [data-is-tracked="true"] .untracked {
+    display: none;
+  }
+  
+  [data-is-tracked="false"] .tracked {
     display: none;
   }
   

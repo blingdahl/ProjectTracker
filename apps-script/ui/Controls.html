@@ -5,28 +5,27 @@
   </head>
   <body>
     <?!= include("ui/ControlsStylesheet"); ?>
-    <div class="global" style="display: none" 
-        data-sheet-id="<?= preferences.sheetId ?>"
-        data-sheet-name="<?= preferences.sheetName ?>" 
-        data-is-tracked="<?= preferences.isTracked ?>"
-        data-label-name="<?= preferences.label ?>"
-        data-max-threads="<?= preferences.maxThreads ?>"></div>   
     <div class="message"></div>
     <div class="error"></div>
     <div class="rpcMessages"></div>
-    <div class="sheetController">
-      <h1><span class="sheetName"></span> sheet</h1>
-      <div class="untracked" style="display: none">
-      <button class="trackButton">Track sheet</button>
+    <div class="sheetController"
+        data-sheet-id="<?= preferences.sheetId ?>"
+        data-sheet-name="<?= preferences.sheetName ?>" 
+        data-is-tracked="<?= preferences.isTracked ?>">
+      <h1 data-templated-name="{sheetName} sheet">??? sheet</h1>
+      <div class="untracked">
+        <button class="trackButton" data-templated-name="Track {sheetName}">Track sheet</button>
       </div>
-      <div class="tracked" style="display: none">
-        <div class="labelPicker">
-          <div class="labelDisplayMode" style="display: none">
+      <div class="tracked">
+        <div class="labelPicker"
+            data-label-name="<?= preferences.label ?>"
+            data-max-threads="<?= preferences.maxThreads ?>">
+          <div class="labelDisplayMode">
             <span class="labelName"></span>
             <button class="removeLabelButton">Remove</button>
             <button class="renameLabelButton">Rename</button>
           </div>
-          <div class="labelSelectMode" style="display: none">
+          <div class="labelSelectMode">
             <select class="labelSelect">
             </select>
             <input type="text" class="maxThreads">
@@ -44,12 +43,14 @@
       <button class="organizeAllButton">Organize All</button>
       <button class="updateOverviewButton">Update Overview</button>
       <button class="doAllTheThingsButton" style="display: none">Do all the things!</button>
-      <div class="toggleRefreshing" data-auto-refresh="<?= autoRefresh ?>">
-        <span class="stopRefreshing">Stop auto-refresh</span>
-        <span class="startRefreshing">Start auto-refresh</span>
-        <span class="refreshNow">Refresh now</span>
-      </div>
-      <span class="rerender">Re-render controls</span>
-      <?!= include("ui/ControlsJavascript"); ?>
+      <div class="rerender">Re-render controls</div>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <script>
+        <?!= include("ui/JavascriptRpcConfig"); ?>
+        <?!= include("ui/JavascriptLabelPicker"); ?>
+        <?!= include("ui/JavascriptSheetController"); ?>
+        <?!= include("ui/JavascriptGlobalController"); ?>
+        <?!= include("ui/JavascriptControls"); ?>
+      </script>
   </body>
 </html>

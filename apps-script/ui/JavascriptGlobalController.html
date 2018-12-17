@@ -1,0 +1,65 @@
+class GlobalController {
+
+  // SECTION:
+  // Elements
+  
+  static getSyncAllWithGmailButtonElement() {
+    return $('.syncAllWithGmailButton');
+  }
+  
+  static getOrganizeAllButtonElement() {
+    return $('.organizeAllButton');
+  }
+  
+  static getUpdateOverviewButtonElement() {
+    return $('.updateOverviewButton');
+  }
+  
+  static getDoAllTheThingsButtonElement() {
+    return $('.doAllTheThingsButton');
+  }
+  
+  static getRerenderElement() {
+    return $('.rerender');
+  }
+
+  // SECTION:
+  // Click handlers
+  
+  static organizeAllClicked() {
+    new RpcConfig(runner => runner.organizell()).
+        output('Organizing all...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static updateOverviewClicked() {
+    new RpcConfig(runner => runner.updateOverview()).
+        output('Updating overview...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  static doAllTheThingsClicked() {
+    new RpcConfig(runner => runner.doAllTheThings()).
+        output('Doing all the things...').
+        retryOnTimeout().
+        callRpc();
+  }
+  
+  static rerenderClicked() {
+    new RpcConfig(runner => runner.showPreferencesSidebar()).callRpc();
+  }
+
+  static addListeners() {
+    GlobalController.getSyncAllWithGmailButtonElement().click(GlobalController.syncAllWithGmailClicked);
+    GlobalController.getOrganizeAllButtonElement().click(GlobalController.organizeAllClicked);
+    GlobalController.getUpdateOverviewButtonElement().click(GlobalController.updateOverviewClicked);
+    GlobalController.getDoAllTheThingsButtonElement().click(GlobalController.doAllTheThingsClicked);
+    GlobalController.getRerenderElement().click(GlobalController.rerenderClicked);
+  }
+  
+  static init() {
+    GlobalController.addListeners();
+  }
+}

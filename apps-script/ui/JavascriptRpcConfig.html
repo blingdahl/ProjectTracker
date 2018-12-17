@@ -1,0 +1,108 @@
+class RpcConfig {
+  constructor(callFn) {
+    this.callFn = callFn;
+    this.successOut_ = this.output.bind(this);
+    this.failureOut_ = this.output.bind(this);
+    this.successFn_ = null;
+    this.failureFn_ = null;
+  }
+  
+  retryOnTimeout() {
+    if (!RpcConfig.ALLOW_RETRIES) {
+      return this;
+    }
+    return this.logAll().withFailureFn(function(errorMsg) {
+          if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
+            console.log(errorMsg);
+            this.callRpc();
+            return;
+            this.output(errorMsg);
+          }
+        }.bind(this));
+  }
+  
+  logSuccess() {
+    this.successOut_ = Log.log;
+    return this;
+  }
+  
+  logFailure() {
+    this.failureOut_ = Log.log;
+    return this;
+  }
+  
+  logAll() {
+    return this.logSuccess().logFailure();
+  }
+  
+  ignoreSuccess() {
+    this.successOut_ = function() { };
+    return this;
+  }
+  
+  ignoreFailure() {
+    this.failureOut_ = function() { };
+    return this;
+  }
+  
+  ignoreAll() {
+    return this.ignoreSuccess().ignoreFailure();
+  }
+  
+  withSuccessFn(successFn) {
+    this.successFn_ = successFn;
+    return this;
+  }
+  
+  withFailureFn(failureFn) {
+    this.failureFn_ = failureFn;
+    return this;
+  }
+  
+  removeRpcDiv_() {
+    if (this.rpcDiv_) {
+      this.rpcDiv_.fadeOut('slow');
+    }
+  }
+  
+  makeRemoveLogButton_() {
+    let removeLogButton = $('<div />').addClass('removeLogButton').text('✕');
+    removeLogButton.click(this.removeRpcDiv_.bind(this));
+    return removeLogButton;
+  }
+  
+  handleSuccess_(msg) {
+    this.successOut_(msg);
+    if (this.successFn_) {
+      this.successFn_(msg);
+    }
+    if (this.rpcDiv_) {
+      this.rpcDiv_.append(this.makeRemoveLogButton_());
+    }
+  }
+  
+  handleFailure_(msg) {
+    this.failureOut_(msg);
+    if (this.failureFn_) {
+      this.failureFn_(msg);
+    }
+    if (this.rpcDiv_) {
+      this.rpcDiv_.append(this.makeRemoveLogButton_());
+    }
+  }
+  
+  output(msg) {
+    if (!this.rpcDiv_) {
+      this.rpcDiv_ = $('<div />').addClass('rpcMessage');
+      $('.rpcMessages').append(this.rpcDiv_);
+    }
+    this.rpcDiv_.text(msg);
+    return this;
+  }
+  
+  callRpc() {
+    this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_.bind(this)).withFailureHandler(this.handleFailure_.bind(this)));
+  }
+}
+
+RpcConfig.ALLOW_RETRIES = false;

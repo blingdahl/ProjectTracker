@@ -1,0 +1,129 @@
+class SheetController {
+  constructor(divJq) {
+    this.divJq = divJq;
+    this.labelPicker = new LabelPicker(this.divJq.find('.labelPicker'), this.getSheetId());
+  }
+  
+  // SECTION:
+  // Elements
+   
+  getTrackButtonElement() {
+    return this.divJq.find('.trackButton');
+  }
+  
+  getSyncWithGmailButtonElement() {
+    return this.divJq.find('.syncWithGmailButton');
+  }
+  
+  getOrganizeButtonElement() {
+    return this.divJq.find('.organizeButton');
+  }
+  
+  getAddUrlButtonElement() {
+    return this.divJq.find('.addUrlButton');
+  }
+
+  // SECTION:
+  // Attributes
+  getSheetId() {
+    return this.divJq.attr('data-sheet-id');
+  }
+   
+  getSheetName() {
+    return this.divJq.attr('data-sheet-name');
+  }
+   
+  getIsTracked() {
+    return this.divJq.attr('data-is-tracked') === 'true';
+  }
+   
+  setIsTracked(tracked) {
+    this.divJq.attr('data-is-tracked', tracked ? 'true' : 'false');
+  }
+  
+  // SECTION:
+  // Logic
+  setTracked(tracked) {
+    this.setIsTracked(tracked);
+    new RpcConfig(runner => runner.setTrackedForSheet(this.getSheetId(), tracked)).
+        retryOnTimeout().
+        callRpc();
+  }
+  
+  hide() {
+    this.divJq.hide();
+  }
+  
+  updateTemplatedText(sheetName) {
+    this.divJq.find('[data-templated-name]').each(function() {
+      let jq = $(this);
+      if (sheetName) {
+        jq.text(jq.attr('data-templated-name').replace(/{sheetName}/g, sheetName));
+      } else {
+        jq.text(jq.attr('data-no-templated-name'));
+      }
+    });
+  }
+  
+  show() {
+    let sheetName = this.getSheetName();
+    if (sheetName === 'Overview') {
+      this.hide();
+      return;
+    }
+    this.updateTemplatedText(sheetName);
+    this.labelPicker.setMode(LabelPicker.MODE.DISPLAY);
+    this.divJq.show();
+  }
+  
+  // SECTION:
+  // Click handlers
+
+  trackClicked() {
+    this.setTracked(true);
+    this.show();
+  }
+
+  organizeClicked() {
+    new RpcConfig(runner => runner.organize(this.getSheetId())).
+        output('Organizing ' + this.getSheetName() + ' sheet...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  syncWithGmailClicked() {
+    new RpcConfig(runner => runner.syncSheetWithGmail(this.getSheetId())).
+        output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
+        retryOnTimeout().
+        callRpc();
+  }
+
+  addUrlClicked() {
+    let url = window.prompt('URL');
+    if (url) {
+      new RpcConfig(runner => runner.addUrl(this.getSheetId(), url)).
+          output('Adding ' + url + ' to ' + this.getSheetName() + '...').
+          retryOnTimeout().
+          callRpc();
+    }
+  }
+  
+  // SECTION:
+  // Initialization
+  
+  addListeners() {
+    this.labelPicker.addListeners();
+    this.getTrackButtonElement().click(this.trackClicked.bind(this));
+    this.getSyncWithGmailButtonElement().click(this.syncWithGmailClicked.bind(this));
+    this.getOrganizeButtonElement().click(this.organizeClicked.bind(this));
+    this.getAddUrlButtonElement().click(this.addUrlClicked.bind(this));
+  }
+  
+  static init() {
+    $('.sheetController').each(function() {
+      let sheetController = new SheetController($(this));
+      sheetController.addListeners();
+      sheetController.show();
+    });
+  }
+}

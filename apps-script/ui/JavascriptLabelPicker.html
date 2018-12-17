@@ -1,0 +1,150 @@
+class LabelPicker {
+  constructor(pickerJq, sheetId) {
+    this.pickerJq = pickerJq;
+    this.sheetId = sheetId;
+  }
+  
+  // SECTION:
+  // Elements
+  
+  getLabelNameElement() {
+    return this.pickerJq.find('.labelName');
+  }
+  
+  getSelectElement() {
+    return this.pickerJq.find('.labelSelect');
+  }
+
+  getMaxThreadsElement() {
+    return this.pickerJq.find('.maxThreads');
+  }
+  
+  getRenameButtonElement() {
+    return this.pickerJq.find('.renameLabelButton');
+  }
+  
+  getRemoveButtonElement() {
+    return this.pickerJq.find('.removeLabelButton');
+  }
+  
+  getCancelButtonElement() {
+    return this.pickerJq.find('.cancelLabelButton');
+  }
+  
+  getSaveButtonElement() {
+    return this.pickerJq.find('.saveButton');
+  }
+  
+  // SECTION:
+  // Attributes
+   
+  getLabelName() {
+    return this.pickerJq.attr('data-label-name');
+  }
+   
+  getMaxThreads() {
+    return this.pickerJq.attr('data-max-threads');
+  }
+  
+  // SECTION:
+  // Logic
+
+  clearSelectOptions(initialOptionText) {
+    this.getSelectElement().find('option').remove();
+    this.getSelectElement().append($('<option />').text(initialOptionText));
+  }
+
+  setMode(mode) {
+    this.pickerJq.attr('data-mode', mode);
+    this.getLabelNameElement().text(this.getLabelName());
+  }
+  
+  populateSelect(labels) {
+    this.clearSelectOptions('Select Label');
+    let currLabel = this.getLabelName();
+    labels.sort();
+    labels.forEach(function(label) {
+      let newOption = $('<option />').val(label).text(label);
+      this.getSelectElement().append(newOption)
+      if (currLabel == label) {
+        newOption.prop('selected', true);
+      }
+    }.bind(this));
+  }
+  
+  populateLabelSelect() {
+    this.clearSelectOptions('Populating...');
+    this.getMaxThreadsElement().val(this.getMaxThreads());
+    new RpcConfig(runner => runner.getAllLabels()).
+        retryOnTimeout().
+        logAll().
+        withSuccessFn(successMsg => this.populateSelect(JSON.parse(successMsg))).
+        callRpc();
+  }
+  
+  updateLabelFromSelect() {
+    let ret = this.getSelectElement().val();
+    this.setLabel(ret);
+    this.setMaxThreads(this.getMaxThreadsElement().val());
+    return ret;
+  }
+  
+  updateMaxThreadsFromInput() {
+    let ret = this.getMaxThreadsElement().val();
+    this.setMaxThreads(ret);
+    return ret;
+  }
+  
+  renameLabel(newLabel) {
+    new RpcConfig(runner => runner.renameLabel(this.sheetId, newLabel)).
+        output('Renaming label ' + this.getLabelName() + ' to ' + newLabel).
+        callRpc();
+    this.setLabel(newLabel);
+    this.setMode(LabelPicker.MODE.DISPLAY);
+  }
+  
+  labelNameClicked() {
+    this.populateLabelSelect();
+    this.setMode(LabelPicker.MODE.SELECT);
+  }
+  
+  cancelLabelClicked() {
+    this.setMode(LabelPicker.MODE.DISPLAY);
+  }
+  
+  saveClicked() {
+    new RpcConfig(runner => runner.setLabelForSheet(this.getSheetId(),
+                                                    this.updateLabelFromSelect(),
+                                                    this.updateMaxThreadsFromInput())).
+        retryOnTimeout().
+        callRpc();
+    this.setMode(LabelPicker.MODE.DISPLAY);
+  }
+  
+	clearLabel() {
+    this.setLabel(null);
+  }
+
+  renameLabelClicked() {
+    let newLabel = window.prompt('New label name?');
+    if (newLabel) {
+      this.renameLabel(newLabel);
+    }
+  }
+  
+  removeLabelClicked() {
+    this.clearLabel();
+    new RpcConfig(runner => runner.clearLabelForSheet(this.getSheetId())).callRpc();
+    this.setMode(LabelPicker.MODE.DISPLAY);
+  }
+  
+  addListeners() {
+    this.getLabelNameElement().click(this.labelNameClicked.bind(this));
+    this.getRenameButtonElement().click(this.renameLabelClicked.bind(this));
+    this.getRemoveButtonElement().click(this.removeLabelClicked.bind(this));
+    this.getCancelButtonElement().click(this.cancelLabelClicked.bind(this));
+    this.getSaveButtonElement().click(this.saveClicked.bind(this));
+  }
+}
+
+LabelPicker.MODE = {'SELECT': 'SELECT', 'DISPLAY': 'DISPLAY'};
