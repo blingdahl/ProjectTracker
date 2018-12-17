@@ -14,7 +14,7 @@
         data-is-tracked="<?= preferences.isTracked ?>">
       <h1 data-templated-name="{sheetName} sheet">??? sheet</h1>
       <div class="untracked">
-        <button class="trackButton" data-templated-name="Track {sheetName}">Track sheet</button>
+        <button class="track" data-templated-name="Track {sheetName}">Track sheet</button>
       </div>
       <div class="tracked">
         <div class="labelPicker"
@@ -22,27 +22,27 @@
             data-max-threads="<?= preferences.maxThreads ?>">
           <div class="labelDisplayMode">
             <span class="labelName"></span>
-            <button class="removeLabelButton">Remove</button>
-            <button class="renameLabelButton">Rename</button>
+            <button class="removeLabel labelOnly">Remove</button>
+            <button class="renameLabel labelOnly">Rename</button>
           </div>
           <div class="labelSelectMode">
-            <select class="labelSelect">
+            <select class="selectLabel">
             </select>
             <input type="text" class="maxThreads">
-            <button class="saveButton">Save</button>
-            <button class="cancelLabelButton">Cancel</button>
+            <button class="saveLabel">Save</button>
+            <button class="cancelLabel">Cancel</button>
           </div>
+          <button class="syncWithGmail labelOnly" data-templated-name="Sync {sheetName} with Gmail" data-no-templated-name="Sync with Gmail"></button>
         </div>
-        <button class="syncWithGmailButton" data-templated-name="Sync {sheetName} with Gmail" data-no-templated-name="Sync with Gmail"></button>
-        <button class="organizeButton" data-templated-name="Organize {sheetName}" data-no-templated-name="Organize"></button>
-        <button class="addUrlButton" data-templated-name="Add URL to {sheetName}" data-no-templated-name="Add URL"></button>
+        <button class="organize" data-templated-name="Organize {sheetName}" data-no-templated-name="Organize"></button>
+        <button class="addUrl" data-templated-name="Add URL to {sheetName}" data-no-templated-name="Add URL"></button>
         </div>
       </div>
       <h1>All Sheets</h1>
-      <button class="syncAllWithGmailButton">Sync All with Gmail</button>
-      <button class="organizeAllButton">Organize All</button>
-      <button class="updateOverviewButton">Update Overview</button>
-      <button class="doAllTheThingsButton" style="display: none">Do all the things!</button>
+      <button class="syncAllWithGmail">Sync All with Gmail</button>
+      <button class="organizeAll">Organize All</button>
+      <button class="updateOverview">Update Overview</button>
+      <button class="doAllTheThings" style="display: none">Do all the things!</button>
       <div class="rerender">Re-render controls</div>
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
       <script>

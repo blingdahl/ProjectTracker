@@ -7,20 +7,20 @@ class SheetController {
   // SECTION:
   // Elements
    
-  getTrackButtonElement() {
-    return this.divJq.find('.trackButton');
+  getTrackElement() {
+    return this.divJq.find('.track');
   }
   
-  getSyncWithGmailButtonElement() {
-    return this.divJq.find('.syncWithGmailButton');
+  getSyncWithGmailElement() {
+    return this.divJq.find('.syncWithGmail');
   }
   
-  getOrganizeButtonElement() {
-    return this.divJq.find('.organizeButton');
+  getOrganizeElement() {
+    return this.divJq.find('.organize');
   }
   
-  getAddUrlButtonElement() {
-    return this.divJq.find('.addUrlButton');
+  getAddUrlElement() {
+    return this.divJq.find('.addUrl');
   }
 
   // SECTION:
@@ -113,10 +113,10 @@ class SheetController {
   
   addListeners() {
     this.labelPicker.addListeners();
-    this.getTrackButtonElement().click(this.trackClicked.bind(this));
-    this.getSyncWithGmailButtonElement().click(this.syncWithGmailClicked.bind(this));
-    this.getOrganizeButtonElement().click(this.organizeClicked.bind(this));
-    this.getAddUrlButtonElement().click(this.addUrlClicked.bind(this));
+    this.getTrackElement().click(this.trackClicked.bind(this));
+    this.getSyncWithGmailElement().click(this.syncWithGmailClicked.bind(this));
+    this.getOrganizeElement().click(this.organizeClicked.bind(this));
+    this.getAddUrlElement().click(this.addUrlClicked.bind(this));
   }
   
   static init() {

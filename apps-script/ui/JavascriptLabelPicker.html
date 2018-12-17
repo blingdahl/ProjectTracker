@@ -11,28 +11,28 @@ class LabelPicker {
     return this.pickerJq.find('.labelName');
   }
   
-  getSelectElement() {
-    return this.pickerJq.find('.labelSelect');
+  getSelectLabelElement() {
+    return this.pickerJq.find('.selectLabel');
   }
 
   getMaxThreadsElement() {
     return this.pickerJq.find('.maxThreads');
   }
   
-  getRenameButtonElement() {
-    return this.pickerJq.find('.renameLabelButton');
+  getRenameLabelElement() {
+    return this.pickerJq.find('.renameLabel');
   }
   
-  getRemoveButtonElement() {
-    return this.pickerJq.find('.removeLabelButton');
+  getRemoveLabelElement() {
+    return this.pickerJq.find('.removeLabel');
   }
   
-  getCancelButtonElement() {
-    return this.pickerJq.find('.cancelLabelButton');
+  getCancelLabelElement() {
+    return this.pickerJq.find('.cancelLabel');
   }
   
-  getSaveButtonElement() {
-    return this.pickerJq.find('.saveButton');
+  getSaveLabelElement() {
+    return this.pickerJq.find('.saveLabel');
   }
   
   // SECTION:
@@ -50,8 +50,8 @@ class LabelPicker {
   // Logic
 
   clearSelectOptions(initialOptionText) {
-    this.getSelectElement().find('option').remove();
-    this.getSelectElement().append($('<option />').text(initialOptionText));
+    this.getSelectLabelElement().find('option').remove();
+    this.getSelectLabelElement().append($('<option />').text(initialOptionText));
   }
 
   setMode(mode) {
@@ -65,7 +65,7 @@ class LabelPicker {
     labels.sort();
     labels.forEach(function(label) {
       let newOption = $('<option />').val(label).text(label);
-      this.getSelectElement().append(newOption)
+      this.getSelectLabelElement().append(newOption)
       if (currLabel == label) {
         newOption.prop('selected', true);
       }
@@ -83,7 +83,7 @@ class LabelPicker {
   }
   
   updateLabelFromSelect() {
-    let ret = this.getSelectElement().val();
+    let ret = this.getSelectLabelElement().val();
     this.setLabel(ret);
     this.setMaxThreads(this.getMaxThreadsElement().val());
     return ret;
@@ -140,10 +140,10 @@ class LabelPicker {
   
   addListeners() {
     this.getLabelNameElement().click(this.labelNameClicked.bind(this));
-    this.getRenameButtonElement().click(this.renameLabelClicked.bind(this));
-    this.getRemoveButtonElement().click(this.removeLabelClicked.bind(this));
-    this.getCancelButtonElement().click(this.cancelLabelClicked.bind(this));
-    this.getSaveButtonElement().click(this.saveClicked.bind(this));
+    this.getRenameLabelElement().click(this.renameLabelClicked.bind(this));
+    this.getRemoveLabelElement().click(this.removeLabelClicked.bind(this));
+    this.getCancelLabelElement().click(this.cancelLabelClicked.bind(this));
+    this.getSaveLabelElement().click(this.saveClicked.bind(this));
   }
 }
 
