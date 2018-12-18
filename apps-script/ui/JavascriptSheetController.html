@@ -112,6 +112,11 @@ class SheetController {
     let sheetControllers = SheetController.getAll();
     sheetControllers.forEach(sheetController => sheetController.organize());
   }
+  
+  static syncAllWithGmail() {
+    let sheetControllers = SheetController.getAll();
+    sheetControllers.forEach(sheetController => sheetController.syncWithGmail());
+  }
 
   // SECTION:
   // Initialization
