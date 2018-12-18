@@ -39,6 +39,7 @@ function organizeAll(spreadsheetUrl) {
   Organize.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Organize.organizeAll();
+  return 'Organized all';
 }
 
 function organize(spreadsheetUrl, sheetId) {
