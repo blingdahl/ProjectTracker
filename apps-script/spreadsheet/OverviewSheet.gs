@@ -44,6 +44,11 @@ OverviewSheet.init = function() {
   }
   
   OverviewSheet.Sheet.prototype.addRowsFromTrackingSheet = function(trackingSheet, priority) {
+    if (trackingSheet.getSheetId() === this.getSheetId()) {
+      Log.info('Not copying from overview');
+      return;
+    }
+    Log.info('Adding ' + priority + ' from ' + trackingSheet.getSheetName());
     trackingSheet.getRowsForPriority(priority).forEach(function(trackingRow) {
       var sheetFormula = Spreadsheet.hyperlinkFormula(trackingSheet.getUrl(), trackingSheet.getSheetName());
       this.addRowFromTrackingRow(sheetFormula, trackingRow);

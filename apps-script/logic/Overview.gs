@@ -18,17 +18,9 @@ Overview.init = function() {
     var trackingSheets = TrackingSheet.getAll();
     // TODO(lindahl) Collapse
     trackingSheets.forEach(function(trackingSheet) {
-      if (trackingSheet.getSheetId() === overviewSheet.getSheetId()) {
-        return;
-      }
-      Log.info('Adding P0 from ' + trackingSheet.getSheetName());
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P0');
     });
     trackingSheets.forEach(function(trackingSheet) {
-      if (trackingSheet.getSheetId() === overviewSheet.getSheetId()) {
-        return;
-      }
-      Log.info('Adding P1 from ' + trackingSheet.getSheetName());
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P1');
     });
     var numRows = overviewSheet.getDataRows().slice(-1)[0].getRowNumber();
