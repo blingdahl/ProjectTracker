@@ -34,9 +34,10 @@ Overview.init = function() {
   }
 }
 
-function updateOverview() {
+function updateOverview(spreadsheetUrl) {
   Log.start('updateOverview', []);
   Overview.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Overview.update();
   Log.start('updateOverview', []);
 }

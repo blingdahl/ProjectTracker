@@ -15,36 +15,46 @@ class GlobalController {
     return $('.updateOverview');
   }
   
-  static getRerenderElement() {
-    return $('.rerender');
+  static getRerenderSidebarElement() {
+    return $('.rerenderSidebar');
+  }
+  
+  static getRerenderWebAppElement() {
+    return $('.rerenderWebApp');
+  }
+  
+  // SECTION:
+  // Attributes
+  
+  static getSpreadsheetUrl() {
+    return $('.global').attr('data-spreadsheet-url');
   }
 
   // SECTION:
   // Click handlers
   
   static organizeAllClicked() {
-    new RpcConfig(runner => runner.organizell()).
+    new RpcConfig(runner => runner.organizeAll(GlobalController.getSpreadsheetUrl())).
         output('Organizing all...').
         retryOnTimeout().
         callRpc();
   }
 
   static updateOverviewClicked() {
-    new RpcConfig(runner => runner.updateOverview()).
+    new RpcConfig(runner => runner.updateOverview(GlobalController.getSpreadsheetUrl())).
         output('Updating overview...').
         retryOnTimeout().
         callRpc();
   }
   
-  static rerenderClicked() {
-    new RpcConfig(runner => runner.showPreferencesSidebar()).output('Rerendering...').callRpc();
+  static rerenderSidebarClicked() {
+    new RpcConfig(runner => runner.showPreferencesSidebar(GlobalController.getSpreadsheetUrl())).output('Rerendering sidebar...').callRpc();
   }
 
   static addListeners() {
-    GlobalController.getSyncAllWithGmailElement().click(GlobalController.syncAllWithGmailClicked);
     GlobalController.getOrganizeAllElement().click(GlobalController.organizeAllClicked);
     GlobalController.getUpdateOverviewElement().click(GlobalController.updateOverviewClicked);
-    GlobalController.getRerenderElement().click(GlobalController.rerenderClicked);
+    GlobalController.getRerenderSidebarElement().click(GlobalController.rerenderSidebarClicked);
   }
   
   static init() {

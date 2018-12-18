@@ -10,6 +10,7 @@ TrackingSheet.init = function() {
   }
   
   Spreadsheet.init();
+  Preferences.init();
   Log.info('TrackingSheet.init()');
   TrackingSheet.initialized = true;
 
@@ -70,24 +71,19 @@ TrackingSheet.init = function() {
   }
   
   TrackingSheet.forSheetId = function(sheetId) {
-    return TrackingSheet.forSheet(Spreadsheet.getNativeSheet(sheetId));
+    return TrackingSheet.forSheet(Spreadsheet.getSpreadsheet().getNativeSheet(sheetId));
   }
   
   TrackingSheet.getAll = function() {
-    var sheets = SpreadsheetApp.getActive().getSheets();
+    var sheets = Spreadsheet.getSpreadsheet().getNativeSheets();
     var ret = [];
     sheets.forEach(function(sheet) {
       if (sheet.getSheetName() == 'Overview') {
         Log.fine('Not including Overview');
         return;
       }
-      var headerRow = sheet.getDataRange().offset(0, 0, 1);
-      for (var columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
-        var headerCell = headerRow.offset(0, columnOffset);
-        if (headerCell.getValue() === TrackingSheet.COLUMNS.PRIORITY) {
-          ret.push(TrackingSheet.forSheet(sheet));
-          break;
-        }
+      if (Preferences.getTrackedForSheet(sheet.getSheetId())) {
+        ret.push(TrackingSheet.forSheet(sheet));
       }
     });
     return ret;

@@ -1,95 +1,68 @@
-var TrackingSheet = {};
-TrackingSheet.initialized = false;
-
-
-TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner'];
-
-TrackingSheet.init = function() {
-  if (TrackingSheet.initialized) {
-    return;
+<style>
+  h1 {
+    font-family: sans-serif;
+    font-size: 13px;
   }
   
-  Spreadsheet.init();
-  Log.info('TrackingSheet.init()');
-  TrackingSheet.initialized = true;
-
-  TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
-      .addColumn('ITEM', 'Item')
-      .addColumn('PRIORITY', 'Priority')
-      .addColumn('EMAIL', 'Email')
-      .addColumn('LINK', 'Link')
-      .addColumn('ACTION', 'Action')
-      .addColumn('TO_DO', 'To Do')
-      .addColumn('INBOX', 'Inbox')
-      .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
-      .addColumn('NOTES', 'Notes')
-      .addColumn('THREAD_ID', 'Thread ID')
-      .addColumn('SUBJECT', 'Subject')
-      .addColumn('FROM', 'From')
-      .addColumn('SCRIPT_NOTES', 'Script Notes');
-  
-  TrackingSheet.sheetIdToSheet = {};
-  
-  TrackingSheet.Sheet = function(sheet) {
-    Spreadsheet.Sheet.call(this, sheet, TrackingSheet.COLUMNS);
-  }
-  TrackingSheet.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
-  
-  TrackingSheet.Sheet.prototype.getCachedRowOffsetsForColumnValue = function(columnName, value) {
-    return this.cache.getRowOffsetsForColumnValue(this.columns.getColumnOffset(columnName), value);
+  td, div {
+    font-family: sans-serif;
   }
   
-  TrackingSheet.Sheet.prototype.getRowsForPriority = function(priority) {
-    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.PRIORITY, priority);
-    var ret = [];
-    rowOffsets.forEach(function(rowOffset) {
-      ret.push(this.getRow(rowOffset));
-    }.bind(this));
-    return ret;
+  error {
+    color: red;
   }
   
-  TrackingSheet.Sheet.prototype.getRowForThreadId = function(id) {
-    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.THREAD_ID, id);
-    if (rowOffsets.length >= 1) {
-      return this.getRow(rowOffsets[0]);
-    }
-    var row = this.addRow();
-    row.setValue(TrackingSheet.COLUMNS.THREAD_ID, id);
-    return row;
+  .labelName {
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 13px;
+    color: blue;
   }
   
-  TrackingSheet.Sheet.prototype.toString = function() {
-    return 'TrackingSheet.Sheet';
-  };
-  
-  TrackingSheet.forSheet = function(sheet) {
-    if (!TrackingSheet.sheetIdToSheet[sheet.getSheetId()]) {
-      TrackingSheet.sheetIdToSheet[sheet.getSheetId()] = new TrackingSheet.Sheet(sheet);
-    }
-    return TrackingSheet.sheetIdToSheet[sheet.getSheetId()];
+  .rerenderSidebar {
+    font-size: 8px;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 10px;
   }
   
-  TrackingSheet.forSheetId = function(sheetId) {
-    return TrackingSheet.forSheet(Spreadsheet.getNativeSheet(sheetId));
+  .maxThreads {
+    width: 30px;
   }
   
-  TrackingSheet.getAll = function() {
-    var sheets = Spreadsheet.getSpreadsheet().getNativeSheets();
-    var ret = [];
-    sheets.forEach(function(sheet) {
-      if (sheet.getSheetName() == 'Overview') {
-        Log.fine('Not including Overview');
-        return;
-      }
-      var headerRow = sheet.getDataRange().offset(0, 0, 1);
-      for (var columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
-        var headerCell = headerRow.offset(0, columnOffset);
-        if (headerCell.getValue() === TrackingSheet.COLUMNS.PRIORITY) {
-          ret.push(TrackingSheet.forSheet(sheet));
-          break;
-        }
-      }
-    });
-    return ret;
+  h1 {
+    margin-top: 30px;
   }
-}
+  
+  [data-auto-refresh="true"] .startRefreshing, [data-auto-refresh="true"] .refreshNow {
+    display: none;
+  }
+  
+  [data-auto-refresh="false"] .stopRefreshing {
+    display: none;
+  }
+  
+  [data-mode="SELECT"] .labelDisplayMode {
+    display: none;
+  }
+  
+  [data-mode="DISPLAY"] .labelSelectMode {
+    display: none;
+  }
+  
+  [data-label-name=""] .labelOnly {
+    display: none;
+  }
+  
+  .removeLog {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 8px;
+  }
+  
+  a {
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+</style>

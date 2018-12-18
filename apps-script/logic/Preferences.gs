@@ -12,31 +12,31 @@ Preferences.init = function() {
   Preferences.initialized = true;
   
   Preferences.getProperty = function(propertyName) {
-    return PropertiesService.getScriptProperties().getProperty(propertyName);
+    return PropertiesService.getUserProperties().getProperty(propertyName);
   }
   
   Preferences.setProperty = function(propertyName, value) {
-    PropertiesService.getScriptProperties().setProperty(propertyName, value);
+    PropertiesService.getUserProperties().setProperty(propertyName, value);
   }
   
   Preferences.clearProperty = function(propertyName) {
-    PropertiesService.getScriptProperties().deleteProperty(propertyName);
+    PropertiesService.getUserProperties().deleteProperty(propertyName);
   }
   
-  Preferences.labelPropertyName = function(sheetId) {
+  Preferences.labelNamePropertyName = function(sheetId) {
     return 'label:' + sheetId;
   }
   
-  Preferences.setLabelForSheet = function(sheetId, labelName) {
-    Preferences.setProperty(Preferences.labelPropertyName(sheetId), labelName);
+  Preferences.setLabelNameForSheet = function(sheetId, labelName) {
+    Preferences.setProperty(Preferences.labelNamePropertyName(sheetId), labelName);
   }
   
-  Preferences.clearLabelForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(Preferences.labelPropertyName(sheetId));
+  Preferences.clearLabelNameForSheet = function(sheetId) {
+    Preferences.clearProperty(Preferences.labelNamePropertyName(sheetId));
   }
   
   Preferences.getLabelNameForSheet = function(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(Preferences.labelPropertyName(sheetId));
+    return Preferences.getProperty(Preferences.labelNamePropertyName(sheetId));
   }
   
   Preferences.maxThreadsProperty = function(sheetId) {
@@ -45,20 +45,16 @@ Preferences.init = function() {
   
   Preferences.setMaxThreadsForSheet = function(sheetId, maxThreads) {
     Log.start('setMaxThreadsForSheet', [sheetId, maxThreads]);
-    PropertiesService.getScriptProperties().setProperty(Preferences.maxThreadsProperty(sheetId), maxThreads);
+    Preferences.setProperty(Preferences.maxThreadsProperty(sheetId), maxThreads);
     Log.stop('setMaxThreadsForSheet', [sheetId, maxThreads]);
   }
   
   Preferences.clearMaxThreadsForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(Preferences.maxThreadsProperty(sheetId));
+    Preferences.clearProperty(Preferences.maxThreadsProperty(sheetId));
   }
   
   Preferences.getMaxThreadsForSheet = function(sheetId) {
-    Log.start('getMaxThreadsForSheet', [sheetId]);
-    var ret = parseInt(PropertiesService.getScriptProperties().getProperty(Preferences.maxThreadsProperty(sheetId))) || Preferences.DEFAULT_MAX_THREADS;
-    Log.stop('getMaxThreadsForSheet', [sheetId]);
-    Log.info(ret);
-    return ret;
+    return parseInt(Preferences.getProperty(Preferences.maxThreadsProperty(sheetId))) || Preferences.DEFAULT_MAX_THREADS;
   }
 
   Preferences.trackedProperty = function(sheetId) {
@@ -66,15 +62,15 @@ Preferences.init = function() {
   }
   
   Preferences.setTrackedForSheet = function(sheetId, tracked) {
-    PropertiesService.getScriptProperties().setProperty(Preferences.trackedProperty(sheetId), tracked ? 'true' : 'false');
+    Preferences.setProperty(Preferences.trackedProperty(sheetId), tracked ? 'true' : 'false');
   }
   
   Preferences.clearTrackedForSheet = function(sheetId) {
-    PropertiesService.getScriptProperties().deleteProperty(Preferences.trackedProperty(sheetId));
+    Preferences.clearProperty(Preferences.trackedProperty(sheetId));
   }
   
   Preferences.getTrackedForSheet = function(sheetId) {
-    return PropertiesService.getScriptProperties().getProperty(Preferences.trackedProperty(sheetId)) === 'true';
+    return Preferences.getProperty(Preferences.trackedProperty(sheetId)) === 'true';
   }
   
   Preferences.spreadsheetUrlProperty = function() {
@@ -82,15 +78,16 @@ Preferences.init = function() {
   }
   
   Preferences.getSpreadsheetUrl = function() {
-    return PropertiesService.getScriptProperties().getProperty(Preferences.spreadsheetUrlProperty());
+    return Preferences.getProperty(Preferences.spreadsheetUrlProperty());
   }
   
   Preferences.setSpreadsheetUrl = function(spreadsheetUrl) {
-    return PropertiesService.getScriptProperties().setProperty(Preferences.spreadsheetUrlProperty(), spreadsheetUrl);
+    return Preferences.setProperty(Preferences.spreadsheetUrlProperty(), spreadsheetUrl);
   }
 
   Preferences.getPreferencesForSheet = function(sheetId) {
     Log.start('getPreferencesForSheet', [sheetId]);
+    Log.info(Preferences.getLabelNameForSheet(sheetId))
     var ret = {'sheetId': sheetId,
                'sheetName': Spreadsheet.getSpreadsheet().getNativeSheet(sheetId).getName(),
                'label': Preferences.getLabelNameForSheet(sheetId),
@@ -103,40 +100,47 @@ Preferences.init = function() {
   Preferences.DEFAULT_MAX_THREADS = 50;
 }
 
-function setLabelForSheet(sheetId, label, maxThreads) {
-  Log.start('setLabelForSheet', [sheetId, label, maxThreads]);
+function setLabelNameForSheet(spreadsheetUrl, sheetId, label, maxThreads) {
+  Log.start('setLabelNameForSheet', [spreadsheetUrl, sheetId, label, maxThreads]);
   Preferences.init();
-  Preferences.setLabelForSheet(sheetId, label);
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
+  Preferences.setLabelNameForSheet(sheetId, label);
   Preferences.setMaxThreadsForSheet(sheetId, maxThreads);
-  Log.stop('setLabelForSheet', [sheetId, label, maxThreads]);
+  Log.stop('setLabelNameForSheet', [spreadsheetUrl, sheetId, label, maxThreads]);
+  return 'Set label';
 }
 
-function getLabelForSheet(sheetId) {
-  Log.start('getLabelForSheet', [sheetId]);
+function getLabelNameForSheet(spreadsheetUrl, sheetId) {
+  Log.start('getLabelNameForSheet', [spreadsheetUrl, sheetId]);
   Preferences.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Preferences.getLabelForSheet(sheetId);
-  Log.stop('getLabelForSheet', [sheetId]);
+  Log.stop('getLabelNameForSheet', [spreadsheetUrl, sheetId]);
   return ret;
 }
 
-function setTrackedForSheet(sheetId, tracked) {
-  Log.start('setTrackedForSheet', [sheetId, tracked]);
+function clearLabelNameForSheet(spreadsheetUrl, sheetId) {
+  Log.start('clearLabelNameForSheet', [spreadsheetUrl, sheetId]);
   Preferences.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
+  Preferences.clearLabelNameForSheet(sheetId);
+  Log.stop('clearLabelNameForSheet', [spreadsheetUrl, sheetId]);
+}
+
+function setTrackedForSheet(spreadsheetUrl, sheetId, tracked) {
+  Log.start('setTrackedForSheet', [spreadsheetUrl, sheetId, tracked]);
+  Preferences.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Preferences.setTrackedForSheet(sheetId, tracked);
-  Log.stop('setTrackedForSheet', [sheetId, tracked]);
+  Log.stop('setTrackedForSheet', [spreadsheetUrl, sheetId, tracked]);
+  return tracked ? 'Added tracking' : 'Removed tracking';
 }
 
-function getTrackedForSheet(sheetId) {
-  Log.start('getTrackedForSheet', [sheetId]);
+function getTrackedForSheet(spreadsheetUrl, sheetId) {
+  Log.start('getTrackedForSheet', [spreadsheetUrl, sheetId]);
   Preferences.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Preferences.getTrackedForSheet(sheetId);
-  Log.stop('getTrackedForSheet', [sheetId]);
+  Log.stop('getTrackedForSheet', [spreadsheetUrl, sheetId]);
   return ret;
-}
-
-function clearLabelForSheet(sheetId) {
-  Log.start('clearLabelForSheet', [sheetId]);
-  Preferences.init();
-  Preferences.clearLabelForSheet(sheetId);
-  Log.stop('clearLabelForSheet', [sheetId]);
 }

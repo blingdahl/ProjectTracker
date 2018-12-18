@@ -40,9 +40,10 @@ function organizeAll() {
   Organize.organizeAll();
 }
 
-function organize(sheetId) {
+function organize(spreadsheetUrl, sheetId) {
   Log.start('organize', [sheetId]);
   Organize.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Organize.organize(sheetId);
   Log.stop('organize', [sheetId]);
   return ret;

@@ -326,8 +326,6 @@ Spreadsheet.init = function() {
   }
 }
 
-
-
 function setSpreadsheetUrl(spreadsheetUrl) {
   Log.start('setSpreadsheetUrl', [spreadsheetUrl]);
   Preferences.init();

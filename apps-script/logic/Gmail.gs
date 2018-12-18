@@ -248,28 +248,31 @@ Gmail.init = function() {
     var newLabel = GmailApp.createLabel(toLabelName);
     newLabel.addToThreads(threads)
     !currLabel.removeFromThreads(threads);
-    Label.setLabelForSheet(sheetId, toLabelName);
+    Label.setLabelNameForSheet(sheetId, toLabelName);
   }
 }
 
-function syncSheetWithGmail(sheetId) {
+function syncSheetWithGmail(spreadsheetUrl, sheetId) {
   Log.start('syncSheetWithGmail', [sheetId]);
   Gmail.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Gmail.syncSheet(sheetId);
   Log.stop('syncSheetWithGmail', [sheetId]);
   return ret;
 }
 
-function syncAllSheetsWithGmail() {
+function syncAllSheetsWithGmail(spredsheetUrl) {
   Log.start('syncAllSheetsWithGmail', []);
   Gmail.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Gmail.syncAllSheetsWithGmail();
   Log.stop('syncAllSheetsWithGmail', []);
 }
 
-function renameLabel(sheetId, toLabelName) {
+function renameLabel(spreadsheetUrl, sheetId, toLabelName) {
   Log.start('renameLabel', [sheetId, toLabelName]);
   Gmail.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Gmail.renameLabel(sheetId, toLabelName);
   Log.stop('renameLabel', [sheetId, toLabelName]);
 }

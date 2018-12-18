@@ -25,7 +25,8 @@ AddUrl.init = function() {
   }
 }
 
-function addUrl(sheetId, url) {
+function addUrl(spreadsheetUrl, sheetId, url) {
   AddUrl.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   return AddUrl.addUrl(sheetId, url);
 }

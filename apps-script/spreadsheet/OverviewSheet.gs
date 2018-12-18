@@ -51,9 +51,9 @@ OverviewSheet.init = function() {
   }
   
   OverviewSheet.get = function() {
-    var sheet = Spreadsheet.getSpreadsheet().getSheetByName('Overview');
+    var sheet = Spreadsheet.getSpreadsheet().nativeSpreadsheet.getSheetByName('Overview');
     if (!sheet) {
-      sheet = Spreadsheet.getSpreadsheet().insertSheet('Overview');
+      sheet = Spreadsheet.getSpreadsheet().nativeSpreadsheet.insertSheet('Overview');
     }
     return new OverviewSheet.Sheet(sheet);
   }

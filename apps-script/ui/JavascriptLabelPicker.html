@@ -42,8 +42,16 @@ class LabelPicker {
     return this.pickerJq.attr('data-label-name');
   }
    
+  setLabelName(labelName) {
+    this.pickerJq.attr('data-label-name', labelName);
+  }
+   
   getMaxThreads() {
     return this.pickerJq.attr('data-max-threads');
+  }
+   
+  setMaxThreads(maxThreads) {
+    this.pickerJq.attr('data-max-threads', maxThreads);
   }
   
   // SECTION:
@@ -56,7 +64,7 @@ class LabelPicker {
 
   setMode(mode) {
     this.pickerJq.attr('data-mode', mode);
-    this.getLabelNameElement().text(this.getLabelName() || 'Label...');
+    this.getLabelNameElement().text(this.getLabelName() || 'Set label...');
   }
   
   populateSelect(labels) {
@@ -75,7 +83,7 @@ class LabelPicker {
   populateLabelSelect() {
     this.clearSelectOptions('Populating...');
     this.getMaxThreadsElement().val(this.getMaxThreads());
-    new RpcConfig(runner => runner.getAllLabels()).
+    new RpcConfig(runner => runner.getAllLabels(GlobalController.getSpreadsheetUrl())).
         retryOnTimeout().
         logAll().
         withSuccessFn(successMsg => this.populateSelect(JSON.parse(successMsg))).
@@ -84,7 +92,7 @@ class LabelPicker {
   
   updateLabelFromSelect() {
     let ret = this.getSelectLabelElement().val();
-    this.setLabel(ret);
+    this.setLabelName(ret);
     this.setMaxThreads(this.getMaxThreadsElement().val());
     return ret;
   }
@@ -96,11 +104,18 @@ class LabelPicker {
   }
   
   renameLabel(newLabel) {
-    new RpcConfig(runner => runner.renameLabel(this.sheetId, newLabel)).
+    new RpcConfig(runner => runner.renameLabel(GlobalController.getSpreadsheetUrl(), this.sheetId, newLabel)).
         output('Renaming label ' + this.getLabelName() + ' to ' + newLabel).
         callRpc();
-    this.setLabel(newLabel);
+    this.setLabelName(newLabel);
     this.setMode(LabelPicker.MODE.DISPLAY);
+  }
+  
+  clearLabel() {
+    this.setLabelName(null);
+    new RpcConfig(runner => runner.clearLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).
+        retryOnTimeout().
+        callRpc();
   }
   
   labelNameClicked() {
@@ -113,16 +128,12 @@ class LabelPicker {
   }
   
   saveClicked() {
-    new RpcConfig(runner => runner.setLabelForSheet(this.getSheetId(),
-                                                    this.updateLabelFromSelect(),
-                                                    this.updateMaxThreadsFromInput())).
+    new RpcConfig(runner => runner.setLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId,
+                                                        this.updateLabelFromSelect(),
+                                                        this.updateMaxThreadsFromInput())).
         retryOnTimeout().
         callRpc();
     this.setMode(LabelPicker.MODE.DISPLAY);
-  }
-  
-	clearLabel() {
-    this.setLabel(null);
   }
 
   renameLabelClicked() {
@@ -134,7 +145,7 @@ class LabelPicker {
   
   removeLabelClicked() {
     this.clearLabel();
-    new RpcConfig(runner => runner.clearLabelForSheet(this.getSheetId())).callRpc();
+    new RpcConfig(runner => runner.clearLabelForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).callRpc();
     this.setMode(LabelPicker.MODE.DISPLAY);
   }
   
