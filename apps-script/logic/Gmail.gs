@@ -251,16 +251,6 @@ Gmail.init = function() {
     return 'Synced ' + Math.min(maxThreads, totalCount) + '/' + totalCount + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
   }
   
-  Gmail.syncAllSheetsWithGmail = function() {
-    var sheets = Spreadsheet.getNativeSpreadsheet().getSheets();
-    for (var i = 0; i < sheets.length; i++) {
-      var label = Preferences.getLabelNameForSheet(sheets[i].getSheetId());
-      if (label) {
-        Gmail.syncWithGmail(sheets[i].getSheetId(), label);
-      }
-    }
-  }
-  
   Gmail.renameLabel = function(sheetId, toLabelName) {
     if (!toLabelName) {
       throw new Error('No toLabelName');
@@ -282,14 +272,6 @@ function syncSheetWithGmail(spreadsheetUrl, sheetId) {
   var ret = Gmail.syncSheet(sheetId);
   Log.stop('syncSheetWithGmail', [sheetId]);
   return ret;
-}
-
-function syncAllSheetsWithGmail(spredsheetUrl) {
-  Log.start('syncAllSheetsWithGmail', []);
-  Gmail.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  Gmail.syncAllSheetsWithGmail();
-  Log.stop('syncAllSheetsWithGmail', []);
 }
 
 function renameLabel(spreadsheetUrl, sheetId, toLabelName) {

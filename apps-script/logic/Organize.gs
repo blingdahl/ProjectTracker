@@ -42,20 +42,9 @@ Organize.init = function() {
     return 'Organized ' + trackingSheet.getSheetName();
   }
   
-  Organize.organizeAll = function() {
-    TrackingSheet.getAll().forEach(function (trackingSheet) { Organize.organizeSheet(trackingSheet); });
-  }
-  
   Organize.organize = function(sheetId) {
     return Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
-}
-
-function organizeAll(spreadsheetUrl) {
-  Organize.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  Organize.organizeAll();
-  return 'Organized all';
 }
 
 function organize(spreadsheetUrl, sheetId) {
