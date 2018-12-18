@@ -69,7 +69,6 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Sheet.prototype.getValuesForRow = function(rowOffset) {
     Log.info('getValuesForRow');
-    Log.matrix(Log.Level.INFO, this.getNativeRow(rowOffset).getValues());
     return this.getNativeRow(rowOffset).getValues()[0];
   }
   
