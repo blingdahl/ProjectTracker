@@ -63,14 +63,14 @@ class SheetController {
   // Click handlers
 
   organizeClicked() {
-    new RpcConfig(runner => runner.organize(this.getSheetId())).
+    new RpcConfig(runner => runner.organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Organizing ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
   }
 
   syncWithGmailClicked() {
-    new RpcConfig(runner => runner.syncSheetWithGmail(this.getSheetId())).
+    new RpcConfig(runner => runner.syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
         retryOnTimeout().
         callRpc();
@@ -79,7 +79,7 @@ class SheetController {
   addUrlClicked() {
     let url = window.prompt('URL');
     if (url) {
-      new RpcConfig(runner => runner.addUrl(this.getSheetId(), url)).
+      new RpcConfig(runner => runner.addUrl(GlobalController.getSpreadsheetUrl(), this.getSheetId(), url)).
           output('Adding ' + url + ' to ' + this.getSheetName() + '...').
           retryOnTimeout().
           callRpc();
