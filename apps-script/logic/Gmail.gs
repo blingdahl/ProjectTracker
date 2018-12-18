@@ -2,6 +2,8 @@ var Gmail = {};
 Gmail.initialized = false;
 
 Gmail.NO_TRACK_LABEL = 'No-Track';
+Gmail.P0_LABEL = 'Make P0';
+Gmail.P1_LABEL = 'Make P1';
 
 Gmail.ACTIONS_IN_INBOX = ['Archive',
                           'Untrack',
@@ -71,6 +73,17 @@ Gmail.init = function() {
     }
   }
   
+  Gmail.hasLabel = function(thread, row, label, subject) {
+    var threadLabels = thread.getLabels();
+    var hasLabel = false;
+    threadLabels.forEach(function(threadLabel) {
+      if (threadLabel.getName() === label.getName()) {
+        hasLabel = true;
+      }
+    });
+    return hasLabel;
+  }
+  
   Gmail.removeLabel = function(thread, row, label, subject) {
     var threadLabels = thread.getLabels();
     var labelRemoved = false;
@@ -124,6 +137,8 @@ Gmail.init = function() {
     var totalCount = threads.length;
     threads = threads.slice(0, maxThreads);
     var noTrackLabel = Label.getUserDefined(Gmail.NO_TRACK_LABEL, true);
+    var p0Label = Label.getUserDefined(Gmail.P0_LABEL, true);
+    var p1Label = Label.getUserDefined(Gmail.P1_LABEL, true);
     Log.info(threads.length + ' threads');
     var otherLabels = Label.getSheetLabelNames();
     for (var i = 0; i < otherLabels.length; i++) {
@@ -156,6 +171,13 @@ Gmail.init = function() {
         row.setValue(TrackingSheet.COLUMNS.ITEM, subject);
         row.setFormula(TrackingSheet.COLUMNS.EMAIL, Spreadsheet.hyperlinkFormula(thread.getPermalink(), 'Email'));
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Imported');
+        if (Gmail.hasLabel(thread, row, p0Label, subject)) {
+          thread.removeLabel(p0Label);
+          row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P0');
+        } else if (Gmail.hasLabel(thread, row, p1Label, subject)) {
+          thread.removeLabel(p1Label);
+          row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P1');
+        }
       } else {
         Log.fine('Already in sheet: ' + subject);
       }
@@ -255,6 +277,7 @@ Gmail.init = function() {
 function syncSheetWithGmail(spreadsheetUrl, sheetId) {
   Log.start('syncSheetWithGmail', [sheetId]);
   Gmail.init();
+  Log.info('inSyncWithGmail: ' + spreadsheetUrl);
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Gmail.syncSheet(sheetId);
   Log.stop('syncSheetWithGmail', [sheetId]);
