@@ -3,6 +3,7 @@ TrackingSheet.initialized = false;
 
 
 TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner', 'Waiting'];
+TrackingSheet.NON_GMAIL_ACTIONS = ['Completed'];
 
 TrackingSheet.init = function() {
   if (TrackingSheet.initialized) {
