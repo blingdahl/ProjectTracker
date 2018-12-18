@@ -5,11 +5,13 @@
   </head>
   <body>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <?= Session.getActiveUser().getEmail() ?>
     <?!= include("ui/Stylesheet"); ?>
     <?
       if (spreadsheetUrl) {
     ?>
-      <a href="#" onclick="clearSpreadsheetUrl()">Clear Spreadsheet ID</a>
+      <?!= renderControls(spreadsheetUrl) ?>
+      <a class="clearSpreadsheetUrl">Clear Spreadsheet ID</a>
       <script>
         function clearSpreadsheetUrl() {
           new RpcConfig(runner => runner.clearSpreadsheetUrl()).
@@ -17,9 +19,8 @@
               retryOnTimeout().
               callRpc();
           }
-        $('.clearSpreadsheetUrlButton').click(clearSpreadsheetUrl);
+        $('.clearSpreadsheetUrl').click(clearSpreadsheetUrl);
       </script>
-      <?!= renderControls(spreadsheetUrl) ?>
     <? } else { ?>
       <div class="rpcMessages"></div>
       <input type="text" class="spreadsheetUrl"> <button class="setSpreadsheetUrl">Set Spreadsheet URL</button>

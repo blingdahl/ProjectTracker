@@ -54,6 +54,14 @@ class LabelPicker {
     this.pickerJq.attr('data-max-threads', maxThreads);
   }
   
+  getLabelText() {
+    let labelName = this.getLabelName();
+    if (labelName) {
+      return labelName + ' (max ' + this.getMaxThreads() + ')';
+    }
+    return 'Set label...';
+  }
+  
   // SECTION:
   // Logic
 
@@ -64,7 +72,7 @@ class LabelPicker {
 
   setMode(mode) {
     this.pickerJq.attr('data-mode', mode);
-    this.getLabelNameElement().text(this.getLabelName() || 'Set label...');
+    this.getLabelNameElement().text(this.getLabelText());
   }
   
   populateSelect(labels) {

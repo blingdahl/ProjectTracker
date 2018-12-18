@@ -22,6 +22,10 @@ class SheetController {
   getAddUrlElement() {
     return this.divJq.find('.addUrl');
   }
+  
+  getAddTrackingElement() {
+    return this.divJq.find('.addTracking');
+  }
 
   // SECTION:
   // Attributes
@@ -86,6 +90,13 @@ class SheetController {
     }
   }
   
+  addTrackingClicked() {
+    new RpcConfig(runner => runner.setTrackedForSheet(GlobalController.getSpreadsheetUrl(), this.getSheetId(), true)).
+        output('Adding tracking for ' + this.getSheetName() + ' sheet...').
+        retryOnTimeout().
+        callRpc();
+  }
+
   // SECTION:
   // Initialization
   
@@ -94,6 +105,7 @@ class SheetController {
     this.getSyncWithGmailElement().click(this.syncWithGmailClicked.bind(this));
     this.getOrganizeElement().click(this.organizeClicked.bind(this));
     this.getAddUrlElement().click(this.addUrlClicked.bind(this));
+    this.getAddTrackingElement().click(this.addTrackingClicked.bind(this));
   }
   
   static init() {
