@@ -17,7 +17,6 @@ Overview.init = function() {
     overviewSheet.setNumBlankRows(Overview.EXTRA_ROWS);
     overviewSheet.clearData();
     var trackingSheets = TrackingSheet.getAll();
-    // TODO(lindahl) Collapse
     trackingSheets.forEach(function(trackingSheet) {
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P0');
     });

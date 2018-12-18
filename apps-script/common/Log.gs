@@ -52,9 +52,13 @@ Log.error = function(s) {
 }
 
 Log.matrix = function(level, a) {
-  for (var i = 0; i < values.length; i++) {
-    Log.info('i: ' + i);
-    Log.info('values(' + values[i].length + ' of them): ' + values[i]);
+  for (var i = 0; i < a.length; i++) {
+    if (a[i]) {
+      Log.info('i: ' + i);
+      Log.info('values(' + a[i].length + ' of them): ' + a[i]);
+    } else {
+      Log.info('a[' + i + '] is ' + a[i]);
+    }
   }
 }
 

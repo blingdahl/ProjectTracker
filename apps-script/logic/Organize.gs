@@ -1,6 +1,8 @@
 var Organize = {};
 Organize.initialized = false;
 
+Organize.EXTRA_ROWS = 10;
+
 Organize.init = function() {
   if (Organize.initialized) {
     return;
@@ -14,11 +16,28 @@ Organize.init = function() {
   Organize.organizeSheet = function(trackingSheet) {
     var dataRows = trackingSheet.getDataRows();
     trackingSheet.setNumBlankRows(Organize.EXTRA_ROWS);
+    var rowNumbersToRemove = [];
     var rows = trackingSheet.getAllRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
+      if (!row.getValue(TrackingSheet.COLUMNS.THREAD_ID)) {
+        row.setDataValidation(TrackingSheet.COLUMNS.ACTION, TrackingSheet.NON_GMAIL_ACTIONS);
+      }
+      var fullCaseAction = row.getValue(TrackingSheet.COLUMNS.ACTION);
+      var action = fullCaseAction.toLowerCase();
+      Log.info('Action: ' + fullCaseAction);
+      if (action === 'completed') {
+        if (row.getValue(TrackingSheet.COLUMNS.THREAD_ID)) {
+          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Cannot mark threads "Completed"');
+        } else {
+          rowNumbersToRemove.push(row.getRowNumber());
+        }
+      } else if (action) {
+        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
+      }
     }
+    trackingSheet.removeRowNumbers(rowNumbersToRemove);
     trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     return 'Organized ' + trackingSheet.getSheetName();
   }
@@ -31,8 +50,6 @@ Organize.init = function() {
     return Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
 }
-
-Organize.EXTRA_ROWS = 10;
 
 function organizeAll(spreadsheetUrl) {
   Organize.init();

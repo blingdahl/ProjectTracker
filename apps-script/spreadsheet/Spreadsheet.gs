@@ -64,10 +64,12 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.getNativeRow = function(rowOffset) {
-    return this.nativeSheet.getRange(rowOffset + 1, 1);
+    return this.nativeSheet.getRange(rowOffset + 1, 1, 1, this.nativeSheet.getMaxColumns());
   }
   
   Spreadsheet.Sheet.prototype.getValuesForRow = function(rowOffset) {
+    Log.info('getValuesForRow');
+    Log.matrix(Log.Level.INFO, this.getNativeRow(rowOffset).getValues());
     return this.getNativeRow(rowOffset).getValues()[0];
   }
   
@@ -127,6 +129,22 @@ Spreadsheet.init = function() {
     this.clearCache();
   };
   
+  Spreadsheet.Sheet.prototype.removeRowNumbers = function(rowNumbers) {
+    rowNumbers.sort(function(a, b){return a - b});
+    rowNumbers = rowNumbers.reverse();
+    for (var i = 0; i < rowNumbers.length; i++) {
+      this.nativeSheet.deleteRow(rowNumbers[i]);
+    }
+  }
+  
+  Spreadsheet.Sheet.prototype.getLastDataRowNumber = function() {
+    return this.getDataRows().splice(-1)[0].getRowNumber();
+  }
+  
+  Spreadsheet.Sheet.prototype.setNumBlankRows = function(blankRows) {
+    this.setNumRows(this.getLastDataRowNumber() + blankRows);
+  }
+  
   Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
     var ascending = (opt_ascending === undefined) ? true : opt_ascending;
     var columnOffset = this.columns.getColumnOffset(columnHeader);
@@ -178,7 +196,7 @@ Spreadsheet.init = function() {
   };
   
   Spreadsheet.Columns.prototype.getColumnOffset = function(columnName) {
-    if (!columnName in this.mapping) {
+    if (!columnName || !columnName in this.mapping) {
       throw new Error('Invalid column name: ' + columnName);
     }
     return this.mapping[columnName];
@@ -191,6 +209,9 @@ Spreadsheet.init = function() {
   // Spreadsheet.Row
   
   Spreadsheet.Row = function(nativeRow, columns, rowCache, isNew) {
+    if (!nativeRow) {
+      throw new Error('No native row');
+    }
     this.nativeRow = nativeRow;
     this.columns = columns;
     this.rowCache = rowCache;
@@ -214,6 +235,7 @@ Spreadsheet.init = function() {
   };
   
   Spreadsheet.Row.prototype.getValue = function(columnHeader) {
+    Log.info('columnHeader/offset=' + columnHeader + '/' + this.columns.getColumnOffset(columnHeader) + '=' + this.rowCache.getValue(this.columns.getColumnOffset(columnHeader)));
     return this.rowCache.getValue(this.columns.getColumnOffset(columnHeader));
   };
   
