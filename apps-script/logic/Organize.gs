@@ -35,8 +35,9 @@ Organize.init = function() {
 
 Organize.EXTRA_ROWS = 10;
 
-function organizeAll() {
+function organizeAll(spreadsheetUrl) {
   Organize.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Organize.organizeAll();
 }
 
