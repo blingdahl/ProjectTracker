@@ -287,11 +287,6 @@ Spreadsheet.init = function() {
     return 'Spreadsheet.Row';
   };
 
-  Spreadsheet.getActiveSheetId = function() {
-    Log.finer('getActiveSheetId');
-    return SpreadsheetApp.getActiveSheet().getSheetId();
-  };
-
   Spreadsheet.hyperlinkFormula = function(url, text) {
     return '=hyperlink("' + url + '", "' + text + '")'
   };
@@ -300,8 +295,16 @@ Spreadsheet.init = function() {
     return formula.substring(formula.indexOf('"') + 1, formula.lastIndexOf(',') - 1);
   };
   
-  Spreadsheet.getNativeSheet = function(sheetId) {
-    var sheets = SpreadsheetApp.getActive().getSheets();
+  Spreadsheet.Spreadsheet = function(nativeSpreadsheet) {
+    this.nativeSpreadsheet = nativeSpreadsheet;
+  }
+  
+  Spreadsheet.Spreadsheet.prototype.getNativeSheets = function(sheetId) {
+    return this.nativeSpreadsheet.getSheets();
+  }
+  
+  Spreadsheet.Spreadsheet.prototype.getNativeSheet = function(sheetId) {
+    var sheets = this.getNativeSheets();
     for (var i = 0; i < sheets.length; i++) {
       var sheet = sheets[i];
       if (sheet.getSheetId() == sheetId) {
@@ -310,9 +313,42 @@ Spreadsheet.init = function() {
     }
     throw new Error('Sheet not found: ' + sheetId);
   }
+  
+  Spreadsheet.SPREADSHEET_URL = null;
+  
+  Spreadsheet.setSpreadsheetUrl = function(spreadsheetUrl) {
+    Spreadsheet.SPREADSHEET_URL = spreadsheetUrl;
+  }
+    
+  Spreadsheet.getSpreadsheet = function(opt_spreadsheetUrl) {
+    var spreadsheetUrl = opt_spreadsheetUrl || Spreadsheet.SPREADSHEET_URL || SpreadsheetApp.getActive().getUrl();
+    return new Spreadsheet.Spreadsheet(SpreadsheetApp.openByUrl(spreadsheetUrl));
+  }
 }
 
-function getActiveSheetId() {
+
+
+function setSpreadsheetUrl(spreadsheetUrl) {
+  Log.start('setSpreadsheetUrl', [spreadsheetUrl]);
+  Preferences.init();
   Spreadsheet.init();
-  return Spreadsheet.getActiveSheetId();
+  Spreadsheet.getSpreadsheet(spreadsheetUrl);
+  Preferences.setSpreadsheetUrl(spreadsheetUrl);
+  Log.stop('setSpreadsheetUrl', [spreadsheetUrl]);
+  return 'Set spreadsheet id';
+}
+
+function getSpreadsheetUrl() {
+  Log.start('getSpreadsheetUrl', []);
+  Preferences.init();
+  var ret = Preferences.getSpreadsheetUrl();
+  Log.stop('getSpreadsheetUrl', []);
+  return ret;
+}
+
+function clearSpreadsheetUrl() {
+  Log.start('clearSpreadsheetUrl', []);
+  Preferences.init();
+  Preferences.clearSpreadsheetUrl();
+  Log.stop('clearSpreadsheetUrl', []);
 }
