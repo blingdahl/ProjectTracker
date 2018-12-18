@@ -10,15 +10,14 @@
   ?>
   <tr class="sheetController"
       data-sheet-id="<?= preferences.sheetId ?>"
-      data-sheet-name="<?= preferences.sheetName ?>">
+      data-sheet-name="<?= preferences.sheetName ?>"
+      data-label-name="<?= preferences.label || '' ?>"
+      data-max-threads="<?= preferences.maxThreads ?>">
     <td data-templated-name="{sheetName}">???</td>
     <td>
-      <div class="labelPicker"
-          data-label-name="<?= preferences.label || '' ?>"
-          data-max-threads="<?= preferences.maxThreads ?>">
+      <div class="labelPicker">
         <div class="labelDisplayMode">
           <span class="labelName"></span>
-          <a class="syncWithGmail labelOnly">Sync</a>
         </div>
         <div class="labelSelectMode">
           <select class="selectLabel">
@@ -30,6 +29,9 @@
           <a class="renameLabel">Rename</a>
         </div>
       </div>
+    </td>
+    <td>
+      <a class="syncWithGmail labelOnly">Sync</a>
     </td>
     <td>
       <a class="organize">Organize</a>

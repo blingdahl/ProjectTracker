@@ -37,21 +37,22 @@ class LabelPicker {
   
   // SECTION:
   // Attributes
-   
+  
+  // TODO(lindahl) Factor out closest logic
   getLabelName() {
-    return this.pickerJq.attr('data-label-name');
+    return this.pickerJq.closest('[data-label-name]').attr('data-label-name');
   }
    
   setLabelName(labelName) {
-    this.pickerJq.attr('data-label-name', labelName);
+    this.pickerJq.closest('[data-label-name]').attr('data-label-name', labelName);
   }
    
   getMaxThreads() {
-    return this.pickerJq.attr('data-max-threads');
+    return this.pickerJq.closest('[data-max-threads]').attr('data-max-threads');
   }
    
   setMaxThreads(maxThreads) {
-    this.pickerJq.attr('data-max-threads', maxThreads);
+    this.pickerJq.closest('[data-max-threads]').attr('data-max-threads', maxThreads);
   }
   
   getLabelText() {
