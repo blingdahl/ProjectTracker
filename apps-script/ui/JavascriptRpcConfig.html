@@ -103,6 +103,18 @@ class RpcConfig {
   callRpc() {
     this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_.bind(this)).withFailureHandler(this.handleFailure_.bind(this)));
   }
+  
+  static clearCompleted() {
+    $('.removeLog').click();
+  }
+  
+  static addGlobalListeners() {
+    $('.clearCompleted').click(RpcConfig.clearCompleted);
+  }
+  
+  static init() {
+    RpcConfig.addGlobalListeners();
+  }
 }
 
 RpcConfig.ALLOW_RETRIES = false;
