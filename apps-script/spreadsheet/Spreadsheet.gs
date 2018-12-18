@@ -320,8 +320,16 @@ Spreadsheet.init = function() {
     Spreadsheet.SPREADSHEET_URL = spreadsheetUrl;
   }
     
+  Spreadsheet.getSpreadsheetUrl = function(opt_spreadsheetUrl) {
+    var spreadsheetUrl = opt_spreadsheetUrl || Spreadsheet.SPREADSHEET_URL;
+    if (!spreadsheetUrl && SpreadsheetApp.getActive()) {
+      spreadsheetUrl = SpreadsheetApp.getActive().getUrl();
+    }
+    return spreadsheetUrl;
+  }
+    
   Spreadsheet.getSpreadsheet = function(opt_spreadsheetUrl) {
-    var spreadsheetUrl = opt_spreadsheetUrl || Spreadsheet.SPREADSHEET_URL || SpreadsheetApp.getActive().getUrl();
+    var spreadsheetUrl = Spreadsheet.getSpreadsheetUrl(opt_spreadsheetUrl);
     return new Spreadsheet.Spreadsheet(SpreadsheetApp.openByUrl(spreadsheetUrl));
   }
 }

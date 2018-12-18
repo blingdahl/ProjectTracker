@@ -2,7 +2,7 @@ var TrackingSheet = {};
 TrackingSheet.initialized = false;
 
 
-TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner'];
+TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner', 'Waiting'];
 
 TrackingSheet.init = function() {
   if (TrackingSheet.initialized) {

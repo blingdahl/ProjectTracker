@@ -13,8 +13,7 @@ Organize.init = function() {
 
   Organize.organizeSheet = function(trackingSheet) {
     var dataRows = trackingSheet.getDataRows();
-    var numRows = dataRows.slice(-1)[0].getRowNumber();
-    trackingSheet.setNumRows(numRows + Organize.EXTRA_ROWS);
+    trackingSheet.setNumBlankRows(Organize.EXTRA_ROWS);
     var rows = trackingSheet.getAllRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];

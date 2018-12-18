@@ -14,6 +14,7 @@ Overview.init = function() {
   Overview.update = function() {
     Log.info('Overview.update()');
     var overviewSheet = OverviewSheet.get();
+    overviewSheet.setNumBlankRows(Overview.EXTRA_ROWS);
     overviewSheet.clearData();
     var trackingSheets = TrackingSheet.getAll();
     // TODO(lindahl) Collapse
@@ -23,12 +24,11 @@ Overview.init = function() {
     trackingSheets.forEach(function(trackingSheet) {
       overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P1');
     });
-    var numRows = overviewSheet.getDataRows().slice(-1)[0].getRowNumber();
-    overviewSheet.setNumRows(numRows + Overview.EXTRA_ROWS);
+    overviewSheet.setNumBlankRows(Overview.EXTRA_ROWS);
     Log.info('Updated overview');
   }
   
-  Overview.EXTRA_ROWS = 0;
+  Overview.EXTRA_ROWS = 5;
 }
 
 function updateOverview(spreadsheetUrl) {
