@@ -38,7 +38,7 @@ OverviewSheet.init = function() {
     copyFromTrackingRow(TrackingSheet.COLUMNS.ITEM, OverviewSheet.COLUMNS.ITEM);
     copyFromTrackingRow(TrackingSheet.COLUMNS.STATUS, OverviewSheet.COLUMNS.STATUS);
     copyFromTrackingRow(TrackingSheet.COLUMNS.NOTES, OverviewSheet.COLUMNS.NOTES);
-    copyFromTrackingRow(TrackingSheet.COLUMNS.LINK, OverviewSheet.COLUMNS.LINK);
+    copyFormulaFromTrackingRow(TrackingSheet.COLUMNS.LINK, OverviewSheet.COLUMNS.LINK);
     copyFormulaFromTrackingRow(TrackingSheet.COLUMNS.EMAIL, OverviewSheet.COLUMNS.EMAIL);
     overviewRow.setFormula(OverviewSheet.COLUMNS.SHEET, sheetFormula);
   }
