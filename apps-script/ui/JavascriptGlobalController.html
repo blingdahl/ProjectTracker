@@ -3,14 +3,6 @@ class GlobalController {
   // SECTION:
   // Elements
   
-  static getSyncAllWithGmailElement() {
-    return $('.syncAllWithGmail');
-  }
-  
-  static getOrganizeAllElement() {
-    return $('.organizeAll');
-  }
-  
   static getUpdateOverviewElement() {
     return $('.updateOverview');
   }
@@ -27,18 +19,11 @@ class GlobalController {
   // Attributes
   
   static getSpreadsheetUrl() {
-    return $('.global').attr('data-spreadsheet-url');
+    return $('[data-spreadsheet-url]').attr('data-spreadsheet-url');
   }
 
   // SECTION:
   // Click handlers
-  
-  static organizeAllClicked() {
-    new RpcConfig(runner => runner.organizeAll(GlobalController.getSpreadsheetUrl())).
-        output('Organizing all...').
-        retryOnTimeout().
-        callRpc();
-  }
 
   static updateOverviewClicked() {
     new RpcConfig(runner => runner.updateOverview(GlobalController.getSpreadsheetUrl())).
@@ -52,7 +37,6 @@ class GlobalController {
   }
 
   static addListeners() {
-    GlobalController.getOrganizeAllElement().click(GlobalController.organizeAllClicked);
     GlobalController.getUpdateOverviewElement().click(GlobalController.updateOverviewClicked);
     GlobalController.getRerenderSidebarElement().click(GlobalController.rerenderSidebarClicked);
   }

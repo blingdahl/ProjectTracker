@@ -26,6 +26,14 @@ class SheetController {
   getAddTrackingElement() {
     return this.divJq.find('.addTracking');
   }
+  
+  static getSyncAllWithGmailElement() {
+    return $('.syncAllWithGmail');
+  }
+  
+  static getOrganizeAllElement() {
+    return $('.organizeAll');
+  }
 
   // SECTION:
   // Attributes
@@ -66,21 +74,24 @@ class SheetController {
   // SECTION:
   // Click handlers
 
-  organizeClicked() {
+  organize() {
     new RpcConfig(runner => runner.organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Organizing ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
   }
 
-  syncWithGmailClicked() {
+  syncWithGmail() {
+    if (!this.labelPicker.getLabelName()) {
+      return;
+    }
     new RpcConfig(runner => runner.syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
         retryOnTimeout().
         callRpc();
   }
 
-  addUrlClicked() {
+  addUrl() {
     let url = window.prompt('URL');
     if (url) {
       new RpcConfig(runner => runner.addUrl(GlobalController.getSpreadsheetUrl(), this.getSheetId(), url)).
@@ -90,11 +101,16 @@ class SheetController {
     }
   }
   
-  addTrackingClicked() {
+  addTracking() {
     new RpcConfig(runner => runner.setTrackedForSheet(GlobalController.getSpreadsheetUrl(), this.getSheetId(), true)).
         output('Adding tracking for ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
+  }
+  
+  static organizeAll() {
+    let sheetControllers = SheetController.getAll();
+    sheetControllers.forEach(sheetController => sheetController.organize());
   }
 
   // SECTION:
@@ -102,10 +118,19 @@ class SheetController {
   
   addListeners() {
     this.labelPicker.addListeners();
-    this.getSyncWithGmailElement().click(this.syncWithGmailClicked.bind(this));
-    this.getOrganizeElement().click(this.organizeClicked.bind(this));
-    this.getAddUrlElement().click(this.addUrlClicked.bind(this));
-    this.getAddTrackingElement().click(this.addTrackingClicked.bind(this));
+    this.getSyncWithGmailElement().click(this.syncWithGmail.bind(this));
+    this.getOrganizeElement().click(this.organize.bind(this));
+    this.getAddUrlElement().click(this.addUrl.bind(this));
+    this.getAddTrackingElement().click(this.addTracking.bind(this));
+  }
+  
+  static addGlobalListeners() {
+    SheetController.getOrganizeAllElement().click(SheetController.organizeAll);
+    SheetController.getSyncAllWithGmailElement().click(SheetController.syncAllWithGmail);
+  }
+  
+  static getAll() {
+    return SheetController.ALL;
   }
   
   static init() {
@@ -113,6 +138,10 @@ class SheetController {
       let sheetController = new SheetController($(this));
       sheetController.addListeners();
       sheetController.show();
+      SheetController.ALL.push(sheetController);
     });
+    SheetController.addGlobalListeners();
   }
 }
+
+SheetController.ALL = [];
