@@ -1,6 +1,6 @@
 class RpcConfig {
   constructor(callFn) {
-    this.callFn = callFn;
+    this.callFn_ = callFn;
     this.successOut_ = this.output.bind(this);
     this.failureOut_ = this.output.bind(this);
     this.successFn_ = null;
@@ -101,7 +101,12 @@ class RpcConfig {
   }
   
   callRpc() {
-    this.callFn(google.script.run.withSuccessHandler(this.handleSuccess_.bind(this)).withFailureHandler(this.handleFailure_.bind(this)));
+    return new Promise(function(resolve, reject) {
+          this.callFn_(
+              google.script.run.
+                  withSuccessHandler(msg => resolve(msg)).
+                  withFailureHandler(err => reject(err)));
+        }.bind(this)).then(this.handleSuccess_.bind(this), this.handleFailure_.bind(this));
   }
   
   static clearCompleted() {

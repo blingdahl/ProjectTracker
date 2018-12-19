@@ -75,7 +75,7 @@ class SheetController {
   // Click handlers
 
   organize() {
-    new RpcConfig(runner => runner.organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+    return new RpcConfig(runner => runner.organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Organizing ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
@@ -83,12 +83,20 @@ class SheetController {
 
   syncWithGmail() {
     if (!this.labelPicker.getLabelName()) {
-      return;
+      return Promise.resolve();
     }
-    new RpcConfig(runner => runner.syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+    return new RpcConfig(runner => runner.syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
         retryOnTimeout().
         callRpc();
+  }
+
+  doYourThing() {
+    if (this.labelPicker.getLabelName()) {
+      return this.syncWithGmail();
+    } else {
+      return this.organize();
+    }
   }
 
   addUrl() {
@@ -116,6 +124,12 @@ class SheetController {
   static syncAllWithGmail() {
     let sheetControllers = SheetController.getAll();
     sheetControllers.forEach(sheetController => sheetController.syncWithGmail());
+  }
+  
+  static doYourThings() {
+    let promises = [];
+    SheetController.getAll().forEach(sheetController => promises.push(sheetController.doYourThing()));
+    return Promise.all(promises);
   }
 
   // SECTION:

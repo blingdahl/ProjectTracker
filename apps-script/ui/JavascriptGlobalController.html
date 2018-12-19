@@ -11,8 +11,8 @@ class GlobalController {
     return $('.rerenderSidebar');
   }
   
-  static getRerenderWebAppElement() {
-    return $('.rerenderWebApp');
+  static getDoAllTheThingsElement() {
+    return $('.doAllTheThings');
   }
   
   // SECTION:
@@ -25,20 +25,25 @@ class GlobalController {
   // SECTION:
   // Click handlers
 
-  static updateOverviewClicked() {
+  static updateOverview() {
     new RpcConfig(runner => runner.updateOverview(GlobalController.getSpreadsheetUrl())).
         output('Updating overview...').
         retryOnTimeout().
         callRpc();
   }
   
-  static rerenderSidebarClicked() {
+  static rerenderSidebar() {
     new RpcConfig(runner => runner.showPreferencesSidebar(GlobalController.getSpreadsheetUrl())).output('Rerendering sidebar...').callRpc();
   }
 
+  static doAllTheThings() {
+    SheetController.doYourThings().then(GlobalController.updateOverview);
+  }
+
   static addListeners() {
-    GlobalController.getUpdateOverviewElement().click(GlobalController.updateOverviewClicked);
-    GlobalController.getRerenderSidebarElement().click(GlobalController.rerenderSidebarClicked);
+    GlobalController.getUpdateOverviewElement().click(GlobalController.updateOverview);
+    GlobalController.getRerenderSidebarElement().click(GlobalController.rerenderSidebar);
+    GlobalController.getDoAllTheThingsElement().click(GlobalController.doAllTheThings);
   }
   
   static init() {
