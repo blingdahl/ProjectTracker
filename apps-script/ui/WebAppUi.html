@@ -11,6 +11,7 @@
       if (spreadsheetUrl) {
     ?>
       <?!= renderControls(spreadsheetUrl) ?>
+      <a class="spreadsheetLink" href="<?= spreadsheetUrl ?>" target="_new">View spreadsheet</a>
       <a class="clearSpreadsheetUrl">Clear Spreadsheet URL</a>
       <script>
         function clearSpreadsheetUrl() {
