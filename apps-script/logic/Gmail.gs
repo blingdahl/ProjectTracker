@@ -2,8 +2,8 @@ var Gmail = {};
 Gmail.initialized = false;
 
 Gmail.NO_TRACK_LABEL = 'No-Track';
-Gmail.P0_LABEL = 'Make P0';
-Gmail.P1_LABEL = 'Make P1';
+Gmail.P0_LABEL = '!Make P0';
+Gmail.P1_LABEL = '!Make P1';
 
 Gmail.ACTIONS_IN_INBOX = ['Archive',
                           'Untrack',
