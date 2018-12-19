@@ -21,6 +21,7 @@ TrackingSheet.init = function() {
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
       .addColumn('ACTION', 'Action')
+      .addColumn('STATUS', 'Status')
       .addColumn('TO_DO', 'To Do')
       .addColumn('INBOX', 'Inbox')
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')

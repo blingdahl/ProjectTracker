@@ -14,6 +14,7 @@ OverviewSheet.init = function() {
       .addColumn('SHEET', 'Sheet')
       .addColumn('ITEM', 'Item')
       .addColumn('PRIORITY', 'Priority')
+      .addColumn('STATUS', 'Status')
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
       .addColumn('NOTES', 'Notes')
