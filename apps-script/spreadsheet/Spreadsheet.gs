@@ -69,6 +69,7 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Sheet.prototype.getValuesForRow = function(rowOffset) {
     Log.info('getValuesForRow');
+    Log.matrix(Log.Level.INFO, this.getNativeRow(rowOffset).getValues());
     return this.getNativeRow(rowOffset).getValues()[0];
   }
   
@@ -87,7 +88,7 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.createRowObject = function(nativeRow, columns, rowCache, opt_isNew) {
-    return new Spreadsheet.Row(nativeRow, columns, rowCache, opt_isNew === true);
+    return new Spreadsheet.Row(this, nativeRow, columns, rowCache, opt_isNew === true);
   }
   
   Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
@@ -207,10 +208,14 @@ Spreadsheet.init = function() {
   
   // Spreadsheet.Row
   
-  Spreadsheet.Row = function(nativeRow, columns, rowCache, isNew) {
+  Spreadsheet.Row = function(sheet, nativeRow, columns, rowCache, isNew) {
+    if (!sheet) {
+      throw new Error('No sheet');
+    }
     if (!nativeRow) {
       throw new Error('No native row');
     }
+    this.sheet = sheet;
     this.nativeRow = nativeRow;
     this.columns = columns;
     this.rowCache = rowCache;
