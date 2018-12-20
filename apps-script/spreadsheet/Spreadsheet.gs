@@ -367,7 +367,7 @@ function setSpreadsheetUrl(spreadsheetUrl) {
   Spreadsheet.getSpreadsheet(spreadsheetUrl);
   Preferences.setSpreadsheetUrl(spreadsheetUrl);
   Log.stop('setSpreadsheetUrl', [spreadsheetUrl]);
-  return 'Set spreadsheet id';
+  return 'Set spreadsheet url';
 }
 
 function getSpreadsheetUrl() {
@@ -383,4 +383,5 @@ function clearSpreadsheetUrl() {
   Preferences.init();
   Preferences.clearSpreadsheetUrl();
   Log.stop('clearSpreadsheetUrl', []);
+  return 'Cleared spreadsheet url';
 }
