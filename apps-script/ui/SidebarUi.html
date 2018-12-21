@@ -6,6 +6,11 @@
   <body>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <?!= include("ui/Stylesheet"); ?>
-    <?!= renderControls(this.sheets) ?>
+    <?!= renderControls(spreadsheetUrl) ?>
+    <script>
+      <?!= include("ui/JavascriptSidebarController"); ?>
+      SidebarController.init();
+    </script>
+    <div class="rerenderSidebar">Re-render controls</div>
   </body>
 </html>

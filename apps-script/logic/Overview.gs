@@ -6,35 +6,42 @@ Overview.init = function() {
     return;
   }
   
-  OverviewSheet.init();
+  TrackingSheet.init();
   Log.info('Overview.init()');
   
   Overview.initialized = true;
   
-  Overview.update = function() {
-    Log.info('Overview.update()');
-    var overviewSheet = OverviewSheet.get();
-    overviewSheet.setNumBlankRows(Overview.EXTRA_ROWS);
-    overviewSheet.clearData();
-    var trackingSheets = TrackingSheet.getAll();
-    trackingSheets.forEach(function(trackingSheet) {
-      overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P0');
+  Overview.getRowsFromTrackingSheet = function(trackingSheet, priority) {
+    Log.info('Getting ' + priority + ' from ' + trackingSheet.getSheetName());
+    var rows = [];
+    trackingSheet.getRowsForPriority(priority).forEach(function(trackingRow) {
+      rows.push(trackingRow);
     });
-    trackingSheets.forEach(function(trackingSheet) {
-      overviewSheet.addRowsFromTrackingSheet(trackingSheet, 'P1');
-    });
-    overviewSheet.setNumBlankRows(Overview.EXTRA_ROWS);
-    Log.info('Updated overview');
+    return rows;
   }
   
-  Overview.EXTRA_ROWS = 5;
+  Overview.getTrackingRowsForPriorities = function(priorities) {
+    Log.start('Overview.getTrackingRowsForPriorities', [priorities]);
+    var rows = [];
+    var trackingSheets = TrackingSheet.getAll();
+    for (var i = 0; i < priorities.length; i++) {
+      var priority = priorities[i];
+      trackingSheets.forEach(function(trackingSheet) {
+        rows = rows.concat(Overview.getRowsFromTrackingSheet(trackingSheet, priority));
+      });
+    }
+    Log.stop('Overview.getTrackingRowsForPriorities', [priorities]);
+    return rows;
+  }
 }
 
-function updateOverview(spreadsheetUrl) {
-  Log.start('updateOverview', []);
+function getOverviewRows(spreadsheetUrl) {
   Overview.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  Overview.update();
-  Log.start('updateOverview', []);
-  return 'Updated overview';
+  var trackingRows = Overview.getTrackingRowsForPriorities(['P0', 'P1']);
+  var objectRows = [];
+  trackingRows.forEach(function(trackingRow) {
+    objectRows.push(trackingRow.toObject());
+  });
+  return JSON.stringify(objectRows);
 }

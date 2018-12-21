@@ -3,12 +3,8 @@ class GlobalController {
   // SECTION:
   // Elements
   
-  static getUpdateOverviewElement() {
-    return $('.updateOverview');
-  }
-  
-  static getRerenderSidebarElement() {
-    return $('.rerenderSidebar');
+  static getShowOverviewElement() {
+    return $('.showOverview');
   }
   
   static getDoAllTheThingsElement() {
@@ -24,25 +20,15 @@ class GlobalController {
 
   // SECTION:
   // Click handlers
-
-  static updateOverview() {
-    new RpcConfig(runner => runner.updateOverview(GlobalController.getSpreadsheetUrl())).
-        output('Updating overview...').
-        retryOnTimeout().
-        callRpc();
-  }
   
-  static rerenderSidebar() {
-    new RpcConfig(runner => runner.showPreferencesSidebar(GlobalController.getSpreadsheetUrl())).output('Rerendering sidebar...').callRpc();
-  }
-
-  static doAllTheThings() {
-    SheetController.doYourThings().then(GlobalController.updateOverview);
+  static showOverview() {
+    new RpcConfig(runner => runner.getOverviewRows(GlobalController.getSpreadsheetUrl())).
+        output('Showing overview...').
+        callRpc();
   }
 
   static addListeners() {
-    GlobalController.getUpdateOverviewElement().click(GlobalController.updateOverview);
-    GlobalController.getRerenderSidebarElement().click(GlobalController.rerenderSidebar);
+    GlobalController.getShowOverviewElement().click(GlobalController.showOverview);
     GlobalController.getDoAllTheThingsElement().click(GlobalController.doAllTheThings);
   }
   

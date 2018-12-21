@@ -84,6 +84,10 @@ Preferences.init = function() {
   Preferences.setSpreadsheetUrl = function(spreadsheetUrl) {
     return Preferences.setProperty(Preferences.spreadsheetUrlProperty(), spreadsheetUrl);
   }
+  
+  Preferences.clearSpreadsheetUrl = function(spreadsheetUrl) {
+    return Preferences.clearProperty(Preferences.spreadsheetUrlProperty());
+  }
 
   Preferences.getPreferencesForSheet = function(sheetId) {
     Log.start('getPreferencesForSheet', [sheetId]);

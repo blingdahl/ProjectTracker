@@ -13,10 +13,12 @@ Spreadsheet.init = function() {
   
   Spreadsheet.ColumnDefinitions = function() {
     this.columnNamesInOrder = [];
+    this.columnKeys = [];
   }
   
   Spreadsheet.ColumnDefinitions.prototype.addColumn = function(key, header) {
     this.columnNamesInOrder.push(header);
+    this.columnKeys.push(key);
     this[key] = header;
     return this;
   }
@@ -307,6 +309,14 @@ Spreadsheet.init = function() {
       }
     }
     cell.setDataValidation(SpreadsheetApp.newDataValidation().setAllowInvalid(false).requireValueInList(options).build());
+  };
+
+  Spreadsheet.Row.prototype.toObject = function() {
+    var ret = {};
+    this.columns.columnDefinitions.columnKeys.forEach(function(columnKey) {
+      ret[columnKey] = this.getValue(columnKey);
+    }.bind(this));
+    return ret;
   };
   
   Spreadsheet.Row.prototype.toString = function() {

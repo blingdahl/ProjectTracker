@@ -1,81 +1,83 @@
 <!DOCTYPE html>
-<div class="message"></div>
-<div class="error"></div>
-<div class="rpcMessages"></div>
-<a class="clearCompleted">Clear completed</a>
-<div class="global" style="display: none" data-spreadsheet-url="<?= spreadsheetUrl ?>"></div>
-<table>
+<div class="controls">
+  <div class="message"></div>
+  <div class="error"></div>
+  <div class="rpcMessages"></div>
+  <a class="clearCompleted">Clear completed</a>
+  <div class="global" style="display: none" data-spreadsheet-url="<?= spreadsheetUrl ?>"></div>
+  <table>
+    <?
+      for (var i = 0; i < trackedSheets.length; i++) {
+        var preferences = trackedSheets[i];
+    ?>
+    <tr class="sheetController"
+        data-sheet-id="<?= preferences.sheetId ?>"
+        data-sheet-name="<?= preferences.sheetName ?>"
+        data-label-name="<?= preferences.label || '' ?>"
+        data-max-threads="<?= preferences.maxThreads ?>">
+      <td data-templated-name="{sheetName}">???</td>
+      <td>
+        <div class="labelPicker">
+          <div class="labelDisplayMode">
+            <span class="labelName"></span>
+          </div>
+          <div class="labelSelectMode">
+            <select class="selectLabel">
+            </select>
+            <input type="text" class="maxThreads">
+            <a class="saveLabel">Save</a>
+            <a class="cancelLabel">Cancel</a>
+            <a class="removeLabel">Remove</a>
+            <a class="renameLabel">Rename</a>
+          </div>
+        </div>
+      </td>
+      <td>
+        <a class="syncWithGmail labelOnly">Sync</a>
+      </td>
+      <td>
+        <a class="organize">Organize</a>
+      </td>
+      <td>
+        <a class="addUrl">Add URL</a>
+      </td>
+    </tr>
+    <?
+      }
+    ?>
+  </table>
   <?
-    for (var i = 0; i < trackedSheets.length; i++) {
-      var preferences = trackedSheets[i];
+    if (untrackedSheets.length > 0) {
   ?>
-  <tr class="sheetController"
-      data-sheet-id="<?= preferences.sheetId ?>"
-      data-sheet-name="<?= preferences.sheetName ?>"
-      data-label-name="<?= preferences.label || '' ?>"
-      data-max-threads="<?= preferences.maxThreads ?>">
-    <td data-templated-name="{sheetName}">???</td>
-    <td>
-      <div class="labelPicker">
-        <div class="labelDisplayMode">
-          <span class="labelName"></span>
-        </div>
-        <div class="labelSelectMode">
-          <select class="selectLabel">
-          </select>
-          <input type="text" class="maxThreads">
-          <a class="saveLabel">Save</a>
-          <a class="cancelLabel">Cancel</a>
-          <a class="removeLabel">Remove</a>
-          <a class="renameLabel">Rename</a>
-        </div>
-      </div>
-    </td>
-    <td>
-      <a class="syncWithGmail labelOnly">Sync</a>
-    </td>
-    <td>
-      <a class="organize">Organize</a>
-    </td>
-    <td>
-      <a class="addUrl">Add URL</a>
-    </td>
-  </tr>
+  <h1>Untracked</h1>
+  <table>
+    <?
+      for (var i = 0; i < untrackedSheets.length; i++) {
+        var sheetInfo = untrackedSheets[i];
+    ?>
+    <tr class="sheetController"
+        data-sheet-id="<?= sheetInfo.sheetId ?>"
+        data-sheet-name="<?= sheetInfo.sheetName ?>">
+      <td data-templated-name="{sheetName}"><?= sheetInfo.sheetName ?></td>
+      <td><a class="addTracking">Track</a></td>
+    </tr>
+    <?
+      }
+    ?>
+  </table>
   <?
     }
   ?>
-</table>
-<?
-  if (untrackedSheets.length > 0) {
-?>
-<h1>Untracked</h1>
-<table>
-  <?
-    for (var i = 0; i < untrackedSheets.length; i++) {
-      var sheetInfo = untrackedSheets[i];
-  ?>
-  <tr class="sheetController"
-      data-sheet-id="<?= sheetInfo.sheetId ?>"
-      data-sheet-name="<?= sheetInfo.sheetName ?>">
-    <td data-templated-name="{sheetName}"><?= sheetInfo.sheetName ?></td>
-    <td><a class="addTracking">Track</a></td>
-  </tr>
-  <?
-    }
-  ?>
-</table>
-<?
-  }
-?>
-<h1>All Sheets</h1>
-<button class="syncAllWithGmail">Sync All</button>
-<button class="organizeAll">Organize All</button>
-<button class="updateOverview">Update Overview</button>
-<button class="doAllTheThings">Do all the things!</button>
-<script>
-  <?!= include("ui/JavascriptRpcConfig"); ?>
-  <?!= include("ui/JavascriptLabelPicker"); ?>
-  <?!= include("ui/JavascriptSheetController"); ?>
-  <?!= include("ui/JavascriptGlobalController"); ?>
-  <?!= include("ui/JavascriptControls"); ?>
-</script>
+  <h1>All Sheets</h1>
+  <button class="syncAllWithGmail">Sync All</button>
+  <button class="organizeAll">Organize All</button>
+  <button class="showOverview">Show Overview</button>
+  <button class="doAllTheThings">Do all the things!</button>
+  <script>
+    <?!= include("ui/JavascriptRpcConfig"); ?>
+    <?!= include("ui/JavascriptLabelPicker"); ?>
+    <?!= include("ui/JavascriptSheetController"); ?>
+    <?!= include("ui/JavascriptGlobalController"); ?>
+    <?!= include("ui/JavascriptControls"); ?>
+  </script>
+</div>

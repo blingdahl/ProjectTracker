@@ -1,0 +1,24 @@
+class SidebarController {
+
+  // SECTION:
+  // Elements
+  
+  static getRerenderSidebarElement() {
+    return $('.rerenderSidebar');
+  }
+  
+  // SECTION:
+  // Click handlers
+
+  static rerenderSidebar() {
+    new RpcConfig(runner => runner.showPreferencesSidebar(GlobalController.getSpreadsheetUrl())).output('Rerendering sidebar...').callRpc();
+  }
+
+  static addListeners() {
+    GlobalController.getRerenderSidebarElement().click(SidebarController.rerenderSidebar);
+  }
+  
+  static init() {
+    GlobalController.addListeners();
+  }
+}
