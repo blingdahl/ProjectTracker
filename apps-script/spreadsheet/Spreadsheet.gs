@@ -11,14 +11,17 @@ Spreadsheet.init = function() {
   
   Log.info('Spreadsheet.init()');
   
+  Spreadsheet.ColumnDefinition = function(key, header) {
+    this.key = key;
+    this.header = header;
+  }
+  
   Spreadsheet.ColumnDefinitions = function() {
-    this.columnNamesInOrder = [];
-    this.columnKeys = [];
+    this.columnDefinitionsInOrder = [];
   }
   
   Spreadsheet.ColumnDefinitions.prototype.addColumn = function(key, header) {
-    this.columnNamesInOrder.push(header);
-    this.columnKeys.push(key);
+    this.columnDefinitionsInOrder.push(new Spreadsheet.ColumnDefinition(key, header));
     this[key] = header;
     return this;
   }
@@ -181,7 +184,9 @@ Spreadsheet.init = function() {
   };
   
   Spreadsheet.Columns.prototype.createColumnsIfMissing = function(columnDefinitions) {
-    columnDefinitions.columnNamesInOrder.forEach(function(columnName) { this.createColumnIfMissing(columnName); }.bind(this));
+    columnDefinitions.columnDefinitionsInOrder.forEach(function(columnDefinition) {
+      this.createColumnIfMissing(columnDefinition.header);
+    }.bind(this));
     this.nativeSheet.setFrozenRows(1)
     this.refreshHeaders();
   };
@@ -313,9 +318,16 @@ Spreadsheet.init = function() {
 
   Spreadsheet.Row.prototype.toObject = function() {
     var ret = {};
-    this.columns.columnDefinitions.columnKeys.forEach(function(columnKey) {
-      ret[columnKey] = this.getValue(columnKey);
+    this.columns.columnDefinitions.columnDefinitionsInOrder.forEach(function(columnDefinition) {
+      ret[columnDefinition.key] = this.getValue(columnDefinition.header);
+      var formula = this.getFormula(columnDefinition.header);
+      if (formula) {
+        ret[columnDefinition.key + '_URL'] = Spreadsheet.getUrlFromHyperlinkFormula(formula);
+      }
     }.bind(this));
+    ret['SHEET'] = this.sheet.getSheetName();
+    ret['SHEET_ID'] = this.sheet.getSheetId();
+    ret['SHEET_URL'] = Spreadsheet.getSpreadsheetUrl() + '#gid=' + this.sheet.getSheetId();
     return ret;
   };
   

@@ -21,6 +21,10 @@ class GlobalController {
   // SECTION:
   // Click handlers
   
+  static makeLink(rowData, key) {
+    return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_NEW').text(rowData[key]);
+  }
+  
   static handleOverviewData(msg) {
     let data = JSON.parse(msg);
     let overviewTableTemplate = $('.overviewTableTemplate');
@@ -29,9 +33,11 @@ class GlobalController {
     overviewTable.find('.overviewRowTemplate').remove();
     data.forEach(rowData => {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
-      overviewRow.find('.sheet').text(rowData['SHEET']);
+      overviewRow.find('.sheet').append(GlobalController.makeLink(rowData, 'SHEET'));
       overviewRow.find('.item').text(rowData['ITEM']);
       overviewRow.find('.priority').text(rowData['PRIORITY']);
+      overviewRow.find('.email').append(GlobalController.makeLink(rowData, 'EMAIL'));
+      overviewRow.find('.link').append(GlobalController.makeLink(rowData, 'LINK'));
       overviewTable.append(overviewRow);
     });
     $('.overviewPlaceholder').append(overviewTable.show());
