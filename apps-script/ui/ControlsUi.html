@@ -1,9 +1,9 @@
 <!DOCTYPE html>
+<div class="message"></div>
+<div class="error"></div>
+<div class="rpcMessages"></div>
+<a class="clearCompleted">Clear completed</a>
 <div class="controls">
-  <div class="message"></div>
-  <div class="error"></div>
-  <div class="rpcMessages"></div>
-  <a class="clearCompleted">Clear completed</a>
   <div class="global" style="display: none" data-spreadsheet-url="<?= spreadsheetUrl ?>"></div>
   <table>
     <?
@@ -80,4 +80,20 @@
     <?!= include("ui/JavascriptGlobalController"); ?>
     <?!= include("ui/JavascriptControls"); ?>
   </script>
+  
+  <table class="overviewTableTemplate overview" style="display: none">
+    <tr>
+      <th>Sheet</th>
+      <th>Priority</th>
+      <th>Item</th>
+    </tr>
+    <tr class="overviewRowTemplate overviewRow">
+      <td class="sheet"></td>
+      <td class="priority"></td>
+      <td class="item"></td>
+      <td class="email"></td>
+      <td class="link"></td>
+    </tr>
+  </table>
 </div>
+<div class="overviewPlaceholder"></div>

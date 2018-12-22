@@ -36,12 +36,32 @@ class RpcConfig {
   }
   
   ignoreSuccess() {
-    this.successOut_ = function() { };
+    this.successOut_ = () => null;
     return this;
   }
   
   ignoreFailure() {
-    this.failureOut_ = function() { };
+    this.failureOut_ = () => null;
+    return this;
+  }
+  
+  clearMessageOnSuccess() {
+    this.successOut_ = () => this.removeRpcDiv_();
+    return this;
+  }
+  
+  setMessageOnSuccess(msg) {
+    this.successOut_ = () => this.output(msg);
+    return this;
+  }
+  
+  clearMessageOnFailure() {
+    this.failureOut_ = () => this.removeRpcDiv_();
+    return this;
+  }
+  
+  setMessageOnFailure(msg) {
+    this.failureOut_ = () => this.output(msg);
     return this;
   }
   

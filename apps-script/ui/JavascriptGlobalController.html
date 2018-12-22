@@ -21,9 +21,28 @@ class GlobalController {
   // SECTION:
   // Click handlers
   
+  static handleOverviewData(msg) {
+    let data = JSON.parse(msg);
+    let overviewTableTemplate = $('.overviewTableTemplate');
+    let overviewRowTemplate = overviewTableTemplate.find('.overviewRowTemplate');
+    let overviewTable = overviewTableTemplate.clone().removeClass('overviewTableTemplate');
+    overviewTable.find('.overviewRowTemplate').remove();
+    data.forEach(rowData => {
+      let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
+      overviewRow.find('.sheet').text(rowData['SHEET']);
+      overviewRow.find('.item').text(rowData['ITEM']);
+      overviewRow.find('.priority').text(rowData['PRIORITY']);
+      overviewTable.append(overviewRow);
+    });
+    $('.overviewPlaceholder').append(overviewTable.show());
+  }
+  
   static showOverview() {
+    $('.controls').hide();
     new RpcConfig(runner => runner.getOverviewRows(GlobalController.getSpreadsheetUrl())).
-        output('Showing overview...').
+        output('Loading overview...').
+        clearMessageOnSuccess().
+        withSuccessFn(GlobalController.handleOverviewData).
         callRpc();
   }
 
