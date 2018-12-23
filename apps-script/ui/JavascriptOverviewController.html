@@ -53,7 +53,7 @@ class OverviewController {
   }
   
   static showOverview() {
-    google.script.history.push(null, null, "overview");
+    google.script.history.push(null, null, 'overview');
     $('.controls').hide();
     new RpcConfig(runner => runner.getOverviewRows(GlobalController.getSpreadsheetUrl())).
         output('Loading overview...').
@@ -63,7 +63,7 @@ class OverviewController {
   }
   
   static hideOverview() {
-    console.log('Hiding overview');
+    google.script.history.push(null, null, '');
     $('.controls').show();
     $('.overviewPlaceholder').empty();
   }
