@@ -38,7 +38,7 @@ class SheetController {
   // SECTION:
   // Attributes
   getSheetId() {
-    return this.divJq.attr('data-sheet-id');
+    return parseInt(this.divJq.attr('data-sheet-id'));
   }
    
   getSheetName() {
@@ -69,6 +69,13 @@ class SheetController {
     this.updateTemplatedText(sheetName);
     this.labelPicker.setMode(LabelPicker.MODE.DISPLAY);
     this.divJq.show();
+  }
+  
+  setAction(uuid, action) {
+    return new RpcConfig(runner => runner.setAction(GlobalController.getSpreadsheetUrl(), this.getSheetId(), uuid, action)).
+        output('Setting action to ' + action + '...').
+        retryOnTimeout().
+        callRpc();
   }
   
   // SECTION:
@@ -150,6 +157,16 @@ class SheetController {
   
   static getAll() {
     return SheetController.ALL;
+  }
+  
+  static forSheet(sheetId) {
+    let ret = null;
+    SheetController.ALL.forEach(sheetController => {
+      if (sheetController.getSheetId() === sheetId) {
+        ret = sheetController;
+      }
+    });
+    return ret;
   }
   
   static init() {

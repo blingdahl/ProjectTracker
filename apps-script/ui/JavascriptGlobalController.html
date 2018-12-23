@@ -11,6 +11,10 @@ class GlobalController {
     return $('.doAllTheThings');
   }
   
+  static getHideOverviewElement() {
+    return $('.hideOverview');
+  }
+  
   // SECTION:
   // Attributes
   
@@ -27,10 +31,10 @@ class GlobalController {
   
   static handleOverviewData(msg) {
     let data = JSON.parse(msg);
-    let overviewTableTemplate = $('.overviewTableTemplate');
-    let overviewRowTemplate = overviewTableTemplate.find('.overviewRowTemplate');
-    let overviewTable = overviewTableTemplate.clone().removeClass('overviewTableTemplate');
-    overviewTable.find('.overviewRowTemplate').remove();
+    let overviewTemplate = $('.overviewTemplate');
+    let overviewRowTemplate = overviewTemplate.find('.overviewRowTemplate');
+    let overview = overviewTemplate.clone().removeClass('overviewTemplate');
+    overview.find('.overviewRowTemplate').remove();
     data.forEach(rowData => {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
       overviewRow.find('.sheet').append(GlobalController.makeLink(rowData, 'SHEET'));
@@ -38,9 +42,22 @@ class GlobalController {
       overviewRow.find('.priority').text(rowData['PRIORITY']);
       overviewRow.find('.email').append(GlobalController.makeLink(rowData, 'EMAIL'));
       overviewRow.find('.link').append(GlobalController.makeLink(rowData, 'LINK'));
-      overviewTable.append(overviewRow);
+      let link;
+      let action;
+      if (rowData['THREAD_ID']) {
+        link = overviewRow.find('.untrack');
+        action = 'Untrack';
+      } else {
+        link = overviewRow.find('.markCompleted');
+        action = 'Untrack';
+      }
+      link.show().click(() => SheetController.forSheet(rowData['SHEET_ID']).setAction(rowData['UUID'], action).then(() => {
+          link.hide();
+          overviewRow.css('color', '#555');
+      }));
+      overview.append(overviewRow);
     });
-    $('.overviewPlaceholder').append(overviewTable.show());
+    $('.overviewPlaceholder').append(overview.show());
   }
   
   static showOverview() {
@@ -51,10 +68,16 @@ class GlobalController {
         withSuccessFn(GlobalController.handleOverviewData).
         callRpc();
   }
+  
+  static hideOverview() {
+    $('.controls').show();
+    $('.overviewPlaceholder').empty();
+  }
 
   static addListeners() {
     GlobalController.getShowOverviewElement().click(GlobalController.showOverview);
     GlobalController.getDoAllTheThingsElement().click(SheetController.doYourThings);
+    GlobalController.getHideOverviewElement().click(GlobalController.hideOverview);
   }
   
   static init() {

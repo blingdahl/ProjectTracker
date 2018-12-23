@@ -79,21 +79,28 @@
     <?!= include("ui/JavascriptControls"); ?>
   </script>
   
-  <table class="overviewTableTemplate overview" style="display: none">
-    <tr>
-      <th>Sheet</th>
-      <th>Priority</th>
-      <th>Email</th>
-      <th>Link</th>
-      <th>Item</th>
-    </tr>
-    <tr class="overviewRowTemplate overviewRow">
-      <td class="sheet"></td>
-      <td class="priority"></td>
-      <td class="email"></td>
-      <td class="link"></td>
-      <td class="item"></td>
-    </tr>
-  </table>
+  <div class="overviewTemplate">
+    <a class="hideOverview">Hide overview</a><br>
+    <table class="overviewTable" style="display: none">
+      <tr>
+        <th>Sheet</th>
+        <th>Priority</th>
+        <th>Email</th>
+        <th>Link</th>
+        <th>Item</th>
+      </tr>
+      <tr class="overviewRowTemplate overviewRow">
+        <td class="sheet"></td>
+        <td class="priority"></td>
+        <td class="email"></td>
+        <td class="link"></td>
+        <td class="item"></td>
+        <td class="action">
+          <a class="markCompleted" style="display: none">Mark complete</a>
+          <a class="untrack" style="display: none">Untrack</a>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 <div class="overviewPlaceholder"></div>
