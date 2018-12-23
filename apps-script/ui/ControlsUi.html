@@ -76,18 +76,20 @@
     <?!= include("ui/JavascriptLabelPicker"); ?>
     <?!= include("ui/JavascriptSheetController"); ?>
     <?!= include("ui/JavascriptGlobalController"); ?>
+    <?!= include("ui/JavascriptOverviewController"); ?>
     <?!= include("ui/JavascriptControls"); ?>
   </script>
   
-  <div class="overviewTemplate">
+  <div class="overviewTemplate" style="display: none">
     <a class="hideOverview">Hide overview</a><br>
-    <table class="overviewTable" style="display: none">
+    <table class="overviewTable">
       <tr>
         <th>Sheet</th>
         <th>Priority</th>
         <th>Email</th>
         <th>Link</th>
         <th>Item</th>
+        <th>Action</th>
       </tr>
       <tr class="overviewRowTemplate overviewRow">
         <td class="sheet"></td>
