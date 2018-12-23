@@ -27,6 +27,7 @@ TrackingSheet.init = function() {
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
       .addColumn('NOTES', 'Notes')
       .addColumn('THREAD_ID', 'Thread ID')
+      .addColumn('UUID', 'UUID')
       .addColumn('SUBJECT', 'Subject')
       .addColumn('FROM', 'From')
       .addColumn('SCRIPT_NOTES', 'Script Notes');
@@ -51,6 +52,7 @@ TrackingSheet.init = function() {
     return ret;
   }
   
+  // TODO(lindahl) Rename threadId
   TrackingSheet.Sheet.prototype.getRowForThreadId = function(id) {
     var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.THREAD_ID, id);
     if (rowOffsets.length >= 1) {
@@ -59,6 +61,14 @@ TrackingSheet.init = function() {
     var row = this.addRow();
     row.setValue(TrackingSheet.COLUMNS.THREAD_ID, id);
     return row;
+  }
+  
+  TrackingSheet.Sheet.prototype.getRowForUuid = function(uuid) {
+    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.UUID, uuid);
+    if (rowOffsets.length >= 1) {
+      return this.getRow(rowOffsets[0]);
+    }
+    throw new Error('No row for uuid ' + uuid);
   }
   
   TrackingSheet.Sheet.prototype.toString = function() {

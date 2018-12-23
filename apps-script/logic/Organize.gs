@@ -21,8 +21,14 @@ Organize.init = function() {
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
+      if (!row.getValue(TrackingSheet.COLUMNS.ITEM)) {
+        continue;
+      }
       if (!row.getValue(TrackingSheet.COLUMNS.THREAD_ID)) {
         row.setDataValidation(TrackingSheet.COLUMNS.ACTION, TrackingSheet.NON_GMAIL_ACTIONS);
+      }
+      if (!row.getValue(TrackingSheet.COLUMNS.UUID)) {
+        row.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
       }
       var fullCaseAction = row.getValue(TrackingSheet.COLUMNS.ACTION);
       var action = fullCaseAction.toLowerCase();
@@ -48,10 +54,10 @@ Organize.init = function() {
 }
 
 function organize(spreadsheetUrl, sheetId) {
-  Log.start('organize', [sheetId]);
+  Log.start('organize', [spreadsheetUrl, sheetId]);
   Organize.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Organize.organize(sheetId);
-  Log.stop('organize', [sheetId]);
+  Log.stop('organize', [spreadsheetUrl, sheetId]);
   return ret;
 }

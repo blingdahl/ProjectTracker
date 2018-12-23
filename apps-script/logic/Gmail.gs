@@ -275,9 +275,9 @@ function syncSheetWithGmail(spreadsheetUrl, sheetId) {
 }
 
 function renameLabel(spreadsheetUrl, sheetId, toLabelName) {
-  Log.start('renameLabel', [sheetId, toLabelName]);
+  Log.start('renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
   Gmail.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   Gmail.renameLabel(sheetId, toLabelName);
-  Log.stop('renameLabel', [sheetId, toLabelName]);
+  Log.stop('renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
 }
