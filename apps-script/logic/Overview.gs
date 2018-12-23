@@ -35,10 +35,10 @@ Overview.init = function() {
   }
 }
 
-function getOverviewRows(spreadsheetUrl) {
+function getOverviewRows(spreadsheetUrl, priorities) {
   Overview.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var trackingRows = Overview.getTrackingRowsForPriorities(['P0', 'P1']);
+  var trackingRows = Overview.getTrackingRowsForPriorities(priorities);
   var objectRows = [];
   trackingRows.forEach(function(trackingRow) {
     objectRows.push(trackingRow.toObject());
