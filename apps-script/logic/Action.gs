@@ -22,6 +22,6 @@ function setAction(spreadsheetUrl, sheetId, uuid, action) {
   Action.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   var ret = Action.setAction(sheetId, uuid, action);
-  Log.stop('markCompleted', [spreadsheetUrl, sheetId, uuid, action]);
+  Log.stop('setAction', [spreadsheetUrl, sheetId, uuid, action]);
   return ret;
 }

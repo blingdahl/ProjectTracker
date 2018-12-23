@@ -14,14 +14,10 @@ class OverviewController {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_NEW').text(rowData[key]);
   }
   
-  static handleOverviewData(msg) {
-    window.location.hash = 'overview';
+  static handleOverviewData(priority, msg) {
     let data = JSON.parse(msg);
-    let overviewTemplate = $('.overviewTemplate');
-    let overviewRowTemplate = overviewTemplate.find('.overviewRowTemplate');
-    let overview = overviewTemplate.clone().removeClass('overviewTemplate');
-    let overviewTable = overview.find('table');
-    overview.find('.overviewRowTemplate').remove();
+    let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
+    let overviewTable = $('.overviewPlaceholder').find('table').show();
     data.forEach(rowData => {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
       overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
@@ -48,18 +44,34 @@ class OverviewController {
       }
       overviewTable.append(overviewRow);
     });
-    $('.overviewPlaceholder').append(overview.show());
-    overview.find('.hideOverview').click(OverviewController.hideOverview);
+    let nextPriority = {'P0': 'P1', 'P1': 'P2', 'P2': 'P3', 'P3': 'P4'}[priority];
+    let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
+    $('.overviewPlaceholder').find('.priorityLoading').hide();
+    if (nextPriority) {
+      loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(nextPriority)).show();
+    }
+  }
+  
+  static loadPriority(priority) {
+    $('.overviewPlaceholder').find('.loadPriority').hide();
+    $('.overviewPlaceholder').find('.priorityLoading').show();
+    new RpcConfig(runner => runner.getOverviewRows(GlobalController.getSpreadsheetUrl(), [priority])).
+        output('Loading ' + priority + '...').
+        clearMessageOnSuccess().
+        withSuccessFn(msg => OverviewController.handleOverviewData(priority, msg)).
+        callRpc();
   }
   
   static showOverview() {
     google.script.history.push(null, null, 'overview');
     $('.controls').hide();
-    new RpcConfig(runner => runner.getOverviewRows(GlobalController.getSpreadsheetUrl())).
-        output('Loading overview...').
-        clearMessageOnSuccess().
-        withSuccessFn(OverviewController.handleOverviewData).
-        callRpc();
+    let overviewTemplate = $('.overviewTemplate');
+    let overview = overviewTemplate.clone().removeClass('overviewTemplate');
+    overview.find('.overviewRowTemplate').remove();
+    $('.overviewPlaceholder').append(overview.show());
+    $('.overviewPlaceholder').find('table').hide();
+    overview.find('.hideOverview').click(OverviewController.hideOverview);
+    OverviewController.loadPriority('P0');
   }
   
   static hideOverview() {
