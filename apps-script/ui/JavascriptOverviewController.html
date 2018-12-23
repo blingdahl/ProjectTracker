@@ -29,19 +29,23 @@ class OverviewController {
       overviewRow.find('.priority').text(rowData['PRIORITY']);
       overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
       overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
-      let link;
-      let action;
-      if (rowData['THREAD_ID']) {
-        link = overviewRow.find('.untrack');
-        action = 'Untrack';
+      if (rowData['ACTION'] === 'Completed' || rowData['ACTION'] === 'Untrack') {
+        overviewRow.addClass('completed');
+        overviewRow.find('.action').text(rowData['ACTION']);
       } else {
-        link = overviewRow.find('.markCompleted');
-        action = 'Completed';
+        let link;
+        let action;
+        if (rowData['THREAD_ID']) {
+          link = overviewRow.find('.untrack');
+          action = 'Untrack';
+        } else {
+          link = overviewRow.find('.markCompleted');
+          action = 'Completed';
+        }
+        link.show().click(() => SheetController.forSheet(rowData['SHEET_ID']).setAction(rowData['UUID'], action).then(() => {
+            overviewRow.addClass('completed');
+        }));
       }
-      link.show().click(() => SheetController.forSheet(rowData['SHEET_ID']).setAction(rowData['UUID'], action).then(() => {
-          link.hide();
-          overviewRow.css('color', '#999');
-      }));
       overviewTable.append(overviewRow);
     });
     $('.overviewPlaceholder').append(overview.show());

@@ -72,10 +72,18 @@
   }
   
   .overviewTable tr:nth-child(even) {
-    background: #DDD
+    background: #DDD;
   }
 
   .overviewTable tr:nth-child(odd) {
-    background: #FFF
+    background: #FFF;
+  }
+
+  .overviewTable tr.completed {
+    color: #666;
+  }
+
+  .overviewTable tr.completed .action a {
+    display: none;
   }
 </style>
