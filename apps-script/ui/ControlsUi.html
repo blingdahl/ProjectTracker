@@ -15,7 +15,7 @@
         data-sheet-name="<?= preferences.sheetName ?>"
         data-label-name="<?= preferences.label || '' ?>"
         data-max-threads="<?= preferences.maxThreads ?>">
-      <td data-templated-name="{sheetName}">???</td>
+      <td><a href="<?= spreadsheetUrl ?>#gid=<?= preferences.sheetId ?>"><?= preferences.sheetName ?></a></td>
       <td>
         <div class="labelPicker">
           <div class="labelDisplayMode">
@@ -58,7 +58,7 @@
     <tr class="sheetController"
         data-sheet-id="<?= sheetInfo.sheetId ?>"
         data-sheet-name="<?= sheetInfo.sheetName ?>">
-      <td data-templated-name="{sheetName}"><?= sheetInfo.sheetName ?></td>
+      <td><?= sheetInfo.sheetName ?></td>
       <td><a class="addTracking">Track</a></td>
     </tr>
     <?

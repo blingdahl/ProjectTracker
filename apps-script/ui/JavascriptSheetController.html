@@ -1,30 +1,30 @@
 class SheetController {
-  constructor(divJq) {
-    this.divJq = divJq;
-    this.labelPicker = new LabelPicker(this.divJq.find('.labelPicker'), this.getSheetId());
+  constructor(jq) {
+    this.jq = jq;
+    this.labelPicker = new LabelPicker(this.jq.find('.labelPicker'), this.getSheetId());
   }
   
   // SECTION:
   // Elements
    
   getTrackElement() {
-    return this.divJq.find('.track');
+    return this.jq.find('.track');
   }
   
   getSyncWithGmailElement() {
-    return this.divJq.find('.syncWithGmail');
+    return this.jq.find('.syncWithGmail');
   }
   
   getOrganizeElement() {
-    return this.divJq.find('.organize');
+    return this.jq.find('.organize');
   }
   
   getAddUrlElement() {
-    return this.divJq.find('.addUrl');
+    return this.jq.find('.addUrl');
   }
   
   getAddTrackingElement() {
-    return this.divJq.find('.addTracking');
+    return this.jq.find('.addTracking');
   }
   
   static getSyncAllWithGmailElement() {
@@ -38,26 +38,15 @@ class SheetController {
   // SECTION:
   // Attributes
   getSheetId() {
-    return parseInt(this.divJq.attr('data-sheet-id'));
+    return parseInt(this.jq.attr('data-sheet-id'));
   }
    
   getSheetName() {
-    return this.divJq.attr('data-sheet-name');
+    return this.jq.attr('data-sheet-name');
   }
   
   hide() {
-    this.divJq.hide();
-  }
-  
-  updateTemplatedText(sheetName) {
-    this.divJq.find('[data-templated-name]').each(function() {
-      let jq = $(this);
-      if (sheetName) {
-        jq.text(jq.attr('data-templated-name').replace(/{sheetName}/g, sheetName));
-      } else {
-        jq.text(jq.attr('data-no-templated-name'));
-      }
-    });
+    this.jq.hide();
   }
   
   show() {
@@ -66,9 +55,8 @@ class SheetController {
       this.hide();
       return;
     }
-    this.updateTemplatedText(sheetName);
     this.labelPicker.setMode(LabelPicker.MODE.DISPLAY);
-    this.divJq.show();
+    this.jq.show();
   }
   
   setAction(uuid, action) {
