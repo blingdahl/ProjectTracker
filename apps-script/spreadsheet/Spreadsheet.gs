@@ -150,6 +150,26 @@ Spreadsheet.init = function() {
     this.setNumRows(this.getLastDataRowNumber() + blankRows);
   }
   
+  Spreadsheet.Sheet.prototype.resizeColumnToFit = function(columnHeader) {
+    this.nativeSheet.autoResizeColumn(this.columns.getColumnOffset(columnHeader) + 1);
+    return this;
+  };
+  
+  Spreadsheet.Sheet.prototype.hideColumn = function(columnHeader) {
+    this.columns.hideColumn(columnHeader);
+    return this;
+  };
+  
+  Spreadsheet.Sheet.prototype.setFrozenColumns = function(numColumns) {
+    this.nativeSheet.setFrozenColumns(numColumns);
+    return this;
+  };
+  
+  Spreadsheet.Sheet.prototype.resetColumnOrder = function() {
+    this.columns.resetColumnOrder();
+    return this;
+  };
+  
   Spreadsheet.Sheet.prototype.sortBy = function(columnHeader, opt_ascending) {
     var ascending = (opt_ascending === undefined) ? true : opt_ascending;
     var columnOffset = this.columns.getColumnOffset(columnHeader);
@@ -171,14 +191,14 @@ Spreadsheet.init = function() {
     this.createColumnsIfMissing(columnDefinitions);
   };
   
-  Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnName) {
-    if (this.getColumnOffset(columnName) === undefined) {
+  Spreadsheet.Columns.prototype.createColumnIfMissing = function(columnHeader) {
+    if (this.getColumnOffset(columnHeader) === undefined) {
       var dataRange = this.nativeSheet.getDataRange();
       var headerCell = dataRange.offset(0, 0, 1, 1);
       if (headerCell.getValue() != '') {
         headerCell = dataRange.offset(0, dataRange.getNumColumns(), 1, 1);
       }
-      headerCell.setValue(columnName);
+      headerCell.setValue(columnHeader);
       headerCell.setFontWeight('bold')
     }
   };
@@ -191,22 +211,51 @@ Spreadsheet.init = function() {
     this.refreshHeaders();
   };
   
+  Spreadsheet.Columns.prototype.getHeaderRange = function(columnHeader) {
+    return this.getHeaderRangeForColumnOffset(this.getColumnOffset(columnHeader));
+  };
+  
+  Spreadsheet.Columns.prototype.getHeaderRangeForColumnOffset = function(columnOffset) {
+    return this.nativeSheet.getDataRange().offset(0, columnOffset, 1, 1);
+  };
+  
+  Spreadsheet.Columns.prototype.moveColumn = function(columnHeader, newPosition) {
+    var headerRange = this.getHeaderRange(columnHeader);
+    if (headerRange.getColumn() != newPosition) {
+      this.nativeSheet.moveColumns(this.getHeaderRange(columnHeader), newPosition);
+      this.refreshHeaders();
+    }
+    return this;
+  };
+  
+  Spreadsheet.Columns.prototype.resetColumnOrder = function() {
+    for (var i = 0; i < this.columnDefinitions.columnDefinitionsInOrder.length; i++) {
+      this.moveColumn(this.columnDefinitions.columnDefinitionsInOrder[i].header, i + 1);
+    }
+    return this;
+  };
+  
+  Spreadsheet.Columns.prototype.hideColumn = function(columnHeader) {
+    this.nativeSheet.hideColumn(this.getHeaderRange(columnHeader));
+    return this;
+  };
+  
   Spreadsheet.Columns.prototype.refreshHeaders = function() {
-    var headerRow = this.nativeSheet.getDataRange();
+    var numColumns = this.nativeSheet.getDataRange().getNumColumns();
     this.headers = [];
     this.mapping = {};
-    for (var columnOffset = 0; columnOffset < headerRow.getNumColumns(); columnOffset++) {
-      var columnName = headerRow.offset(0, columnOffset, 1, 1).getValue();
-      this.headers[columnOffset] = columnName;
-      this.mapping[columnName] = columnOffset
+    for (var columnOffset = 0; columnOffset < numColumns; columnOffset++) {
+      var columnHeader = this.getHeaderRangeForColumnOffset(columnOffset).getValue();
+      this.headers[columnOffset] = columnHeader;
+      this.mapping[columnHeader] = columnOffset
     }
   };
   
-  Spreadsheet.Columns.prototype.getColumnOffset = function(columnName) {
-    if (!columnName || !columnName in this.mapping) {
-      throw new Error('Invalid column name: ' + columnName);
+  Spreadsheet.Columns.prototype.getColumnOffset = function(columnHeader) {
+    if (!columnHeader || !columnHeader in this.mapping) {
+      throw new Error('Invalid column name: ' + columnHeader);
     }
-    return this.mapping[columnName];
+    return this.mapping[columnHeader];
   };
   
   Spreadsheet.Columns.prototype.toString = function() {

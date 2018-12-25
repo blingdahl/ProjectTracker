@@ -15,7 +15,7 @@
         data-sheet-name="<?= preferences.sheetName ?>"
         data-label-name="<?= preferences.label || '' ?>"
         data-max-threads="<?= preferences.maxThreads ?>">
-      <td><a href="<?= spreadsheetUrl ?>#gid=<?= preferences.sheetId ?>"><?= preferences.sheetName ?></a></td>
+      <td><a href="<?= spreadsheetUrl ?>#gid=<?= preferences.sheetId ?>" target="_new"><?= preferences.sheetName ?></a></td>
       <td>
         <div class="labelPicker">
           <div class="labelDisplayMode">
@@ -40,6 +40,9 @@
       </td>
       <td>
         <a class="addUrl">Add URL</a>
+      </td>
+      <td>
+        <a class="tidyUpColumns">Tidy</a>
       </td>
     </tr>
     <?

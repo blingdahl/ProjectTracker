@@ -23,6 +23,10 @@ class SheetController {
     return this.jq.find('.addUrl');
   }
   
+  getTidyUpColumnsElement() {
+    return this.jq.find('.tidyUpColumns');
+  }
+  
   getAddTrackingElement() {
     return this.jq.find('.addTracking');
   }
@@ -103,6 +107,13 @@ class SheetController {
           callRpc();
     }
   }
+
+  tidyUpColumns() {
+    new RpcConfig(runner => runner.tidyUpColumns(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+        output('Tidying up ' + this.getSheetName() + '...').
+        retryOnTimeout().
+        callRpc();
+  }
   
   addTracking() {
     new RpcConfig(runner => runner.setTrackedForSheet(GlobalController.getSpreadsheetUrl(), this.getSheetId(), true)).
@@ -136,6 +147,7 @@ class SheetController {
     this.getOrganizeElement().click(this.organize.bind(this));
     this.getAddUrlElement().click(this.addUrl.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
+    this.getTidyUpColumnsElement().click(this.tidyUpColumns.bind(this));
   }
   
   static addGlobalListeners() {
