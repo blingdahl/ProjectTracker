@@ -9,8 +9,8 @@ Gmail.ACTIONS_IN_INBOX = ['Completed',
                           'Archive',
                           'Untrack',
                           'Unlabel',
-                          'Archive+Untrack',
-                          'Archive+Unlabel',
+                          'Archive,Untrack',
+                          'Archive,Unlabel',
                           'Mute'];
 
 Gmail.ACTIONS_ARCHIVED = ['Completed',
@@ -184,40 +184,38 @@ Gmail.init = function() {
         Log.fine('Already in sheet: ' + subject);
       }
       var fullCaseAction = row.getValue(TrackingSheet.COLUMNS.ACTION);
-      var action = fullCaseAction.toLowerCase();
-      Log.info('Action: ' + action);
-      if (action === 'archive') {
-        Gmail.archive(thread, row, subject);
-      } else if (action === 'untrack' || action === 'completed') {
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-        Gmail.untrack(thread, row, subject, noTrackLabel);
-      } else if (action === 'mute') {
-        Gmail.mute(thread, row, subject);
-      } else if (action === 'unlabel') {
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-        Gmail.removeLabel(thread, row, label, subject);
-      } else if (action === 'archive+unlabel') {
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-        Gmail.archive(thread, row, subject);
-        Gmail.removeLabel(thread, row, label, subject);
-      } else if (action === 'archive+untrack') {
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-        Gmail.archive(thread, row, subject);
-        Gmail.untrack(thread, row, subject, noTrackLabel);
-      } else if (action === 'inbox') {
-        Gmail.inbox(thread, row, subject);
-      } else if (action) {
-        if (action.startsWith('move to ')) {
-          var newLabelName = fullCaseAction.substring('Move to '.length);
-          var newLabel = Label.getUserDefined(newLabelName);
-          if (newLabel) {
-            Gmail.changeLabel(thread, row, subject, gmailLabel, newLabel);
-            threadIdsToRemove.push(threadId);
+      var actions = fullCaseAction.toLowerCase().split(',');
+      for (var actionIndex = 0; actionIndex < actions.length; actionIndex++) {
+        var action = actions[actionIndex];
+        if (action === '') {
+          continue;
+        }
+        Log.info('Action: ' + action);
+        if (action === 'archive') {
+          Gmail.archive(thread, row, subject);
+        } else if (action === 'untrack' || action === 'completed') {
+          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+          Gmail.untrack(thread, row, subject, noTrackLabel);
+        } else if (action === 'mute') {
+          Gmail.mute(thread, row, subject);
+        } else if (action === 'unlabel') {
+          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+          Gmail.removeLabel(thread, row, label, subject);
+        } else if (action === 'inbox') {
+          Gmail.inbox(thread, row, subject);
+        } else if (action) {
+          if (action.startsWith('move to ')) {
+            var newLabelName = fullCaseAction.substring('Move to '.length);
+            var newLabel = Label.getUserDefined(newLabelName);
+            if (newLabel) {
+              Gmail.changeLabel(thread, row, subject, gmailLabel, newLabel);
+              threadIdsToRemove.push(threadId);
+            } else {
+            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
+            }
           } else {
-          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
+            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
           }
-        } else {
-          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
         }
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
