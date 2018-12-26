@@ -7,14 +7,12 @@ Gmail.P1_LABEL = '!Make P1';
 
 Gmail.ACTIONS_IN_INBOX = ['Completed',
                           'Archive',
-                          'Untrack',
                           'Unlabel',
-                          'Archive,Untrack',
+                          'Archive,Completed',
                           'Archive,Unlabel',
                           'Mute'];
 
 Gmail.ACTIONS_ARCHIVED = ['Completed',
-                          'Untrack',
                           'Unlabel',
                           'Mute',
                           'Inbox'];
@@ -103,7 +101,7 @@ Gmail.init = function() {
     }
   }
   
-  Gmail.untrack = function(thread, row, subject, noTrackLabel) {
+  Gmail.markCompleted = function(thread, row, subject, noTrackLabel) {
     thread.addLabel(noTrackLabel);
     row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Stopped Tracking');
     row.setValue(TrackingSheet.COLUMNS.ACTION, '');
@@ -193,9 +191,9 @@ Gmail.init = function() {
         Log.info('Action: ' + action);
         if (action === 'archive') {
           Gmail.archive(thread, row, subject);
-        } else if (action === 'untrack' || action === 'completed') {
+        } else if (action === 'completed') {
           threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-          Gmail.untrack(thread, row, subject, noTrackLabel);
+          Gmail.markCompleted(thread, row, subject, noTrackLabel);
         } else if (action === 'mute') {
           Gmail.mute(thread, row, subject);
         } else if (action === 'unlabel') {
