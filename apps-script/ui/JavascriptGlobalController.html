@@ -3,10 +3,6 @@ class GlobalController {
   // SECTION:
   // Elements
   
-  static getDoAllTheThingsElement() {
-    return $('.doAllTheThings');
-  }
-  
   // SECTION:
   // Attributes
   
@@ -15,7 +11,6 @@ class GlobalController {
   }
 
   static addListeners() {
-    GlobalController.getDoAllTheThingsElement().click(SheetController.doYourThings);
   }
   
   static init() {

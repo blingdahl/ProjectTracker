@@ -31,12 +31,12 @@ class SheetController {
     return this.jq.find('.addTracking');
   }
   
-  static getSyncAllWithGmailElement() {
-    return $('.syncAllWithGmail');
+  static getDoAllTheThingsElement() {
+    return $('.doAllTheThings');
   }
   
-  static getOrganizeAllElement() {
-    return $('.organizeAll');
+  static getTidyAllElement() {
+    return $('.tidyAll');
   }
 
   // SECTION:
@@ -122,19 +122,15 @@ class SheetController {
         callRpc();
   }
   
-  static organizeAll() {
-    let sheetControllers = SheetController.getAll();
-    sheetControllers.forEach(sheetController => sheetController.organize());
-  }
-  
-  static syncAllWithGmail() {
-    let sheetControllers = SheetController.getAll();
-    sheetControllers.forEach(sheetController => sheetController.syncWithGmail());
-  }
-  
   static doYourThings() {
     let promises = [];
     SheetController.getAll().forEach(sheetController => promises.push(sheetController.doYourThing()));
+    return Promise.all(promises);
+  }
+  
+  static tidyAll() {
+    let promises = [];
+    SheetController.getAll().forEach(sheetController => promises.push(sheetController.tidyUpColumns()));
     return Promise.all(promises);
   }
 
@@ -147,12 +143,11 @@ class SheetController {
     this.getOrganizeElement().click(this.organize.bind(this));
     this.getAddUrlElement().click(this.addUrl.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
-    this.getTidyUpColumnsElement().click(this.tidyUpColumns.bind(this));
   }
   
   static addGlobalListeners() {
-    SheetController.getOrganizeAllElement().click(SheetController.organizeAll);
-    SheetController.getSyncAllWithGmailElement().click(SheetController.syncAllWithGmail);
+    SheetController.getDoAllTheThingsElement().click(SheetController.doYourThings);
+    SheetController.getTidyAllElement().click(SheetController.tidyAll);
   }
   
   static getAll() {
