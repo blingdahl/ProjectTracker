@@ -5,14 +5,16 @@ Gmail.NO_TRACK_LABEL = 'No-Track';
 Gmail.P0_LABEL = '!Make P0';
 Gmail.P1_LABEL = '!Make P1';
 
-Gmail.ACTIONS_IN_INBOX = ['Archive',
+Gmail.ACTIONS_IN_INBOX = ['Completed',
+                          'Archive',
                           'Untrack',
                           'Unlabel',
                           'Archive+Untrack',
                           'Archive+Unlabel',
                           'Mute'];
 
-Gmail.ACTIONS_ARCHIVED = ['Untrack',
+Gmail.ACTIONS_ARCHIVED = ['Completed',
+                          'Untrack',
                           'Unlabel',
                           'Mute',
                           'Inbox'];
@@ -186,7 +188,7 @@ Gmail.init = function() {
       Log.info('Action: ' + action);
       if (action === 'archive') {
         Gmail.archive(thread, row, subject);
-      } else if (action === 'untrack') {
+      } else if (action === 'untrack' || action === 'completed') {
         threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
         Gmail.untrack(thread, row, subject, noTrackLabel);
       } else if (action === 'mute') {
