@@ -18,19 +18,19 @@ TrackingSheet.init = function() {
   TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
       .addColumn('ITEM', 'Item')
       .addColumn('PRIORITY', 'Priority')
+      .addColumn('ACTION', 'Action')
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
-      .addColumn('ACTION', 'Action')
       .addColumn('STATUS', 'Status')
       .addColumn('TO_DO', 'To Do')
       .addColumn('INBOX', 'Inbox')
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
       .addColumn('NOTES', 'Notes')
-      .addColumn('THREAD_ID', 'Thread ID')
-      .addColumn('UUID', 'UUID')
-      .addColumn('SUBJECT', 'Subject')
       .addColumn('FROM', 'From')
-      .addColumn('SCRIPT_NOTES', 'Script Notes');
+      .addColumn('SCRIPT_NOTES', 'Script Notes')
+      .addColumn('THREAD_ID', 'Thread ID')
+      .addColumn('SUBJECT', 'Subject')
+      .addColumn('UUID', 'UUID');
   
   TrackingSheet.sheetIdToSheet = {};
   
@@ -39,8 +39,8 @@ TrackingSheet.init = function() {
   }
   TrackingSheet.Sheet.prototype = Object.create(Spreadsheet.Sheet.prototype);
   
-  TrackingSheet.Sheet.prototype.getCachedRowOffsetsForColumnValue = function(columnName, value) {
-    return this.cache.getRowOffsetsForColumnValue(this.columns.getColumnOffset(columnName), value);
+  TrackingSheet.Sheet.prototype.getCachedRowOffsetsForColumnValue = function(columnHeader, value) {
+    return this.cache.getRowOffsetsForColumnValue(this.columns.getColumnOffset(columnHeader), value);
   }
   
   TrackingSheet.Sheet.prototype.getRowsForPriority = function(priority) {
