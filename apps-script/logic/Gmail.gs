@@ -227,7 +227,9 @@ Gmail.init = function() {
       var threadId = row.getValue(TrackingSheet.COLUMNS.THREAD_ID);
       if (threadId && threadIdsInLabel.indexOf(threadId) < 0) {
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Not labeled');
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+        if (!row.getValue(TrackingSheet.COLUMNS.PRIORITY)) {
+          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+        }
       }
     }
     for (var i = 0; i < threadIdsToRemove.length; i++) {
