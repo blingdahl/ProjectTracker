@@ -46,6 +46,7 @@ TaskSync.init = function() {
     var tasklist = TaskSync.getTaskList(trackingSheet, priority);
     if (dataRows.length === 0 && tasklist) {
       Tasks.Tasklists.remove(tasklist.id);
+      return;
     }
     var tasks = Tasks.Tasks.list(tasklist.id).items;
     var tasksById = {};
@@ -64,14 +65,16 @@ TaskSync.init = function() {
       delete unvisitedTaskIds[taskId];
       if (taskId) {
         var task = tasksById[taskId];
-        Log.info(taskId);
-        Log.info(task);
-        if (taskTitle != task.title) {
-          task.title = taskTitle;
-          Tasks.Tasks.update(task, tasklist.id, taskId);
-        }
-        if (task.completed) {
-          dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
+        if (task) {
+          if (taskTitle != task.title) {
+            task.title = taskTitle;
+            Tasks.Tasks.update(task, tasklist.id, taskId);
+          }
+          if (task.completed) {
+            dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
+          }
+        } else {
+          Log.info('Task not found: ' + taskId + ' (' + taskTitle + ')');
         }
       } else {
         var newTask = {
