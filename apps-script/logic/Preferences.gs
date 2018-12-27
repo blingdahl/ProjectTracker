@@ -72,6 +72,22 @@ Preferences.init = function() {
   Preferences.getTrackedForSheet = function(sheetId) {
     return Preferences.getProperty(Preferences.trackedProperty(sheetId)) === 'true';
   }
+
+  Preferences.tasklistProperty = function(sheetId) {
+    return 'tasklist:' + sheetId;
+  }
+  
+  Preferences.setTasklistForSheet = function(sheetId, tasklist) {
+    Preferences.setProperty(Preferences.tasklistProperty(sheetId), tasklist);
+  }
+  
+  Preferences.clearTasklistForSheet = function(sheetId) {
+    Preferences.clearProperty(Preferences.tasklistProperty(sheetId));
+  }
+  
+  Preferences.getTasklistForSheet = function(sheetId) {
+    return Preferences.getProperty(Preferences.tasklistProperty(sheetId));
+  }
   
   Preferences.spreadsheetUrlProperty = function() {
     return 'spreadsheetUrl';

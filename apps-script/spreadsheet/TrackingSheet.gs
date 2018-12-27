@@ -21,7 +21,6 @@ TrackingSheet.init = function() {
       .addColumn('ACTION', 'Action')
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
-      .addColumn('STATUS', 'Status')
       .addColumn('TO_DO', 'To Do')
       .addColumn('INBOX', 'Inbox')
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
@@ -45,12 +44,11 @@ TrackingSheet.init = function() {
   }
   
   TrackingSheet.Sheet.prototype.getRowsForPriority = function(priority) {
-    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.PRIORITY, priority);
-    var ret = [];
-    rowOffsets.forEach(function(rowOffset) {
-      ret.push(this.getRow(rowOffset));
-    }.bind(this));
-    return ret;
+    return this.getRowsByPriority()[priority];
+  }
+  
+  TrackingSheet.Sheet.prototype.getRowsByPriority = function() {
+    return map(this.getDataRows(), function(dataRow) { return dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY); });
   }
   
   TrackingSheet.Sheet.prototype.getRowForThreadId = function(threadId) {
