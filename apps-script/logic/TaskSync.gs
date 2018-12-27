@@ -11,19 +11,38 @@ TaskSync.init = function() {
   
   TaskSync.initialized = true;
   
-  TaskSync.getTaskList = function(trackingSheet, priority) {
+  TaskSync.getTasklist = function(trackingSheet, priority, createIfNeeded) {
     var tasklistTitle = priority + ': ' + trackingSheet.getSheetName();
-    var tasklists = Tasks.Tasklists.list().items;
-    for (var i = 0; i < tasklists.length; i++) {
-      var tasklist = tasklists[i];
+    var allTasklists = Tasks.Tasklists.list().items;
+    var matchingTasklists = [];
+    for (var i = 0; i < allTasklists.length; i++) {
+      var tasklist = allTasklists[i];
       if (tasklist.title === tasklistTitle) {
-        return tasklist;
+        matchingTasklists.push(tasklist);
       }
     }
-    tasklist = {
+    if (matchingTasklists.length === 1) {
+      Log.info('Returning ' + tasklistTitle);
+      return matchingTasklists[0];
+    }
+    if (matchingTasklists.length > 1) {
+      Log.info('Too many lists ' + tasklistTitle);
+      throw new Error('Too many matching lists for ' + tasklistTitle);
+    }
+    if (!createIfNeeded) {
+      return null;
+    }
+    Log.info('Creating ' + tasklistTitle);
+    return Tasks.Tasklists.insert({
       title: tasklistTitle
-    };
-    return Tasks.Tasklists.insert(tasklist);
+    });
+  }
+  
+  TaskSync.createTask = function(title, tasklistId) {
+    Log.info('Creating ' + title);
+    return Tasks.Tasks.insert({
+      title: title
+    }, tasklistId);
   }
   
   TaskSync.makeTitleForRow = function(dataRow) {
@@ -43,12 +62,15 @@ TaskSync.init = function() {
   
   TaskSync.syncForPriority = function(trackingSheet, priority) {
     var dataRows = trackingSheet.getRowsForPriority(priority);
-    var tasklist = TaskSync.getTaskList(trackingSheet, priority);
-    if (dataRows.length === 0 && tasklist) {
-      Tasks.Tasklists.remove(tasklist.id);
+    var tasklist;
+    var tasklist = TaskSync.getTasklist(trackingSheet, priority, dataRows.length !== 0);
+    if (dataRows.length === 0) {
+      if (tasklist !== null) {
+        Tasks.Tasklists.remove(tasklist.id);
+      }
       return;
     }
-    var tasks = Tasks.Tasks.list(tasklist.id).items;
+    var tasks = Tasks.Tasks.list(tasklist.id, {showDeleted: true, showHidden: true}).items;
     var tasksById = {};
     var unvisitedTaskIds = {};
     if (tasks) {
@@ -56,6 +78,7 @@ TaskSync.init = function() {
         var task = tasks[i];
         tasksById[task.id] = task;
         unvisitedTaskIds[task.id] = true;
+        Log.info('tracking task: ' + task);
       }
     }
     for (var i = 0; i < dataRows.length; i++) {
@@ -64,24 +87,22 @@ TaskSync.init = function() {
       var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
       delete unvisitedTaskIds[taskId];
       if (taskId) {
+        Log.info('taskId: ' + taskId);
         var task = tasksById[taskId];
         if (task) {
           if (taskTitle != task.title) {
             task.title = taskTitle;
             Tasks.Tasks.update(task, tasklist.id, taskId);
           }
-          if (task.completed) {
+          if (task.status === 'completed') {
             dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
           }
         } else {
           Log.info('Task not found: ' + taskId + ' (' + taskTitle + ')');
+          dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
         }
       } else {
-        var newTask = {
-          title: taskTitle
-        };
-        var taskWithId = Tasks.Tasks.insert(newTask, tasklist.id);
-        dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskWithId.id);
+        dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
       }
     }
     var unvisitedTaskIds = Object.keys(unvisitedTaskIds);
