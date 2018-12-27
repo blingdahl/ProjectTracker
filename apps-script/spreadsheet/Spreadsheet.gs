@@ -73,8 +73,6 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.getValuesForRow = function(rowOffset) {
-    Log.info('getValuesForRow');
-    Log.matrix(Log.Level.INFO, this.getNativeRow(rowOffset).getValues());
     return this.getNativeRow(rowOffset).getValues()[0];
   }
   
@@ -295,7 +293,6 @@ Spreadsheet.init = function() {
   };
   
   Spreadsheet.Row.prototype.getValue = function(columnHeader) {
-    Log.info('columnHeader/offset=' + columnHeader + '/' + this.columns.getColumnOffset(columnHeader) + '=' + this.rowCache.getValue(this.columns.getColumnOffset(columnHeader)));
     return this.rowCache.getValue(this.columns.getColumnOffset(columnHeader));
   };
   
@@ -350,12 +347,10 @@ Spreadsheet.init = function() {
       if (currentValues.length > 0) {
         function arraysEqual(a1, a2) {
           if (a1.length != a2.length) {
-            Log.info(a1 + ' vs ' + a2);
             return false;
           }
           for (var i = 0; i < a1.length; i++) {
             if (a1[i] !== a2[i]) {
-              Log.info(a1[i] + ' vs ' + a2[i]);
               return false;
             }
           }
