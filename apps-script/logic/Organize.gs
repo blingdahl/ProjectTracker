@@ -9,6 +9,7 @@ Organize.init = function() {
   }
 
   TrackingSheet.init();
+  TaskSync.init();
   Log.info('Organize.init()');
 
   Organize.initialized = true;
@@ -45,6 +46,7 @@ Organize.init = function() {
     }
     trackingSheet.removeRowNumbers(rowNumbersToRemove);
     trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
+    TaskSync.sync(trackingSheet);
     return 'Organized ' + trackingSheet.getSheetName();
   }
   
