@@ -321,6 +321,10 @@ Spreadsheet.init = function() {
     return this.rowCache.getFormula(this.columns.getColumnOffset(columnHeader));
   };
   
+  Spreadsheet.Row.prototype.getLinkUrl = function(columnHeader) {
+    return Spreadsheet.getUrlFromHyperlinkFormula(this.getFormula(columnHeader));
+  };
+  
   Spreadsheet.Row.prototype.setFormula = function(columnHeader, formula) {
     if (this.getFormula(columnHeader) == formula) {
       return;
@@ -389,6 +393,9 @@ Spreadsheet.init = function() {
   };
   
   Spreadsheet.getUrlFromHyperlinkFormula = function(formula) {
+    if (!formula) {
+      return null;
+    }
     return formula.substring(formula.indexOf('"') + 1, formula.lastIndexOf(',') - 1);
   };
   
