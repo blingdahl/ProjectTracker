@@ -30,7 +30,8 @@ TrackingSheet.init = function() {
       .addColumn('SCRIPT_NOTES', 'Script Notes')
       .addColumn('THREAD_ID', 'Thread ID')
       .addColumn('SUBJECT', 'Subject')
-      .addColumn('UUID', 'UUID');
+      .addColumn('UUID', 'UUID')
+      .addColumn('TASK_ID', 'Task ID');
   
   TrackingSheet.sheetIdToSheet = {};
   
@@ -52,15 +53,22 @@ TrackingSheet.init = function() {
     return ret;
   }
   
-  // TODO(lindahl) Rename threadId
-  TrackingSheet.Sheet.prototype.getRowForThreadId = function(id) {
-    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.THREAD_ID, id);
+  TrackingSheet.Sheet.prototype.getRowForThreadId = function(threadId) {
+    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.THREAD_ID, threadId);
     if (rowOffsets.length >= 1) {
       return this.getRow(rowOffsets[0]);
     }
     var row = this.addRow();
-    row.setValue(TrackingSheet.COLUMNS.THREAD_ID, id);
+    row.setValue(TrackingSheet.COLUMNS.THREAD_ID, threadId);
     return row;
+  }
+  
+  TrackingSheet.Sheet.prototype.getRowForTaskId = function(taskId) {
+    var rowOffsets = this.getCachedRowOffsetsForColumnValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
+    if (rowOffsets.length >= 1) {
+      return this.getRow(rowOffsets[0]);
+    }
+    throw new Error('No row for task id ' + taskId);
   }
   
   TrackingSheet.Sheet.prototype.getRowForUuid = function(uuid) {
