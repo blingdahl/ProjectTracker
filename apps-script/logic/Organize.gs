@@ -34,9 +34,7 @@ Organize.init = function() {
       var fullCaseAction = row.getValue(TrackingSheet.COLUMNS.ACTION);
       var action = fullCaseAction.toLowerCase();
       if (action === 'completed') {
-        if (row.getValue(TrackingSheet.COLUMNS.THREAD_ID)) {
-          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Cannot mark threads "Completed"');
-        } else {
+        if (!row.getValue(TrackingSheet.COLUMNS.THREAD_ID)) {
           rowNumbersToRemove.push(row.getRowNumber());
         }
       } else if (action) {
