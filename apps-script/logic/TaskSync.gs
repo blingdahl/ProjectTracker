@@ -34,26 +34,33 @@ TaskSync.init = function() {
     return newTasklist;
   }
   
-  TaskSync.createTask = function(title, tasklistId) {
+  TaskSync.createTask = function(title, notes, tasklistId) {
     Log.info('Creating ' + title);
     return Tasks.Tasks.insert({
-      title: title
+      title: title,
+      notes: notes
     }, tasklistId);
   }
   
   TaskSync.makeTitleForRow = function(dataRow) {
-    var titleParts = ['[', dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY), '] ', dataRow.getValue(TrackingSheet.COLUMNS.ITEM)];
+    return ['[',
+            dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY),
+            '] ',
+            dataRow.getValue(TrackingSheet.COLUMNS.ITEM)
+           ].join('');
+  }
+  
+  TaskSync.makeNotesForRow = function(dataRow) {
+    var parts = [];
     var email = dataRow.getLinkUrl(TrackingSheet.COLUMNS.EMAIL);
     if (email) {
-      titleParts.push('; Email: ');
-      titleParts.push(email);
+      parts.push(['Email: ', email].join(''));
     }
     var link = dataRow.getLinkUrl(TrackingSheet.COLUMNS.LINK);
     if (link) {
-      titleParts.push('; Link: ');
-      titleParts.push(link);
+      parts.push(['Link: ', link].join(''));
     }
-    return titleParts.join('');
+    return parts.join('\n');
   }
   
   TaskSync.sync = function(trackingSheet) {
@@ -83,17 +90,20 @@ TaskSync.init = function() {
         return;
       }
       Log.info('Something for ' + priority + ': ' + dataRows);
+      var lastTaskId = null;
       for (var i = 0; i < dataRows.length; i++) {
         var dataRow = dataRows[i];
         var taskTitle = TaskSync.makeTitleForRow(dataRow);
+        var taskNotes = TaskSync.makeNotesForRow(dataRow);
         var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
         delete unvisitedTaskIds[taskId];
         if (taskId) {
           Log.info('taskId: ' + taskId);
           var task = tasksById[taskId];
           if (task) {
-            if (taskTitle != task.title) {
+            if (taskTitle != task.title || taskNotes != task.notes) {
               task.title = taskTitle;
+              task.notes = taskNotes;
               Tasks.Tasks.update(task, tasklist.id, taskId);
             }
             if (task.status === 'completed') {
@@ -101,12 +111,18 @@ TaskSync.init = function() {
             }
           } else {
             Log.info('Task not found: ' + taskId + ' (' + taskTitle + ')');
-            dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
+            var taskId = TaskSync.createTask(taskTitle, taskNotes, tasklist.id).id;
+            dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
           }
         } else {
           Log.info('Adding task for ' + taskTitle);
-          dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
+          var taskId = TaskSync.createTask(taskTitle, taskNotes, tasklist.id).id;
+          dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
         }
+        if (lastTaskId) {
+          Tasks.Tasks.move(tasklist.id, taskId, {previous: lastTaskId});
+        }
+        lastTaskId = taskId;
       }
     });
 
