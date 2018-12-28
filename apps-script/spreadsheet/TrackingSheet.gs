@@ -48,7 +48,7 @@ TrackingSheet.init = function() {
   }
   
   TrackingSheet.Sheet.prototype.getRowsByPriority = function() {
-    return mapBy(this.getDataRows(), function(dataRow) { return dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY); });
+    return index(this.getDataRows(), function(dataRow) { return dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY); });
   }
   
   TrackingSheet.Sheet.prototype.getRowForThreadId = function(threadId) {
