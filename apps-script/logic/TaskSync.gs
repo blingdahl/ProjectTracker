@@ -72,7 +72,7 @@ TaskSync.init = function() {
       }
       return;
     }
-    var tasks = Tasks.Tasks.list(tasklist.id, {showDeleted: true, showHidden: true}).items;
+    var tasks = Tasks.Tasks.list(tasklist.id, {showHidden: true}).items;
     var tasksById = {};
     var unvisitedTaskIds = {};
     if (tasks) {
@@ -83,7 +83,7 @@ TaskSync.init = function() {
         Log.info('tracking task: ' + task);
       }
     }
-    TrackingSheet.PRIORITIES.concat(['']).reverse().forEach(function(priority) {
+    TrackingSheet.PRIORITIES.concat(['']).forEach(function(priority) {
       var dataRows = dataRowsByPriority[priority];
       if (dataRows === undefined) {
         Log.info('Nothing for ' + priority);
