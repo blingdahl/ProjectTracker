@@ -15,6 +15,8 @@ Organize.init = function() {
   Organize.initialized = true;
 
   Organize.organizeSheet = function(trackingSheet) {
+    var taskSync = TaskSync.forSheet(trackingSheet);
+    taskSync.copyCompleted();
     var dataRows = trackingSheet.getDataRows();
     trackingSheet.setNumBlankRows(Organize.EXTRA_ROWS);
     var rowNumbersToRemove = [];
@@ -43,7 +45,7 @@ Organize.init = function() {
     }
     trackingSheet.removeRowNumbers(rowNumbersToRemove);
     trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
-    TaskSync.sync(trackingSheet);
+    taskSync.syncToTasks(trackingSheet);
     return 'Organized ' + trackingSheet.getSheetName();
   }
   

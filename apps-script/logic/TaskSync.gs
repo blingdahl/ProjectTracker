@@ -11,9 +11,17 @@ TaskSync.init = function() {
   
   TaskSync.initialized = true;
   
-  TaskSync.getTasklist = function(trackingSheet) {
-    var tasklistTitle = trackingSheet.getSheetName();
-    var tasklistId = Preferences.getTasklistForSheet(trackingSheet.getSheetId());
+  TaskSync.TaskSync = function(trackingSheet) {
+    this.trackingSheet = trackingSheet;
+    this.tasklist = this.getTasklist();
+    this.tasks = Tasks.Tasks.list(this.tasklist.id, {showCompleted: true, showHidden: true}).items;
+    this.tasksById = index(this.tasks, function(task) { return task.id; });
+    this.copiedCompleted = false;
+  }
+  
+  TaskSync.TaskSync.prototype.getTasklist = function() {
+    var tasklistTitle = this.trackingSheet.getSheetName();
+    var tasklistId = Preferences.getTasklistForSheet(this.trackingSheet.getSheetId());
     if (tasklistId) {
       try {
         var tasklist = Tasks.Tasklists.get(tasklistId);
@@ -34,15 +42,15 @@ TaskSync.init = function() {
     return newTasklist;
   }
   
-  TaskSync.createTask = function(title, notes, tasklistId) {
+  TaskSync.TaskSync.prototype.createTask = function(title, notes) {
     Log.info('Creating ' + title);
     return Tasks.Tasks.insert({
       title: title,
       notes: notes
-    }, tasklistId);
+    }, this.tasklist.id);
   }
   
-  TaskSync.makeTitleForRow = function(dataRow) {
+  TaskSync.TaskSync.prototype.makeTitleForRow = function(dataRow) {
     return ['[',
             dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY),
             '] ',
@@ -50,7 +58,7 @@ TaskSync.init = function() {
            ].join('');
   }
   
-  TaskSync.makeNotesForRow = function(dataRow) {
+  TaskSync.TaskSync.prototype.makeNotesForRow = function(dataRow) {
     var parts = [];
     var email = dataRow.getLinkUrl(TrackingSheet.COLUMNS.EMAIL);
     if (email) {
@@ -63,72 +71,84 @@ TaskSync.init = function() {
     return parts.join('\n');
   }
   
-  TaskSync.sync = function(trackingSheet) {
-    var tasklist = TaskSync.getTasklist(trackingSheet);
-    var dataRowsByPriority = trackingSheet.getRowsByPriority();
+  TaskSync.TaskSync.prototype.syncToTasks = function() {
+    Log.info('syncToTasks');
+    var dataRowsByPriority = this.trackingSheet.getRowsByPriority();
     if (dataRowsByPriority.length === 0) {
-      if (tasklist !== null) {
-        Tasks.Tasklists.remove(tasklist.id);
+      if (this.tasklist !== null) {
+        Tasks.Tasklists.remove(this.tasklist.id);
       }
       return;
     }
-    var tasks = Tasks.Tasks.list(tasklist.id, {showHidden: true}).items;
-    var tasksById = {};
     var unvisitedTaskIds = {};
-    if (tasks) {
-      for (var i = 0; i < tasks.length; i++) {
-        var task = tasks[i];
-        tasksById[task.id] = task;
-        unvisitedTaskIds[task.id] = true;
-        Log.info('tracking task: ' + task);
-      }
-    }
     TrackingSheet.PRIORITIES.concat(['']).forEach(function(priority) {
       var dataRows = dataRowsByPriority[priority];
       if (dataRows === undefined) {
         Log.info('Nothing for ' + priority);
         return;
       }
-      Log.info('Something for ' + priority + ': ' + dataRows);
       var lastTaskId = null;
-      for (var i = 0; i < dataRows.length; i++) {
-        var dataRow = dataRows[i];
-        var taskTitle = TaskSync.makeTitleForRow(dataRow);
-        var taskNotes = TaskSync.makeNotesForRow(dataRow);
+      dataRows.forEach(function(dataRow) {
+        var taskTitle = this.makeTitleForRow(dataRow);
+        var taskNotes = this.makeNotesForRow(dataRow);
         var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
         delete unvisitedTaskIds[taskId];
         if (taskId) {
-          Log.info('taskId: ' + taskId);
-          var task = tasksById[taskId];
+          Log.info('taskId: ' + taskId + ' (' + taskTitle + ')');
+          var task = this.tasksById[taskId];
           if (task) {
             if (taskTitle != task.title || taskNotes != task.notes) {
               task.title = taskTitle;
               task.notes = taskNotes;
               Tasks.Tasks.update(task, tasklist.id, taskId);
             }
-            if (task.status === 'completed') {
-              dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
-            }
           } else {
             Log.info('Task not found: ' + taskId + ' (' + taskTitle + ')');
-            var taskId = TaskSync.createTask(taskTitle, taskNotes, tasklist.id).id;
+            var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, tasklist.id).id;
+            Log.info('Added taskId: ' + taskId + '(' + taskTitle + ')');
             dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
           }
         } else {
-          Log.info('Adding task for ' + taskTitle);
-          var taskId = TaskSync.createTask(taskTitle, taskNotes, tasklist.id).id;
+          var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, tasklist.id).id;
+          Log.info('Added taskId: ' + taskId + '(' + taskTitle + ')');
           dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
         }
         if (lastTaskId) {
-          Tasks.Tasks.move(tasklist.id, taskId, {previous: lastTaskId});
+          Log.info('Moving ' + taskId + ' to after ' + lastTaskId);
+          Tasks.Tasks.move(this.tasklist.id, taskId, {previous: lastTaskId});
         }
         lastTaskId = taskId;
-      }
-    });
+      }.bind(this));
+    }.bind(this));
 
     var unvisitedTaskIds = Object.keys(unvisitedTaskIds);
     for (var i = 0; i < unvisitedTaskIds.length; i++) {
-      Tasks.Tasks.remove(tasklist.id, unvisitedTaskIds[i]);
+      Tasks.Tasks.remove(this.tasklist.id, unvisitedTaskIds[i]);
     }
   }
+  
+  TaskSync.TaskSync.prototype.copyCompleted = function(trackingSheet) {
+    Log.info('copyCompleted');
+    var dataRows = this.trackingSheet.getDataRows();
+    dataRows.forEach(function(dataRow) {
+      var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
+      if (taskId) {
+        var task = this.tasksById[taskId];
+        if (task) {
+          if (task.status === 'completed') {
+            dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
+          }
+        }
+      }
+    }.bind(this));
+  }
+  
+  TaskSync.forSheet = function(trackingSheet) {
+    if (!TaskSync.objs[trackingSheet.getSheetId()]) {
+      TaskSync.objs[trackingSheet.getSheetId()] = new TaskSync.TaskSync(trackingSheet)
+    }
+    return TaskSync.objs[trackingSheet.getSheetId()];
+  }
+  
+  TaskSync.objs = {};
 }

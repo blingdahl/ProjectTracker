@@ -44,6 +44,17 @@ Label.init = function() {
     ret.sort();
     return ret;
   }
+  
+  Label.hasLabel = function(thread, row, label, subject) {
+    var threadLabels = thread.getLabels();
+    var hasLabel = false;
+    threadLabels.forEach(function(threadLabel) {
+      if (threadLabel.getName() === label.getName()) {
+        hasLabel = true;
+      }
+    });
+    return hasLabel;
+  }
 }
 
 function getAllLabels() {

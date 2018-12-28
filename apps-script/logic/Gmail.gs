@@ -26,6 +26,7 @@ Gmail.init = function() {
   TrackingSheet.init();
   Organize.init();
   Label.init();
+  GmailActions.init();
   Log.info('Gmail.init()');
   
   Gmail.initialized = true;
@@ -43,93 +44,11 @@ Gmail.init = function() {
     return from;
   }
   
-  Gmail.archive = function(thread, row, subject) {
-    if (thread.isInInbox()) {
-      Log.info('Archiving: ' + subject);
-      thread.moveToArchive();
-      row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-    } else {
-      Log.fine('Already archived: ' + subject);
-    }
-  }
-  
-  Gmail.inbox = function(thread, row, subject) {
-    if (!thread.isInInbox()) {
-      Log.info('Moving to inbox: ' + subject);
-      thread.moveToInbox();
-      row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-      row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Moved to inbox');
-    } else {
-      Log.fine('Already in inbox: ' + subject);
-    }
-  }
-  
-  Gmail.mute = function(thread, row, subject) {
-    if (thread.isInInbox()) {
-      Log.info('Archiving (mute): ' + subject);
-      thread.moveToArchive();
-    } else {
-      Log.fine('Already archived (mute): ' + subject);
-    }
-  }
-  
-  Gmail.hasLabel = function(thread, row, label, subject) {
-    var threadLabels = thread.getLabels();
-    var hasLabel = false;
-    threadLabels.forEach(function(threadLabel) {
-      if (threadLabel.getName() === label.getName()) {
-        hasLabel = true;
-      }
-    });
-    return hasLabel;
-  }
-  
-  Gmail.removeLabel = function(thread, row, label, subject) {
-    var threadLabels = thread.getLabels();
-    var labelRemoved = false;
-    threadLabels.forEach(function(threadLabel) {
-      if (threadLabel.getName() === label) {
-        thread.removeLabel(threadLabel);
-        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Removed label');
-        labelRemoved = true;
-        Log.info('Removed label: ' + subject);
-      }
-    });
-    if (!labelRemoved) {
-      row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Label not there');
-      Log.info('Label not removed: ' + subject);
-    }
-  }
-  
-  Gmail.markCompleted = function(thread, row, subject, noTrackLabel) {
-    thread.addLabel(noTrackLabel);
-    row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Stopped Tracking');
-    row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-    Log.info('Stopped tracking: ' + subject);
-  }
-  
-  Gmail.changeLabel = function(thread, row, subject, existingLabel, newLabel) {
-    thread.addLabel(newLabel);
-    thread.removeLabel(existingLabel);
-    row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Changed label');
-    row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-    Log.info('Changed label to ' + newLabel + ': ' + subject);
-  }
-  
-  Gmail.getActions = function(otherLabels, thread) {
-    var actions = [];
-    if (thread.isInInbox()) {
-      actions = actions.concat(Gmail.ACTIONS_IN_INBOX);
-    } else {
-      actions = actions.concat(Gmail.ACTIONS_ARCHIVED);
-    }
-    otherLabels.forEach(function(otherLabel) { actions.push('Move to ' + otherLabel); });
-    return actions;
-  }
-  
   Gmail.syncWithGmail = function(sheetId, label, maxThreads) {
     Log.info('syncWithGmail');
-    var sheet = TrackingSheet.forSheetId(sheetId);
+    var trackingSheet = TrackingSheet.forSheetId(sheetId);
+    var taskSync = TaskSync.forSheet(trackingSheet);
+    taskSync.copyCompleted();
     var searchQuery = Label.searchTerm(label) + ' -' + Label.searchTerm(Gmail.NO_TRACK_LABEL);
     Log.info(searchQuery);
     var gmailLabel = Label.getUserDefined(label);
@@ -155,8 +74,8 @@ Gmail.init = function() {
       Log.info(label + ': ' + (i + 1) + ' / ' + threads.length + ': ' + subject);
       var threadId = thread.getId();
       threadIdsInLabel.push(threadId);
-      var row = sheet.getRowForThreadId(threadId);
-      row.setDataValidation(TrackingSheet.COLUMNS.ACTION, Gmail.getActions(otherLabels, thread));
+      var row = trackingSheet.getRowForThreadId(threadId);
+      row.setDataValidation(TrackingSheet.COLUMNS.ACTION, GmailActions.getActions(otherLabels, thread));
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, subject);
       row.setValue(TrackingSheet.COLUMNS.FROM, Gmail.getFrom(thread));
@@ -171,10 +90,10 @@ Gmail.init = function() {
         row.setValue(TrackingSheet.COLUMNS.ITEM, subject);
         row.setFormula(TrackingSheet.COLUMNS.EMAIL, Spreadsheet.hyperlinkFormula(thread.getPermalink(), 'Email'));
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Imported');
-        if (Gmail.hasLabel(thread, row, p0Label, subject)) {
+        if (Label.hasLabel(thread, row, p0Label, subject)) {
           thread.removeLabel(p0Label);
           row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P0');
-        } else if (Gmail.hasLabel(thread, row, p1Label, subject)) {
+        } else if (Label.hasLabel(thread, row, p1Label, subject)) {
           thread.removeLabel(p1Label);
           row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P1');
         }
@@ -190,23 +109,23 @@ Gmail.init = function() {
         }
         Log.info('Action: ' + action);
         if (action === 'archive') {
-          Gmail.archive(thread, row, subject);
+          GmailActions.archive(thread, row, subject);
         } else if (action === 'completed') {
           threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-          Gmail.markCompleted(thread, row, subject, noTrackLabel);
+          GmailActions.markCompleted(thread, row, subject, noTrackLabel);
         } else if (action === 'mute') {
-          Gmail.mute(thread, row, subject);
+          GmailActions.mute(thread, row, subject);
         } else if (action === 'unlabel') {
           threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-          Gmail.removeLabel(thread, row, label, subject);
+          GmailActions.removeLabel(thread, row, label, subject);
         } else if (action === 'inbox') {
-          Gmail.inbox(thread, row, subject);
+          GmailActions.inbox(thread, row, subject);
         } else if (action) {
           if (action.startsWith('move to ')) {
             var newLabelName = fullCaseAction.substring('Move to '.length);
             var newLabel = Label.getUserDefined(newLabelName);
             if (newLabel) {
-              Gmail.changeLabel(thread, row, subject, gmailLabel, newLabel);
+              GmailActions.changeLabel(thread, row, subject, gmailLabel, newLabel);
               threadIdsToRemove.push(threadId);
             } else {
             row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
@@ -219,7 +138,7 @@ Gmail.init = function() {
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
       row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());
     }
-    var rows = sheet.getDataRows();
+    var rows = trackingSheet.getDataRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       var threadId = row.getValue(TrackingSheet.COLUMNS.THREAD_ID);
@@ -232,9 +151,9 @@ Gmail.init = function() {
     }
     for (var i = 0; i < threadIdsToRemove.length; i++) {
       Log.info('Removing thread ' + threadIdsToRemove[i]);
-      sheet.removeRow(sheet.getRowForThreadId(threadIdsToRemove[i]));
+      trackingSheet.removeRow(sheet.getRowForThreadId(threadIdsToRemove[i]));
     }
-    Organize.organizeSheet(sheet);
+    Organize.organizeSheet(trackingSheet);
     // The last sort here will be the primary sort order.
     Log.info('Synced with ' + label);
     return totalCount;
