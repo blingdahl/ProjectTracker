@@ -24,6 +24,7 @@ TidyUpColumns.init = function() {
         hideColumn(TrackingSheet.COLUMNS.THREAD_ID).
         hideColumn(TrackingSheet.COLUMNS.UUID).
         hideColumn(TrackingSheet.COLUMNS.SUBJECT).
+        hideColumn(TrackingSheet.COLUMNS.TASK_ID).
         setFrozenColumns(1);
     return 'Tidied up ' + trackingSheet.getSheetName();
   }

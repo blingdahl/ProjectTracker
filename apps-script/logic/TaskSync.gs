@@ -76,11 +76,13 @@ TaskSync.init = function() {
         Log.info('tracking task: ' + task);
       }
     }
-    TrackingSheet.PRIORITIES.forEach(function(priority) {
+    TrackingSheet.PRIORITIES.concat(['']).reverse().forEach(function(priority) {
       var dataRows = dataRowsByPriority[priority];
       if (dataRows === undefined) {
+        Log.info('Nothing for ' + priority);
         return;
       }
+      Log.info('Something for ' + priority + ': ' + dataRows);
       for (var i = 0; i < dataRows.length; i++) {
         var dataRow = dataRows[i];
         var taskTitle = TaskSync.makeTitleForRow(dataRow);
@@ -102,6 +104,7 @@ TaskSync.init = function() {
             dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
           }
         } else {
+          Log.info('Adding task for ' + taskTitle);
           dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, TaskSync.createTask(taskTitle, tasklist.id).id);
         }
       }
