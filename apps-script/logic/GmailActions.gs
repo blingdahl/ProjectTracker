@@ -67,11 +67,11 @@ GmailActions.init = function() {
     return hasLabel;
   }
   
-  GmailActions.removeLabel = function(thread, row, label, subject) {
+  GmailActions.removeLabel = function(thread, row, labelName, subject) {
     var threadLabels = thread.getLabels();
     var labelRemoved = false;
     threadLabels.forEach(function(threadLabel) {
-      if (threadLabel.getName() === label) {
+      if (threadLabel.getName() === labelName) {
         thread.removeLabel(threadLabel);
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Removed label');
         labelRemoved = true;
@@ -96,17 +96,17 @@ GmailActions.init = function() {
     thread.removeLabel(existingLabel);
     row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Changed label');
     row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-    Log.info('Changed label to ' + newLabel + ': ' + subject);
+    Log.info('Changed label to ' + newLabel.getName() + ': ' + subject);
   }
   
-  GmailActions.getActions = function(otherLabels, thread) {
+  GmailActions.getActions = function(otherLabelNames, thread) {
     var actions = [];
     if (thread.isInInbox()) {
       actions = actions.concat(GmailActions.ACTIONS_IN_INBOX);
     } else {
       actions = actions.concat(GmailActions.ACTIONS_ARCHIVED);
     }
-    otherLabels.forEach(function(otherLabel) { actions.push('Move to ' + otherLabel); });
+    otherLabelNames.forEach(function(otherLabelName) { actions.push('Move to ' + otherLabelName); });
     return actions;
   }
 }

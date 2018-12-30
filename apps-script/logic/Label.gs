@@ -36,9 +36,9 @@ Label.init = function() {
     var ret = [];
     Spreadsheet.getSpreadsheet().getNativeSheets().forEach(function(sheet) {
       var sheetId = sheet.getSheetId();
-      var labelForSheet = Preferences.getLabelNameForSheet(sheetId);
-      if (labelForSheet) {
-        ret.push(labelForSheet);
+      var labelNameForSheet = Preferences.getLabelNameForSheet(sheetId);
+      if (labelNameForSheet) {
+        ret.push(labelNameForSheet);
       }
     });
     ret.sort();
