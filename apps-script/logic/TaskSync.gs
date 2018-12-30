@@ -14,8 +14,9 @@ TaskSync.init = function() {
   TaskSync.TaskSync = function(trackingSheet) {
     this.trackingSheet = trackingSheet;
     this.tasklist = this.getTasklist();
-    this.tasks = Tasks.Tasks.list(this.tasklist.id, {showCompleted: true, showHidden: true}).items;
-    this.tasksById = index(this.tasks, function(task) { return task.id; });
+    this.tasks = Tasks.Tasks.list(this.tasklist.id, {showHidden: true, showCompleted: true}).items;
+    Log.info(this.tasks);
+    this.tasksById = indexMap(this.tasks, function(task) { return task.id; });
     this.copiedCompleted = false;
   }
   
@@ -100,16 +101,17 @@ TaskSync.init = function() {
             if (taskTitle != task.title || taskNotes != task.notes) {
               task.title = taskTitle;
               task.notes = taskNotes;
-              Tasks.Tasks.update(task, tasklist.id, taskId);
+              Log.info('taskId: ' + taskId + ', tasklistId: ' + this.tasklist.id + ', task: ' + task);
+              Tasks.Tasks.update(task, this.tasklist.id, taskId);
             }
           } else {
             Log.info('Task not found: ' + taskId + ' (' + taskTitle + ')');
-            var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, tasklist.id).id;
+            var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, this.tasklist.id).id;
             Log.info('Added taskId: ' + taskId + '(' + taskTitle + ')');
             dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
           }
         } else {
-          var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, tasklist.id).id;
+          var taskId = this.createTask(taskTitle, taskNotes, lastTaskId, this.tasklist.id).id;
           Log.info('Added taskId: ' + taskId + '(' + taskTitle + ')');
           dataRow.setValue(TrackingSheet.COLUMNS.TASK_ID, taskId);
         }
@@ -129,18 +131,27 @@ TaskSync.init = function() {
   
   TaskSync.TaskSync.prototype.copyCompleted = function(trackingSheet) {
     Log.info('copyCompleted');
+    if (this.copiedCompleted) {
+      return;
+    }
     var dataRows = this.trackingSheet.getDataRows();
     dataRows.forEach(function(dataRow) {
+      Log.info('Visiting dataRow');
       var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
       if (taskId) {
+        Log.info('taskId: ' + taskId);
         var task = this.tasksById[taskId];
-        if (task) {
-          if (task.status === 'completed') {
+        Log.info('task: ' + task);
+        if (task != undefined) {
+          Log.info('have task with ' + Object.keys(task));
+          if (task['status'] == 'completed') {
+            Log.info('task is completed');
             dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
           }
         }
       }
     }.bind(this));
+    this.copiedCompleted = true;
   }
   
   TaskSync.forSheet = function(trackingSheet) {

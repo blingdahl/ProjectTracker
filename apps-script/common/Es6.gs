@@ -10,7 +10,17 @@ if (typeof String.prototype.includes != 'function') {
   };
 };
 
-function index(arr, fn) {
+function indexMap(arr, fn) {
+  var ret = {};
+  for (var i = 0; i < arr.length; i++) {
+    var e = arr[i];
+    var key = fn(e);
+    ret[key] = e;
+  }
+  return ret;
+}
+
+function indexMultimap(arr, fn) {
   var ret = {};
   for (var i = 0; i < arr.length; i++) {
     var e = arr[i];
