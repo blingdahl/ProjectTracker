@@ -81,7 +81,7 @@ TaskSync.init = function() {
       }
       return;
     }
-    var unvisitedTaskIds = {};
+    var unvisitedTaskIds = indexMap(this.tasks, function(task) { return task.id; });
     TrackingSheet.PRIORITIES.concat(['']).forEach(function(priority) {
       var dataRows = dataRowsByPriority[priority];
       if (dataRows === undefined) {
@@ -136,16 +136,11 @@ TaskSync.init = function() {
     }
     var dataRows = this.trackingSheet.getDataRows();
     dataRows.forEach(function(dataRow) {
-      Log.info('Visiting dataRow');
       var taskId = dataRow.getValue(TrackingSheet.COLUMNS.TASK_ID);
       if (taskId) {
-        Log.info('taskId: ' + taskId);
         var task = this.tasksById[taskId];
-        Log.info('task: ' + task);
         if (task != undefined) {
-          Log.info('have task with ' + Object.keys(task));
           if (task['status'] == 'completed') {
-            Log.info('task is completed');
             dataRow.setValue(TrackingSheet.COLUMNS.ACTION, 'Completed');
           }
         }
