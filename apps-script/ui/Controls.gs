@@ -1,4 +1,5 @@
 function renderControls(spreadsheetUrl) {
+  SheetInfo.init();
   var template = HtmlService.createTemplateFromFile('ui/ControlsUi');
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
   template.spreadsheetUrl = spreadsheetUrl;
@@ -11,7 +12,7 @@ function renderControls(spreadsheetUrl) {
       return;
     }
     if (Preferences.getTrackedForSheet(sheet.getSheetId())) {
-      template.trackedSheets.push(Preferences.getPreferencesForSheet(sheet.getSheetId()));
+      template.trackedSheets.push(SheetInfo.getInfoForSheet(sheet.getSheetId()));
     } else {
       template.untrackedSheets.push({'sheetName': sheet.getSheetName(), 'sheetId': sheet.getSheetId()});
     }

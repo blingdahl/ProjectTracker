@@ -44,7 +44,7 @@ TrackingSheet.init = function() {
   }
   
   TrackingSheet.Sheet.prototype.getRowsForPriority = function(priority) {
-    return this.getRowsByPriority()[priority];
+    return this.getRowsByPriority()[priority] || [];
   }
   
   TrackingSheet.Sheet.prototype.getRowsByPriority = function() {

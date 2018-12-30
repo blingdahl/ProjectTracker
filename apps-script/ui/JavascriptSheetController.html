@@ -31,6 +31,10 @@ class SheetController {
     return this.jq.find('.addTracking');
   }
   
+  getSearchElement() {
+    return this.jq.find('.search');
+  }
+  
   static getDoAllTheThingsElement() {
     return $('.doAllTheThings');
   }
@@ -47,6 +51,10 @@ class SheetController {
    
   getSheetName() {
     return this.jq.attr('data-sheet-name');
+  }
+   
+  getSearchQuery() {
+    return this.jq.attr('data-search-query');
   }
   
   hide() {
@@ -122,6 +130,10 @@ class SheetController {
         callRpc();
   }
   
+  search() {
+    window.open('https://mail.google.com/mail/u/0/#search/' + this.getSearchQuery());
+  }
+  
   static doYourThings() {
     let promises = [];
     SheetController.getAll().forEach(sheetController => promises.push(sheetController.doYourThing()));
@@ -143,6 +155,7 @@ class SheetController {
     this.getOrganizeElement().click(this.organize.bind(this));
     this.getAddUrlElement().click(this.addUrl.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
+    this.getSearchElement().click(this.search.bind(this));
   }
   
   static addGlobalListeners() {

@@ -1,7 +1,6 @@
 var Gmail = {};
 Gmail.initialized = false;
 
-Gmail.NO_TRACK_LABEL_NAME = 'No-Track';
 Gmail.P0_LABEL_NAME = '!Make P0';
 Gmail.P1_LABEL_NAME = '!Make P1';
 
@@ -37,13 +36,13 @@ Gmail.init = function() {
     var trackingSheet = TrackingSheet.forSheetId(sheetId);
     var taskSync = TaskSync.forSheet(trackingSheet);
     taskSync.copyCompleted();
-    var searchQuery = Label.searchTerm(labelName) + ' -' + Label.searchTerm(Gmail.NO_TRACK_LABEL_NAME);
+    var searchQuery = Label.searchQuery(labelName);
     Log.info(searchQuery);
     var gmailLabel = Label.getUserDefined(labelName);
     var threads = GmailApp.search(searchQuery);
     var totalCount = threads.length;
     threads = threads.slice(0, maxThreads);
-    var noTrackLabel = Label.getUserDefined(Gmail.NO_TRACK_LABEL_NAME, true);
+    var noTrackLabel = Label.getUserDefined(Label.NO_TRACK_LABEL_NAME, true);
     var p0Label = Label.getUserDefined(Gmail.P0_LABEL_NAME, true);
     var p1Label = Label.getUserDefined(Gmail.P1_LABEL_NAME, true);
     Log.info(threads.length + ' threads');

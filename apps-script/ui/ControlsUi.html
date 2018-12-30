@@ -8,14 +8,15 @@
   <table>
     <?
       for (var i = 0; i < trackedSheets.length; i++) {
-        var preferences = trackedSheets[i];
+        var sheetInfo = trackedSheets[i];
     ?>
     <tr class="sheetController"
-        data-sheet-id="<?= preferences.sheetId ?>"
-        data-sheet-name="<?= preferences.sheetName ?>"
-        data-label-name="<?= preferences.label || '' ?>"
-        data-max-threads="<?= preferences.maxThreads ?>">
-      <td><a href="<?= spreadsheetUrl ?>#gid=<?= preferences.sheetId ?>" target="_new"><?= preferences.sheetName ?></a></td>
+        data-sheet-id="<?= sheetInfo.sheetId ?>"
+        data-sheet-name="<?= sheetInfo.sheetName ?>"
+        data-label-name="<?= sheetInfo.labelName || '' ?>"
+        data-max-threads="<?= sheetInfo.maxThreads ?>"
+        data-search-query="<?= sheetInfo.searchQuery || '' ?>">
+      <td><a href="<?= spreadsheetUrl ?>#gid=<?= sheetInfo.sheetId ?>" target="_new"><?= sheetInfo.sheetName ?></a></td>
       <td>
         <div class="labelPicker">
           <div class="labelDisplayMode">
@@ -38,6 +39,9 @@
       </td>
       <td>
         <a class="addUrl">Add URL</a>
+      </td>
+      <td>
+        <a class="search labelOnly">Search</a>
       </td>
     </tr>
     <?

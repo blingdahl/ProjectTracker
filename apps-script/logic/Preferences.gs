@@ -104,18 +104,6 @@ Preferences.init = function() {
   Preferences.clearSpreadsheetUrl = function(spreadsheetUrl) {
     return Preferences.clearProperty(Preferences.spreadsheetUrlProperty());
   }
-
-  Preferences.getPreferencesForSheet = function(sheetId) {
-    Log.start('getPreferencesForSheet', [sheetId]);
-    Log.info(Preferences.getLabelNameForSheet(sheetId))
-    var ret = {'sheetId': sheetId,
-               'sheetName': Spreadsheet.getSpreadsheet().getNativeSheet(sheetId).getName(),
-               'label': Preferences.getLabelNameForSheet(sheetId),
-               'isTracked': Preferences.getTrackedForSheet(sheetId),
-               'maxThreads': Preferences.getMaxThreadsForSheet(sheetId)};
-    Log.stop('getPreferencesForSheet', [sheetId]);
-    return ret;
-  }
   
   Preferences.DEFAULT_MAX_THREADS = 50;
 }

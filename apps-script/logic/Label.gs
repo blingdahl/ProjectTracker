@@ -8,7 +8,9 @@ Label.init = function() {
   
   Log.info('Label.init()');
   
-  Label.initialized = true;
+  Label.initialized = true
+  
+  Label.NO_TRACK_LABEL_NAME = 'No-Track';;
   
   Label.getUserDefined = function(labelName, createIfNonexistent) {
     var label = GmailApp.getUserLabelByName(labelName);
@@ -20,6 +22,13 @@ Label.init = function() {
   
   Label.searchTerm = function(labelName) {
     return 'label:' + labelName.replace(' ', '-');
+  };
+  
+  Label.searchQuery = function(labelName) {
+    if (!labelName) {
+      return null;
+    }
+    return Label.searchTerm(labelName) + ' -' + Label.searchTerm(Label.NO_TRACK_LABEL_NAME);
   }
   
   Label.getAllLabelNames = function() {
@@ -30,7 +39,7 @@ Label.init = function() {
       ret.push(label.getName());
     }
     return ret;
-  }
+  };
   
   Label.getSheetLabelNames = function() {
     var ret = [];
@@ -43,7 +52,7 @@ Label.init = function() {
     });
     ret.sort();
     return ret;
-  }
+  };
   
   Label.hasLabel = function(thread, row, label, subject) {
     var threadLabels = thread.getLabels();
@@ -54,7 +63,7 @@ Label.init = function() {
       }
     });
     return hasLabel;
-  }
+  };
 }
 
 function getAllLabels() {
