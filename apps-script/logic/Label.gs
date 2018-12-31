@@ -10,7 +10,7 @@ Label.init = function() {
   
   Label.initialized = true
   
-  Label.NO_TRACK_LABEL_NAME = 'No-Track';;
+  Label.NO_TRACK_LABEL_NAME = 'No-Track';
   
   Label.getUserDefined = function(labelName, createIfNonexistent) {
     var label = GmailApp.getUserLabelByName(labelName);

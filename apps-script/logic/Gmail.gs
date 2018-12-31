@@ -138,7 +138,7 @@ Gmail.init = function() {
     }
     for (var i = 0; i < threadIdsToRemove.length; i++) {
       Log.info('Removing thread ' + threadIdsToRemove[i]);
-      trackingSheet.removeRow(sheet.getRowForThreadId(threadIdsToRemove[i]));
+      trackingSheet.removeRow(trackingSheet.getRowForThreadId(threadIdsToRemove[i]));
     }
     Organize.organizeSheet(trackingSheet);
     // The last sort here will be the primary sort order.
