@@ -38,7 +38,7 @@ Gmail.init = function() {
     taskSync.copyCompleted();
     var searchQuery = Label.searchQuery(labelName);
     Log.info(searchQuery);
-    var gmailLabel = Label.getUserDefined(labelName);
+    var label = Label.getUserDefined(labelName);
     var threads = GmailApp.search(searchQuery);
     var totalCount = threads.length;
     var noTrackLabel = Label.getUserDefined(Label.NO_TRACK_LABEL_NAME, true);
@@ -88,7 +88,7 @@ Gmail.init = function() {
         Log.fine('Already in sheet: ' + subject);
       }
       var removeRow = GmailActions.processActions(
-        row.getValue(TrackingSheet.COLUMNS.ACTION), thread, row, subject, noTrackLabel);
+        row.getValue(TrackingSheet.COLUMNS.ACTION), thread, row, subject, label, noTrackLabel);
       if (removeRow) {
         threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
       } else {
@@ -125,8 +125,8 @@ Gmail.init = function() {
       return;
     }
     var maxThreads = Preferences.getMaxThreadsForSheet(sheetId);
-    var totalCount = Gmail.syncWithGmail(sheetId, labelName, maxThreads);
-    return 'Synced ' + Math.min(maxThreads, totalCount) + '/' + totalCount + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
+    var counts = Gmail.syncWithGmail(sheetId, labelName, maxThreads);
+    return 'Synced ' + counts + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
   }
   
   Gmail.renameLabel = function(sheetId, toLabelName) {

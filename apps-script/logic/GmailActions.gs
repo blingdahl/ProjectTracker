@@ -119,21 +119,20 @@ GmailActions.init = function() {
         continue;
       }
       Log.info('Action: ' + action);
-      var lowercaseName = action.toLowerCase();
       if (action === 'archive') {
         GmailActions.archive(thread, row, subject);
-      } else if (action === 'completed') {
+      } else if (action === 'Completed') {
         shouldRemove = true;
         GmailActions.markCompleted(thread, row, subject, noTrackLabel);
-      } else if (action === 'mute') {
+      } else if (action === 'Mute') {
         GmailActions.mute(thread, row, subject);
-      } else if (action === 'unlabel') {
+      } else if (action === 'Unlabel') {
         shouldRemove = true;
         GmailActions.removeLabel(thread, row, label, subject);
-      } else if (action === 'inbox') {
+      } else if (action === 'Inbox') {
         GmailActions.inbox(thread, row, subject);
       } else if (action) {
-        if (action.startsWith('move to ')) {
+        if (action.startsWith('Move to ')) {
           var newLabelName = fullCaseAction.substring('Move to '.length);
           var newLabel = Label.getUserDefined(newLabelName);
           if (newLabel) {
