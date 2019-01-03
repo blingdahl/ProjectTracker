@@ -67,11 +67,11 @@ GmailActions.init = function() {
     return hasLabel;
   }
   
-  GmailActions.removeLabel = function(thread, row, labelName, subject) {
+  GmailActions.removeLabel = function(thread, row, label, subject) {
     var threadLabels = thread.getLabels();
     var labelRemoved = false;
     threadLabels.forEach(function(threadLabel) {
-      if (threadLabel.getName() === labelName) {
+      if (threadLabel.getName() === label.getName()) {
         thread.removeLabel(threadLabel);
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Removed label');
         labelRemoved = true;
@@ -108,5 +108,45 @@ GmailActions.init = function() {
     }
     otherLabelNames.forEach(function(otherLabelName) { actions.push('Move to ' + otherLabelName); });
     return actions;
+  }
+  
+  GmailActions.processActions = function(actionsStr, thread, row, subject, label, noTrackLabel) {
+    var actions = actionsStr.split(',');
+    var shouldRemove = false;
+    for (var actionIndex = 0; actionIndex < actions.length; actionIndex++) {
+      var action = actions[actionIndex];
+      if (action === '') {
+        continue;
+      }
+      Log.info('Action: ' + action);
+      var lowercaseName = action.toLowerCase();
+      if (action === 'archive') {
+        GmailActions.archive(thread, row, subject);
+      } else if (action === 'completed') {
+        shouldRemove = true;
+        GmailActions.markCompleted(thread, row, subject, noTrackLabel);
+      } else if (action === 'mute') {
+        GmailActions.mute(thread, row, subject);
+      } else if (action === 'unlabel') {
+        shouldRemove = true;
+        GmailActions.removeLabel(thread, row, label, subject);
+      } else if (action === 'inbox') {
+        GmailActions.inbox(thread, row, subject);
+      } else if (action) {
+        if (action.startsWith('move to ')) {
+          var newLabelName = fullCaseAction.substring('Move to '.length);
+          var newLabel = Label.getUserDefined(newLabelName);
+          if (newLabel) {
+            GmailActions.changeLabel(thread, row, subject, label, newLabel);
+            shouldRemove = true;
+          } else {
+            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
+          }
+        } else {
+          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
+        }
+      }
+    }
+    return shouldRemove;
   }
 }

@@ -41,7 +41,6 @@ Gmail.init = function() {
     var gmailLabel = Label.getUserDefined(labelName);
     var threads = GmailApp.search(searchQuery);
     var totalCount = threads.length;
-    threads = threads.slice(0, maxThreads);
     var noTrackLabel = Label.getUserDefined(Label.NO_TRACK_LABEL_NAME, true);
     var p0Label = Label.getUserDefined(Gmail.P0_LABEL_NAME, true);
     var p1Label = Label.getUserDefined(Gmail.P1_LABEL_NAME, true);
@@ -55,7 +54,8 @@ Gmail.init = function() {
     }
     var threadIdsInLabel = [];
     var threadIdsToRemove = [];
-    for (var i = 0; i < threads.length; i++) {
+    var numThreads = 0;
+    for (var i = 0; i < threads.length && numThreads < maxThreads; i++) {
       var thread = threads[i];
       var subject = thread.getFirstMessageSubject() || '(No Subject)';
       Log.info(labelName + ': ' + (i + 1) + ' / ' + threads.length + ': ' + subject);
@@ -87,40 +87,12 @@ Gmail.init = function() {
       } else {
         Log.fine('Already in sheet: ' + subject);
       }
-      var fullCaseAction = row.getValue(TrackingSheet.COLUMNS.ACTION);
-      var actions = fullCaseAction.toLowerCase().split(',');
-      for (var actionIndex = 0; actionIndex < actions.length; actionIndex++) {
-        var action = actions[actionIndex];
-        if (action === '') {
-          continue;
-        }
-        Log.info('Action: ' + action);
-        if (action === 'archive') {
-          GmailActions.archive(thread, row, subject);
-        } else if (action === 'completed') {
-          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-          GmailActions.markCompleted(thread, row, subject, noTrackLabel);
-        } else if (action === 'mute') {
-          GmailActions.mute(thread, row, subject);
-        } else if (action === 'unlabel') {
-          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-          GmailActions.removeLabel(thread, row, labelName, subject);
-        } else if (action === 'inbox') {
-          GmailActions.inbox(thread, row, subject);
-        } else if (action) {
-          if (action.startsWith('move to ')) {
-            var newLabelName = fullCaseAction.substring('Move to '.length);
-            var newLabel = Label.getUserDefined(newLabelName);
-            if (newLabel) {
-              GmailActions.changeLabel(thread, row, subject, gmailLabel, newLabel);
-              threadIdsToRemove.push(threadId);
-            } else {
-            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
-            }
-          } else {
-            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
-          }
-        }
+      var removeRow = GmailActions.processActions(
+        row.getValue(TrackingSheet.COLUMNS.ACTION), thread, row, subject, noTrackLabel);
+      if (removeRow) {
+        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+      } else {
+        numThreads++;
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
       row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());
@@ -143,7 +115,7 @@ Gmail.init = function() {
     Organize.organizeSheet(trackingSheet);
     // The last sort here will be the primary sort order.
     Log.info('Synced with ' + labelName);
-    return totalCount;
+    return numThreads + '/' + threads.length;
   }
   
   Gmail.syncSheet = function(sheetId) {
