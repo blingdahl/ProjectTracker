@@ -18,6 +18,7 @@ Cache.init = function() {
   };
   
   Cache.Sheet.prototype.precache = function() {
+    Log.info('precache()');
     this.values = this.fetchAllValuesFn();
     this.formulas = this.fetchAllFormulasFn();
   }
