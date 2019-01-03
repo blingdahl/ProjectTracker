@@ -14,7 +14,7 @@ TaskSync.init = function() {
   TaskSync.TaskSync = function(trackingSheet) {
     this.trackingSheet = trackingSheet;
     this.tasklist = this.getTasklist();
-    this.tasks = Tasks.Tasks.list(this.tasklist.id, {showHidden: true, showCompleted: true}).items;
+    this.tasks = Tasks.Tasks.list(this.tasklist.id, {showHidden: true, showCompleted: true}).items || [];
     Log.info(this.tasks);
     this.tasksById = indexMap(this.tasks, function(task) { return task.id; });
     this.copiedCompleted = false;
@@ -39,7 +39,7 @@ TaskSync.init = function() {
     var newTasklist = Tasks.Tasklists.insert({
       title: tasklistTitle
     });
-    Preferences.setTasklistForSheet(trackingSheet.getSheetId(), newTasklist.id);
+    Preferences.setTasklistForSheet(this.trackingSheet.getSheetId(), newTasklist.id);
     return newTasklist;
   }
   
@@ -53,7 +53,7 @@ TaskSync.init = function() {
   
   TaskSync.TaskSync.prototype.makeTitleForRow = function(dataRow) {
     return ['[',
-            dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY),
+            dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY) || '?',
             '] ',
             dataRow.getValue(TrackingSheet.COLUMNS.ITEM)
            ].join('');
