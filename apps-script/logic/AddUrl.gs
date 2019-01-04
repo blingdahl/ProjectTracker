@@ -24,9 +24,3 @@ AddUrl.init = function() {
     return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
   }
 }
-
-function addUrl(spreadsheetUrl, sheetId, url) {
-  AddUrl.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  return AddUrl.addUrl(sheetId, url);
-}

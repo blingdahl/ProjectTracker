@@ -34,14 +34,3 @@ Overview.init = function() {
     return rows;
   }
 }
-
-function getOverviewRows(spreadsheetUrl, priorities) {
-  Overview.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var trackingRows = Overview.getTrackingRowsForPriorities(priorities);
-  var objectRows = [];
-  trackingRows.forEach(function(trackingRow) {
-    objectRows.push(trackingRow.toObject());
-  });
-  return JSON.stringify(objectRows);
-}

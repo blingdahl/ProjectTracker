@@ -53,12 +53,3 @@ Organize.init = function() {
     return Organize.organizeSheet(TrackingSheet.forSheetId(sheetId));
   }
 }
-
-function organize(spreadsheetUrl, sheetId) {
-  Log.start('organize', [spreadsheetUrl, sheetId]);
-  Organize.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Organize.organize(sheetId);
-  Log.stop('organize', [spreadsheetUrl, sheetId]);
-  return ret;
-}

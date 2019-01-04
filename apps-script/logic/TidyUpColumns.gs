@@ -29,12 +29,3 @@ TidyUpColumns.init = function() {
     return 'Tidied up ' + trackingSheet.getSheetName();
   }
 }
-
-function tidyUpColumns(spreadsheetUrl, sheetId) {
-  Log.start('tidyUpColumns', [spreadsheetUrl, sheetId]);
-  TidyUpColumns.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = TidyUpColumns.tidyUp(sheetId);
-  Log.stop('tidyUpColumns', [spreadsheetUrl, sheetId]);
-  return ret;
-}

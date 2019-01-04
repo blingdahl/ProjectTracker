@@ -65,33 +65,3 @@ Label.init = function() {
     return hasLabel;
   };
 }
-
-function getAllLabels() {
-  Log.start('getAllLabels', []);
-  Label.init();
-  var ret = JSON.stringify(Label.getAllLabelNames());
-  Log.stop('getAllLabels', []);
-  return ret;
-}
-
-function setMaxThreadsForSheet(sheetId, maxThreads) {
-  Log.start('setMaxThreadsForSheet', [sheetId, maxThreads]);
-  Label.init();
-  Label.setMaxThreadsForSheet(sheetId, maxThreads);
-  Log.stop('setMaxThreadsForSheet', [sheetId, maxThreads]);
-}
-
-function clearMaxThreadsForSheet(sheetId) {
-  Log.start('clearMaxThreadsForSheet', [sheetId]);
-  Label.init();
-  Label.clearMaxThreadsForSheet(sheetId);
-  Log.stop('clearMaxThreadsForSheet', [sheetId]);
-}
-
-function getMaxThreadsForSheet(sheetId) {
-  Log.start('getMaxThreadsForSheet', [sheetId]);
-  Label.init();
-  var ret = Label.getMaxThreadsForSheet(sheetId);
-  Log.stop('getMaxThreadsForSheet', [sheetId]);
-  return ret;
-}

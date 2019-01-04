@@ -141,21 +141,3 @@ Gmail.init = function() {
     Label.setLabelNameForSheet(sheetId, toLabelName);
   }
 }
-
-function syncSheetWithGmail(spreadsheetUrl, sheetId) {
-  Log.start('syncSheetWithGmail', [sheetId]);
-  Gmail.init();
-  Log.info('inSyncWithGmail: ' + spreadsheetUrl);
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Gmail.syncSheet(sheetId);
-  Log.stop('syncSheetWithGmail', [sheetId]);
-  return ret;
-}
-
-function renameLabel(spreadsheetUrl, sheetId, toLabelName) {
-  Log.start('renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
-  Gmail.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  Gmail.renameLabel(sheetId, toLabelName);
-  Log.stop('renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
-}

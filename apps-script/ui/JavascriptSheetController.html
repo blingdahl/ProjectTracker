@@ -72,7 +72,7 @@ class SheetController {
   }
   
   setAction(uuid, action) {
-    return new RpcConfig(runner => runner.setAction(GlobalController.getSpreadsheetUrl(), this.getSheetId(), uuid, action)).
+    return new RpcConfig(runner => runner.Action_setAction(GlobalController.getSpreadsheetUrl(), this.getSheetId(), uuid, action)).
         output('Setting action to ' + action + '...').
         retryOnTimeout().
         callRpc();
@@ -82,7 +82,7 @@ class SheetController {
   // Click handlers
 
   organize() {
-    return new RpcConfig(runner => runner.organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+    return new RpcConfig(runner => runner.Organize_organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Organizing ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
@@ -92,7 +92,7 @@ class SheetController {
     if (!this.labelPicker.getLabelName()) {
       return Promise.resolve();
     }
-    return new RpcConfig(runner => runner.syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+    return new RpcConfig(runner => runner.Gmail_syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
         retryOnTimeout().
         callRpc();
@@ -109,7 +109,7 @@ class SheetController {
   addUrl() {
     let url = window.prompt('URL');
     if (url) {
-      new RpcConfig(runner => runner.addUrl(GlobalController.getSpreadsheetUrl(), this.getSheetId(), url)).
+      new RpcConfig(runner => runner.AddUrl_addUrl(GlobalController.getSpreadsheetUrl(), this.getSheetId(), url)).
           output('Adding ' + url + ' to ' + this.getSheetName() + '...').
           retryOnTimeout().
           callRpc();
@@ -117,14 +117,14 @@ class SheetController {
   }
 
   tidyUpColumns() {
-    new RpcConfig(runner => runner.tidyUpColumns(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+    new RpcConfig(runner => runner.TidyUpColumns_tidyUpColumns(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
         output('Tidying up ' + this.getSheetName() + '...').
         retryOnTimeout().
         callRpc();
   }
   
   addTracking() {
-    new RpcConfig(runner => runner.setTrackedForSheet(GlobalController.getSpreadsheetUrl(), this.getSheetId(), true)).
+    new RpcConfig(runner => runner.Preferences_setTrackedForSheet(GlobalController.getSpreadsheetUrl(), this.getSheetId(), true)).
         output('Adding tracking for ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
