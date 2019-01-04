@@ -56,15 +56,18 @@ LinkExtractor.extractUrls = function(content) {
   return urls;
 }
 
-LinkExtractor.extractGoLinks = function(content) {
-  var goLinks = content.match(/\Wgo\/[^ )"><]+/g);
-  if (!goLinks) {
+LinkExtractor.extractShortLinks = function(content, shortlinkName) {
+  var shortlinks = content.match(new RegExp('\\W' + shortlinkName + '\\/[^ )"><.\r\n]+', 'g'));
+  if (!shortlinks) {
     return [];
   }
-  for (var i = 0; i < goLinks.length; i++) {
-    goLinks[i] = goLinks[i].replace(/[ <>"]/g, '');
+  for (var i = 0; i < shortlinks.length; i++) {
+    shortlinks[i] = shortlinks[i].replace(/[ <>"\n\r]/g, '');
+    if (shortlinks[i].charAt(0) === '/') {
+      shortlinks[i] = shortlinks[i].substring(1, shortlinks[i].length);
+    }
   }
-  return goLinks;
+  return shortlinks;
 }
 
 LinkExtractor.extractLinkFormula = function(thread) {
@@ -106,9 +109,13 @@ LinkExtractor.extractLinkFormula = function(thread) {
       }
     }
   }
-  var goLinks = LinkExtractor.extractGoLinks(messages[0].getBody());
+  var goLinks = LinkExtractor.extractShortLinks(messages[0].getBody(), 'go');
   if (goLinks.length > 0) {
     return Spreadsheet.hyperlinkFormula('http://' + goLinks[0], goLinks[0]);
+  }
+  var omgLinks = LinkExtractor.extractShortLinks(messages[0].getBody(), 'omg');
+  if (omgLinks.length > 0) {
+    return Spreadsheet.hyperlinkFormula('http://' + omgLinks[0], omgLinks[0]);
   }
   return null;
 }
