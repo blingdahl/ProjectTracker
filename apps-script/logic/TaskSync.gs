@@ -149,7 +149,7 @@ TaskSync.init = function() {
     this.copiedCompleted = true;
   }
   
-  TaskSync.forSheet = function(trackingSheet) {
+  TaskSync.forTrackingSheet = function(trackingSheet) {
     if (!TaskSync.objs[trackingSheet.getSheetId()]) {
       TaskSync.objs[trackingSheet.getSheetId()] = new TaskSync.TaskSync(trackingSheet)
     }

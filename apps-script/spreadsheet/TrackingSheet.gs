@@ -82,27 +82,24 @@ TrackingSheet.init = function() {
     return 'TrackingSheet.Sheet';
   };
   
-  TrackingSheet.forSheet = function(sheet) {
-    if (!TrackingSheet.sheetIdToSheet[sheet.getSheetId()]) {
-      TrackingSheet.sheetIdToSheet[sheet.getSheetId()] = new TrackingSheet.Sheet(sheet);
+  TrackingSheet.forNativeSheet = function(nativeSheet) {
+    var sheetId = nativeSheet.getSheetId();
+    if (!TrackingSheet.sheetIdToSheet[sheetId]) {
+      TrackingSheet.sheetIdToSheet[sheetId] = new TrackingSheet.Sheet(nativeSheet);
     }
-    return TrackingSheet.sheetIdToSheet[sheet.getSheetId()];
+    return TrackingSheet.sheetIdToSheet[sheetId];
   }
   
   TrackingSheet.forSheetId = function(sheetId) {
-    return TrackingSheet.forSheet(Spreadsheet.getSpreadsheet().getNativeSheet(sheetId));
+    return TrackingSheet.forNativeSheet(Spreadsheet.getSpreadsheet().getNativeSheet(sheetId));
   }
   
   TrackingSheet.getAll = function() {
-    var sheets = Spreadsheet.getSpreadsheet().getNativeSheets();
+    var nativeSheets = Spreadsheet.getSpreadsheet().getNativeSheets();
     var ret = [];
-    sheets.forEach(function(sheet) {
-      if (sheet.getSheetName() == 'Overview') {
-        Log.fine('Not including Overview');
-        return;
-      }
-      if (Preferences.getTrackedForSheet(sheet.getSheetId())) {
-        ret.push(TrackingSheet.forSheet(sheet));
+    nativeSheets.forEach(function(nativeSheet) {
+      if (Preferences.getTrackedForSheet(nativeSheet.getSheetId())) {
+        ret.push(TrackingSheet.forNativeSheet(nativeSheet));
       }
     });
     return ret;

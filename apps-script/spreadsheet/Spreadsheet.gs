@@ -28,6 +28,7 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Sheet = function(nativeSheet, columnDefinitions) {
     this.nativeSheet = nativeSheet;
+    this.sheetId = nativeSheet.getSheetId();
     this.columns = new Spreadsheet.Columns(this, columnDefinitions);
     this.cache = new Cache.Sheet(this.getAllValues.bind(this), this.getAllFormulas.bind(this),
                                  this.getValuesForRow.bind(this), this.getFormulasForRow.bind(this));
@@ -40,7 +41,7 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.getSheetId = function() {
-    return this.nativeSheet.getSheetId();
+    return this.sheetId;
   }
   
   Spreadsheet.Sheet.prototype.loadDataIfDirty = function() {

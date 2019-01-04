@@ -113,7 +113,7 @@ class LabelPicker {
   }
   
   renameLabel(newLabel) {
-    new RpcConfig(runner => runner.Label_renameLabel(GlobalController.getSpreadsheetUrl(), this.sheetId, newLabel)).
+    new RpcConfig(runner => runner.Gmail_renameLabel(GlobalController.getSpreadsheetUrl(), this.sheetId, newLabel)).
         output('Renaming label ' + this.getLabelName() + ' to ' + newLabel).
         callRpc();
     this.setLabelName(newLabel);
@@ -122,7 +122,7 @@ class LabelPicker {
   
   clearLabel() {
     this.setLabelName(null);
-    new RpcConfig(runner => runner.Label_clearLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).
+    new RpcConfig(runner => runner.Preferences_clearLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).
         retryOnTimeout().
         callRpc();
   }
@@ -137,7 +137,7 @@ class LabelPicker {
   }
   
   saveClicked() {
-    new RpcConfig(runner => runner.Label_setLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId,
+    new RpcConfig(runner => runner.Preferences_setLabelNameForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId,
                                                         this.updateLabelFromSelect(),
                                                         this.updateMaxThreadsFromInput())).
         retryOnTimeout().
@@ -154,7 +154,7 @@ class LabelPicker {
   
   removeLabelClicked() {
     this.clearLabel();
-    new RpcConfig(runner => runner.Label_clearLabelForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).callRpc();
+    new RpcConfig(runner => runner.Preferences_clearLabelForSheet(GlobalController.getSpreadsheetUrl(), this.sheetId)).callRpc();
     this.setMode(LabelPicker.MODE.DISPLAY);
   }
   

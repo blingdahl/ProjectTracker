@@ -15,12 +15,12 @@ Organize.init = function() {
   Organize.initialized = true;
 
   Organize.organizeSheet = function(trackingSheet) {
-    var taskSync = TaskSync.forSheet(trackingSheet);
+    var taskSync = TaskSync.forTrackingSheet(trackingSheet);
     taskSync.copyCompleted();
     var dataRows = trackingSheet.getDataRows();
     trackingSheet.setNumBlankRows(Organize.EXTRA_ROWS);
     var rowNumbersToRemove = [];
-    var rows = trackingSheet.getAllRows();
+    var rows = trackingSheet.getDataRows();
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);

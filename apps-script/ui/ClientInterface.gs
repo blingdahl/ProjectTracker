@@ -8,15 +8,6 @@ function Preferences_setLabelNameForSheet(spreadsheetUrl, sheetId, label, maxThr
   return 'Set label';
 }
 
-function Preferences_getLabelNameForSheet(spreadsheetUrl, sheetId) {
-  Log.start('getLabelNameForSheet', [spreadsheetUrl, sheetId]);
-  Preferences.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Preferences.getLabelForSheet(sheetId);
-  Log.stop('getLabelNameForSheet', [spreadsheetUrl, sheetId]);
-  return ret;
-}
-
 function Preferences_clearLabelNameForSheet(spreadsheetUrl, sheetId) {
   Log.start('clearLabelNameForSheet', [spreadsheetUrl, sheetId]);
   Preferences.init();
@@ -33,16 +24,6 @@ function Preferences_setTrackedForSheet(spreadsheetUrl, sheetId, tracked) {
   Log.stop('setTrackedForSheet', [spreadsheetUrl, sheetId, tracked]);
   return tracked ? 'Added tracking' : 'Removed tracking';
 }
-
-function Preferences_getTrackedForSheet(spreadsheetUrl, sheetId) {
-  Log.start('getTrackedForSheet', [spreadsheetUrl, sheetId]);
-  Preferences.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Preferences.getTrackedForSheet(sheetId);
-  Log.stop('getTrackedForSheet', [spreadsheetUrl, sheetId]);
-  return ret;
-}
-
 
 function Action_setAction(spreadsheetUrl, sheetId, uuid, action) {
   Log.start('setAction', [spreadsheetUrl, sheetId, uuid, action]);
@@ -83,28 +64,6 @@ function Label_getAllLabels() {
   Label.init();
   var ret = JSON.stringify(Label.getAllLabelNames());
   Log.stop('getAllLabels', []);
-  return ret;
-}
-
-function Label_setMaxThreadsForSheet(sheetId, maxThreads) {
-  Log.start('setMaxThreadsForSheet', [sheetId, maxThreads]);
-  Label.init();
-  Label.setMaxThreadsForSheet(sheetId, maxThreads);
-  Log.stop('setMaxThreadsForSheet', [sheetId, maxThreads]);
-}
-
-function Label_clearMaxThreadsForSheet(sheetId) {
-  Log.start('clearMaxThreadsForSheet', [sheetId]);
-  Label.init();
-  Label.clearMaxThreadsForSheet(sheetId);
-  Log.stop('clearMaxThreadsForSheet', [sheetId]);
-}
-
-function Label_getMaxThreadsForSheet(sheetId) {
-  Log.start('getMaxThreadsForSheet', [sheetId]);
-  Label.init();
-  var ret = Label.getMaxThreadsForSheet(sheetId);
-  Log.stop('getMaxThreadsForSheet', [sheetId]);
   return ret;
 }
 

@@ -34,7 +34,7 @@ Gmail.init = function() {
   Gmail.syncWithGmail = function(sheetId, labelName, maxThreads) {
     Log.info('syncWithGmail');
     var trackingSheet = TrackingSheet.forSheetId(sheetId);
-    var taskSync = TaskSync.forSheet(trackingSheet);
+    var taskSync = TaskSync.forTrackingSheet(trackingSheet);
     taskSync.copyCompleted();
     var searchQuery = Label.searchQuery(labelName);
     Log.info(searchQuery);
@@ -63,7 +63,6 @@ Gmail.init = function() {
       threadIdsInLabel.push(threadId);
       var row = trackingSheet.getRowForThreadId(threadId);
       row.setDataValidation(TrackingSheet.COLUMNS.ACTION, GmailActions.getActions(otherLabelNames, thread));
-      row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, subject);
       row.setValue(TrackingSheet.COLUMNS.FROM, Gmail.getFrom(thread));
       if (!row.getFormula(TrackingSheet.COLUMNS.LINK)) {
