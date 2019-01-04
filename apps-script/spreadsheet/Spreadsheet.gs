@@ -98,7 +98,7 @@ Spreadsheet.init = function() {
   Spreadsheet.Sheet.prototype.addRow = function() {
     this.markDirty();
     var rows = this.getDataRows();
-    var rowOffset = rows.length + 2;
+    var rowOffset = rows.length + 1;
     return this.getRow(rowOffset, true);
   }
   
