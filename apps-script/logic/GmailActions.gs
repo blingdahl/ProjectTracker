@@ -133,7 +133,7 @@ GmailActions.init = function() {
         GmailActions.inbox(thread, row, subject);
       } else if (action) {
         if (action.startsWith('Move to ')) {
-          var newLabelName = fullCaseAction.substring('Move to '.length);
+          var newLabelName = action.substring('Move to '.length);
           var newLabel = Label.getUserDefined(newLabelName);
           if (newLabel) {
             GmailActions.changeLabel(thread, row, subject, label, newLabel);
