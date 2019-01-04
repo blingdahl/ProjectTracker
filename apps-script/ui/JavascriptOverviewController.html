@@ -48,14 +48,24 @@ class OverviewController {
     $('.overviewPlaceholder').find('.priorityLoading').show();
     new RpcConfig(runner => runner.Overview_getOverviewRows(GlobalController.getSpreadsheetUrl(), [priority])).
         output('Loading ' + priority + '...').
-        clearMessageOnSuccess().
+        setMessageOnSuccess('Loaded ' + priority).
         withSuccessFn(msg => OverviewController.handleOverviewData(priority, msg)).
         callRpc();
   }
   
+  static isDisplayed() {
+    return $('.overviewPlaceholder').find('table').length > 0;
+  }
+  
+  static updateOverview() {
+    if (OverviewController.isDisplayed()) {
+      OverviewController.showOverview();
+    }
+  }
+  
   static showOverview() {
+    OverviewController.hideOverview(false);
     google.script.history.push(null, null, 'overview');
-    $('.controls').hide();
     let overviewTemplate = $('.overviewTemplate');
     let overview = overviewTemplate.clone().removeClass('overviewTemplate');
     overview.find('.overviewRowTemplate').remove();
@@ -65,9 +75,10 @@ class OverviewController {
     OverviewController.loadPriority('P0');
   }
   
-  static hideOverview() {
-    google.script.history.push(null, null, '');
-    $('.controls').show();
+  static hideOverview(opt_changeHistory) {
+    if (opt_changeHistory === undefined || opt_changeHistory === true) {
+      google.script.history.push(null, null, '');
+    }
     $('.overviewPlaceholder').empty();
   }
 

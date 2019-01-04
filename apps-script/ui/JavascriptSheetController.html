@@ -137,7 +137,7 @@ class SheetController {
   static doYourThings() {
     let promises = [];
     SheetController.getAll().forEach(sheetController => promises.push(sheetController.doYourThing()));
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => OverviewController.updateOverview());
   }
   
   static tidyAll() {
