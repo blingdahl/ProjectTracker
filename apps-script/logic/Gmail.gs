@@ -66,7 +66,7 @@ Gmail.init = function() {
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, subject);
       row.setValue(TrackingSheet.COLUMNS.FROM, Gmail.getFrom(thread));
       if (!row.getFormula(TrackingSheet.COLUMNS.LINK)) {
-        var linkFormula = LinkExtractor.extractLinkFormula(thread);
+        var linkFormula = GmailLinkExtractor.extractLinkFormula(thread);
         if (linkFormula) {
           row.setValue(TrackingSheet.COLUMNS.LINK, linkFormula);
         }
