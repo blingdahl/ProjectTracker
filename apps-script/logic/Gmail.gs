@@ -73,7 +73,7 @@ Gmail.init = function() {
       }
       if (row.isNew) {
         Log.info('Added: ' + subject);
-        row.setValue(TrackingSheet.COLUMNS.ITEM, subject);
+        row.setValue(TrackingSheet.COLUMNS.ITEM, GmailItemNameExtractor.extractItemName(thread));
         row.setFormula(TrackingSheet.COLUMNS.EMAIL, Spreadsheet.hyperlinkFormula(thread.getPermalink(), 'Email'));
         row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Imported');
         if (Label.hasLabel(thread, row, p0Label, subject)) {
