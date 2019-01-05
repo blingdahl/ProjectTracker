@@ -22,8 +22,10 @@ GmailLinkExtractor.UrlPrefixMatcher.prototype.matchingLinkText = function(s) {
 GmailLinkExtractor.ExtractorStrategy = function() { }
 
 GmailLinkExtractor.ExtractorStrategy.prototype.extract = function(thread) {
-  return (this.extractFromSubject(GmailExtractor.extractSubject(thread)) ||
-          this.extractFromBody(GmailExtractor.extractBody(thread)));
+  var subject = GmailExtractor.extractSubject(thread);
+  var body = GmailExtractor.extractBody(thread);
+  return ((subject && this.extractFromSubject(subject)) ||
+          (body && this.extractFromBody(body)));
 }
 
 GmailLinkExtractor.ExtractorStrategy.prototype.extractFromSubject = function(subject) {
