@@ -2,7 +2,7 @@ class RpcConfig {
   constructor(callFn) {
     this.callFn_ = callFn;
     this.successOut_ = this.output.bind(this);
-    this.failureOut_ = this.output.bind(this);
+    this.failureOut_ = this.append.bind(this);
     this.successFn_ = null;
     this.failureFn_ = null;
   }
@@ -64,7 +64,7 @@ class RpcConfig {
     this.failureOut_ = () => this.output(msg);
     return this;
   }
-  
+
   ignoreAll() {
     return this.ignoreSuccess().ignoreFailure();
   }
@@ -111,12 +111,22 @@ class RpcConfig {
     }
   }
   
-  output(msg) {
+  getRpcDiv_() {
     if (!this.rpcDiv_) {
       this.rpcDiv_ = $('<div />').addClass('rpcMessage');
       $('.rpcMessages').append(this.rpcDiv_);
     }
-    this.rpcDiv_.text(msg);
+    return this.rpcDiv_;
+  }
+  
+  output(msg) {
+    this.getRpcDiv_().text(msg);
+    return this;
+  }
+  
+  append(msg) {
+    var rpcDiv = this.getRpcDiv_();
+    rpcDiv.text(rpcDiv.text() + msg);
     return this;
   }
   
