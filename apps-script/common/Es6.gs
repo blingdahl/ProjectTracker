@@ -46,7 +46,11 @@ function indexMultimap(arr, fn) {
     if (ret[key] === undefined) {
       ret[key] = [];
     }
-    ret[key].push(e);
+    if (typeOf(key) == 'array') {
+      key.forEach(function(k) { ret[k].push(e); });
+    } else {
+      ret[key].push(e);
+    }
   }
   return ret;
 }
