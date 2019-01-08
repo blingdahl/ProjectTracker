@@ -25,7 +25,7 @@
       <div class="rpcMessages"></div>
       <input type="text" class="spreadsheetUrl"> <button class="setSpreadsheetUrl">Set Spreadsheet URL</button>
       <script>
-        <?!= include("ui/JavascriptRpcConfig"); ?>
+        <?!= include("ui/JsRpcConfig"); ?>
         function setSpreadsheetUrl() {
           console.log($('.spreadsheetUrl').val());
           new RpcConfig(runner => runner.setSpreadsheetUrl($('.spreadsheetUrl').val())).

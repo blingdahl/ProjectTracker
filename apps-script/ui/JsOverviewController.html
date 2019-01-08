@@ -48,7 +48,7 @@ class OverviewController {
     $('.overviewPlaceholder').find('.priorityLoading').show();
     new RpcConfig(runner => runner.Overview_getOverviewRows(GlobalController.getSpreadsheetUrl(), [priority])).
         output('Loading ' + priority + '...').
-        setMessageOnSuccess('Loaded ' + priority).
+        clearMessageOnSuccess().
         withSuccessFn(msg => OverviewController.handleOverviewData(priority, msg)).
         callRpc();
   }
