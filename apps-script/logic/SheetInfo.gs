@@ -14,13 +14,13 @@ SheetInfo.init = function() {
 
   SheetInfo.getInfoForSheet = function(sheetId) {
     Log.start('getInfoForSheet', [sheetId]);
-    Log.info(Preferences.getLabelNameForSheet(sheetId));
-    var labelName = Preferences.getLabelNameForSheet(sheetId);
+    Log.info(Preferences.Properties.get(Preferences.Names.labelName(sheetId)));
+    var labelName = Preferences.Properties.get(Preferences.Names.labelName(sheetId));
     var ret = {'sheetId': sheetId,
                'sheetName': Spreadsheet.getSpreadsheet().getNativeSheet(sheetId).getName(),
                'labelName': labelName,
-               'isTracked': Preferences.getTrackedForSheet(sheetId),
-               'maxThreads': Preferences.getMaxThreadsForSheet(sheetId),
+               'isTracked': Preferences.Properties.get(Preferences.Names.tracked(sheetId)),
+               'maxThreads': Preferences.Properties.get(Preferences.Names.maxThreads(sheetId)),
                'searchQuery': Label.searchQuery(labelName)};
     Log.stop('getInfoForSheet', [sheetId]);
     return ret;

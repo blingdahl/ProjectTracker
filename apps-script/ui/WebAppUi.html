@@ -11,15 +11,32 @@
       if (spreadsheetUrl) {
     ?>
       <?!= renderControls(spreadsheetUrl) ?>
-      <a class="clearSpreadsheetUrl">Clear Spreadsheet URL</a>
+      <? if (scriptUrl) { ?>
+      <a href="<?= scriptUrl ?>" target="_new">Open script</a><br>
+      <? } ?>
+      <a class="changePreferences">Change preferences</a>
+      <div class="preferencesInput" style="display: none">
+        Spreadsheet URL: <input type="text" class="spreadsheetUrl" value="<?= spreadsheetUrl ?>"><br>
+        App Title: <input type="text" class="appTitle" value="<?= appTitle ?>"><br>
+        Script URL: <input type="text" class="scriptUrl" value="<?= scriptUrl ?>"><br>
+        <button class="updatePreferences">Update</button>
+      </div>
       <script>
-        function clearSpreadsheetUrl() {
-          new RpcConfig(runner => runner.clearSpreadsheetUrl()).
-              output('Clearing spreadsheet url...').
+        function updatePreferences() {
+          new RpcConfig(runner => runner.Preferences_updateScriptPreferences($('.spreadsheetUrl').val(), $('.appTitle').val(), $('.scriptUrl').val())).
+              output('Updating Preferences...').
               retryOnTimeout().
               callRpc();
-          }
-        $('.clearSpreadsheetUrl').click(clearSpreadsheetUrl);
+          $('.changePreferences').show();
+          $('.preferencesInput').hide();
+        }
+        $('.updatePreferences').click(updatePreferences);
+        
+        function changePreferences() {
+          $('.changePreferences').hide();
+          $('.preferencesInput').show();
+        }
+        $('.changePreferences').click(changePreferences);
       </script>
     <? } else { ?>
       <div class="rpcMessages"></div>

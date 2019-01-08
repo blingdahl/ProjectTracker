@@ -6,6 +6,7 @@ TaskSync.init = function() {
     return;
   }
   
+  Preferences.init();
   TrackingSheet.init();
   Log.info('TaskSync.init()');
   
@@ -22,7 +23,7 @@ TaskSync.init = function() {
   
   TaskSync.TaskSync.prototype.getTasklist = function() {
     var tasklistTitle = this.trackingSheet.getSheetName();
-    var tasklistId = Preferences.getTasklistForSheet(this.trackingSheet.getSheetId());
+    var tasklistId = Preferences.Properties.get(Preferences.Names.tracked(this.trackingSheet.getSheetId()));
     if (tasklistId) {
       try {
         var tasklist = Tasks.Tasklists.get(tasklistId);
@@ -39,7 +40,7 @@ TaskSync.init = function() {
     var newTasklist = Tasks.Tasklists.insert({
       title: tasklistTitle
     });
-    Preferences.setTasklistForSheet(this.trackingSheet.getSheetId(), newTasklist.id);
+    Preferences.Properties.set(Preferences.Names.tracked(this.trackingSheet.getSheetId()), newTasklist.id);
     return newTasklist;
   }
   

@@ -11,7 +11,7 @@ function renderControls(spreadsheetUrl) {
       Log.fine('Not including Overview');
       return;
     }
-    if (Preferences.getTrackedForSheet(sheet.getSheetId())) {
+    if (Preferences.Properties.get(Preferences.Names.tracked(sheet.getSheetId()))) {
       template.trackedSheets.push(SheetInfo.getInfoForSheet(sheet.getSheetId()));
     } else {
       template.untrackedSheets.push({'sheetName': sheet.getSheetName(), 'sheetId': sheet.getSheetId()});

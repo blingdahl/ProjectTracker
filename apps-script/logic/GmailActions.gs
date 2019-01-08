@@ -39,7 +39,6 @@ GmailActions.init = function() {
     return;
   }
   
-  Preferences.init();
   TrackingSheet.init();
   Organize.init();
   Label.init();

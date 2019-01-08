@@ -98,7 +98,7 @@ TrackingSheet.init = function() {
     var nativeSheets = Spreadsheet.getSpreadsheet().getNativeSheets();
     var ret = [];
     nativeSheets.forEach(function(nativeSheet) {
-      if (Preferences.getTrackedForSheet(nativeSheet.getSheetId())) {
+      if (Preferences.Properties.get(Preferences.Names.tracked(nativeSheet.getSheetId()))) {
         ret.push(TrackingSheet.forNativeSheet(nativeSheet));
       }
     });

@@ -8,6 +8,7 @@ Label.init = function() {
   
   Log.info('Label.init()');
   
+  Preferences.init();
   Label.initialized = true
   
   Label.NO_TRACK_LABEL_NAME = 'No-Track';
@@ -45,7 +46,7 @@ Label.init = function() {
     var ret = [];
     Spreadsheet.getSpreadsheet().getNativeSheets().forEach(function(sheet) {
       var sheetId = sheet.getSheetId();
-      var labelNameForSheet = Preferences.getLabelNameForSheet(sheetId);
+      var labelNameForSheet = Preferences.Properties.get(Preferences.Names.labelName(sheetId));
       if (labelNameForSheet) {
         ret.push(labelNameForSheet);
       }

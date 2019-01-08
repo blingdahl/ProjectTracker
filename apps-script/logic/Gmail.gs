@@ -119,12 +119,12 @@ Gmail.init = function() {
   }
   
   Gmail.syncSheet = function(sheetId) {
-    var labelName = Preferences.getLabelNameForSheet(sheetId);
+    var labelName = Preferences.Properties.get(Preferences.Names.labelName(sheetId));
     if (!labelName) {
       Browser.msgBox('No label for sheet: ' + TrackingSheet.forSheetId(sheetId).getSheetName());
       return;
     }
-    var maxThreads = Preferences.getMaxThreadsForSheet(sheetId);
+    var maxThreads = Preferences.Properties.get(Preferences.Names.maxThreads(sheetId));
     var counts = Gmail.syncWithGmail(sheetId, labelName, maxThreads);
     return 'Synced ' + counts + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
   }
@@ -133,7 +133,7 @@ Gmail.init = function() {
     if (!toLabelName) {
       throw new Error('No toLabelName');
     }
-    var currLabel = Label.getUserDefined(Preferences.getLabelNameForSheet(sheetId));
+    var currLabel = Label.getUserDefined(Preferences.Properties.get(Preferences.Names.labelNameForSheet(sheetId)));
     var threads = currLabel.getThreads();
     var newLabel = GmailApp.createLabel(toLabelName);
     newLabel.addToThreads(threads)
