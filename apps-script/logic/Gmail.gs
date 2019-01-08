@@ -85,13 +85,14 @@ Gmail.init = function() {
         }
       } else {
         Log.fine('Already in sheet: ' + subject);
-      }
-      var removeRow = GmailActions.processActions(
-        row.getValue(TrackingSheet.COLUMNS.ACTION), thread, row, subject, label, noTrackLabel);
-      if (removeRow) {
-        threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
-      } else {
-        numThreads++;
+        var actionsResult = GmailActions.processActions(
+            row.getValue(TrackingSheet.COLUMNS.ACTION), thread, row, subject, label, noTrackLabel);
+        if (actionsResult.getShouldRemove()) {
+          threadIdsToRemove.push(row.getValue(TrackingSheet.COLUMNS.THREAD_ID));
+        } else {
+          numThreads++;
+        }
+        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, actionsResult.getScriptNotes());
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
       row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());

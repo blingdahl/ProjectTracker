@@ -13,6 +13,27 @@ GmailActions.ACTIONS_ARCHIVED = ['Completed',
                                  'Mute',
                                  'Inbox'];
 
+GmailActions.Result = function() {
+  this.scriptNotes = [];
+  this.shouldRemove = false;
+}
+
+GmailActions.Result.prototype.addScriptNote = function(newNote) {
+  this.scriptNotes.push(newNote);
+}
+
+GmailActions.Result.prototype.getScriptNotes = function() {
+  return this.scriptNotes.join('; ');
+}
+
+GmailActions.Result.prototype.removeRow = function() {
+  this.shouldRemove = true;
+}
+
+GmailActions.Result.prototype.getShouldRemove = function() {
+  return this.shouldRemove;
+}
+
 GmailActions.init = function() {
   if (GmailActions.initialized) {
     return;
@@ -36,12 +57,12 @@ GmailActions.init = function() {
     }
   }
   
-  GmailActions.inbox = function(thread, row, subject) {
+  GmailActions.inbox = function(result, thread, row, subject) {
     if (!thread.isInInbox()) {
       Log.info('Moving to inbox: ' + subject);
       thread.moveToInbox();
       row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-      row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Moved to inbox');
+      result.addScriptNote('Moved to inbox');
     } else {
       Log.fine('Already in inbox: ' + subject);
     }
@@ -73,12 +94,13 @@ GmailActions.init = function() {
     threadLabels.forEach(function(threadLabel) {
       if (threadLabel.getName() === label.getName()) {
         thread.removeLabel(threadLabel);
-        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Removed label');
+        result.addScriptNote('Removed label');
         labelRemoved = true;
         Log.info('Removed label: ' + subject);
       }
     });
     if (!labelRemoved) {
+      result.addScriptNote('Label not there');
       row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Label not there');
       Log.info('Label not removed: ' + subject);
     }
@@ -86,7 +108,7 @@ GmailActions.init = function() {
   
   GmailActions.markCompleted = function(thread, row, subject, noTrackLabel) {
     thread.addLabel(noTrackLabel);
-    row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Stopped Tracking');
+    result.addScriptNote('Stopped tracking');
     row.setValue(TrackingSheet.COLUMNS.ACTION, '');
     Log.info('Stopped tracking: ' + subject);
   }
@@ -94,7 +116,7 @@ GmailActions.init = function() {
   GmailActions.changeLabel = function(thread, row, subject, existingLabel, newLabel) {
     thread.addLabel(newLabel);
     thread.removeLabel(existingLabel);
-    row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Changed label');
+    result.addScriptNote('Changed label');
     row.setValue(TrackingSheet.COLUMNS.ACTION, '');
     Log.info('Changed label to ' + newLabel.getName() + ': ' + subject);
   }
@@ -112,7 +134,7 @@ GmailActions.init = function() {
   
   GmailActions.processActions = function(actionsStr, thread, row, subject, label, noTrackLabel) {
     var actions = actionsStr.split(',');
-    var shouldRemove = false;
+    var result = new GmailActions.Result();
     for (var actionIndex = 0; actionIndex < actions.length; actionIndex++) {
       var action = actions[actionIndex];
       if (action === '') {
@@ -122,12 +144,12 @@ GmailActions.init = function() {
       if (action === 'archive') {
         GmailActions.archive(thread, row, subject);
       } else if (action === 'Completed') {
-        shouldRemove = true;
+        result.removeRow();
         GmailActions.markCompleted(thread, row, subject, noTrackLabel);
       } else if (action === 'Mute') {
         GmailActions.mute(thread, row, subject);
       } else if (action === 'Unlabel') {
-        shouldRemove = true;
+        result.removeRow();
         GmailActions.removeLabel(thread, row, label, subject);
       } else if (action === 'Inbox') {
         GmailActions.inbox(thread, row, subject);
@@ -137,15 +159,16 @@ GmailActions.init = function() {
           var newLabel = Label.getUserDefined(newLabelName);
           if (newLabel) {
             GmailActions.changeLabel(thread, row, subject, label, newLabel);
-            shouldRemove = true;
+            result.removeRow();
           } else {
-            row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Label: ' + newLabelName);
+            result.addScriptNote('Unknown Label: ' + newLabelName);
           }
         } else {
+            result.addScriptNote('Unknown Action: ' + action);
           row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Unknown Action: ' + action);
         }
       }
     }
-    return shouldRemove;
+    return result;
   }
 }
