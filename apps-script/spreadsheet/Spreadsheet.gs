@@ -163,10 +163,11 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.getRow = function(rowOffset, opt_isNew) {
-    return this.createRowObject(this.getNativeRow_(rowOffset),
-                                this.columns,
-                                this.cache.getRowCache(rowOffset),
-                                opt_isNew);
+    var row = this.createRowObject(this.getNativeRow_(rowOffset),
+                                   this.columns,
+                                   this.cache.getRowCache(rowOffset),
+                                   opt_isNew);
+    return row;
   }
   
   Spreadsheet.Sheet.prototype.getDataRow = function(rowOffset, opt_isNew) {
@@ -210,15 +211,22 @@ Spreadsheet.init = function() {
     return this;
   };
   
-  Spreadsheet.Sheet.prototype.getActiveRows = function() {
-    var activeRange = SpreadsheetApp.getActiveRange();
+  Spreadsheet.Sheet.prototype.getRowsForRange = function(range) {
     var rows = [];
-    for (var rowOffset = activeRange.getRowIndex(); rowOffset < activeRange.getRowIndex() + activeRange.getNumRows(); rowOffset++) {
-      var row = this.getRow(rowOffset);
+    for (var rowNumber = range.getRow(); rowNumber < range.getRow() + range.getNumRows(); rowNumber++) {
+      var row = this.getRow(rowNumber - 1);
       rows.push(row);
     }
     return rows;
+  }
+  
+  Spreadsheet.Sheet.prototype.getActiveRows = function() {
+    return this.getRowsForRange(SpreadsheetApp.getActiveRange());
   };
+  
+  Spreadsheet.Sheet.prototype.getRowsForA1Notation = function(a1Notation) {
+    return this.getRowsForRange(this.nativeSheet.getRange(a1Notation));
+  }
   
   Spreadsheet.Sheet.prototype.toString = function() {
     return 'Spreadsheet.Sheet';
@@ -378,16 +386,30 @@ Spreadsheet.init = function() {
     return this.nativeRow.offset(0, this.columns.getColumnOffset(columnHeader), 1, 1);
   };
   
-  Spreadsheet.Row.prototype.getA1Notation = function(columnHeader) {
-    return this.getCell_(columnHeader).getA1Notation();
+  Spreadsheet.Row.prototype.getA1Notation = function(opt_columnHeader) {
+    if (opt_columnHeader) {
+      return this.getCell_(opt_columnHeader).getA1Notation();
+    } else {
+      return this.nativeRow.getA1Notation();
+    }
   };
   
   Spreadsheet.Row.prototype.clearCache = function(columnHeader) {
     return this.rowCache.clear();
   };
-  
-  Spreadsheet.Row.prototype.getValue = function(columnHeader) {
-    return this.rowCache.getValue(this.columns.getColumnOffset(columnHeader));
+  Spreadsheet.Row.prototype.getValue = function(columnHeader, opt_includeMerged) {
+    var ret = this.rowCache.getValue(this.columns.getColumnOffset(columnHeader));
+    if (ret) {
+      return ret;
+    }
+    if (opt_includeMerged) {
+      // TODO(lindahl) Only include merged for columns that are merged
+      var mergedRows = this.getMergedRows();
+      for (var i = 0; i < mergedRows.length && !ret; i++) {
+        return mergedRows[i].getValue(columnHeader);
+      }
+    }
+    return null;
   };
   
   Spreadsheet.Row.prototype.getBooleanValue = function(columnHeader) {
@@ -409,6 +431,22 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Row.prototype.getRowOffset = function() {
     return this.getRowNumber() - 1;
+  };
+  
+  Spreadsheet.Row.prototype.getMergedRows = function() {
+    var mergedRanges = this.nativeRow.getMergedRanges();
+    var mergedRowIndicesSet = {};
+    for (var i = 0; i < mergedRanges.length; i++) {
+      mergedRowIndicesSet[mergedRanges[i].getRow() - 1] = true;
+    }
+    var mergedRows = [];
+    var mergedRowIndices = Object.keys(mergedRowIndicesSet);
+    for (var i = 0; i < mergedRowIndices.length; i++) {
+      var rowIndex = parseInt(mergedRowIndices[i]);
+      var mergedRow = this.sheet.getRow(rowIndex);
+      mergedRows.push(mergedRow);
+    }
+    return mergedRows;
   };
   
   Spreadsheet.Row.prototype.split = function(mergedColumns) {

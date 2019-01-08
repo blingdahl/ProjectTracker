@@ -10,12 +10,30 @@ if (typeof String.prototype.includes != 'function') {
   };
 };
 
+function typeOf(value) {
+  var s = typeof value;
+  if (s === 'object') {
+    if (value) {
+      if (value instanceof Array) {
+        s = 'array';
+      }
+    } else {
+      s = 'null';
+    }
+  }
+  return s;
+}
+
 function indexMap(arr, fn) {
   var ret = {};
   for (var i = 0; i < arr.length; i++) {
     var e = arr[i];
     var key = fn(e);
-    ret[key] = e;
+    if (typeOf(key) == 'array') {
+      key.forEach(function(k) { ret[k] = e; });
+    } else {
+      ret[key] = e;
+    }
   }
   return ret;
 }
