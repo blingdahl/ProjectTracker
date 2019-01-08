@@ -409,7 +409,7 @@ Spreadsheet.init = function() {
         return mergedRows[i].getValue(columnHeader);
       }
     }
-    return null;
+    return '';
   };
   
   Spreadsheet.Row.prototype.getBooleanValue = function(columnHeader) {
