@@ -11,12 +11,8 @@ class SheetController {
     return this.jq.find('.track');
   }
   
-  getSyncWithGmailElement() {
-    return this.jq.find('.syncWithGmail');
-  }
-  
-  getOrganizeElement() {
-    return this.jq.find('.organize');
+  getUpdateElement() {
+    return this.jq.find('.update');
   }
   
   getAddUrlElement() {
@@ -151,8 +147,7 @@ class SheetController {
   
   addListeners() {
     this.labelPicker.addListeners();
-    this.getSyncWithGmailElement().click(this.syncWithGmail.bind(this));
-    this.getOrganizeElement().click(this.organize.bind(this));
+    this.getUpdateElement().click(this.doYourThing.bind(this));
     this.getAddUrlElement().click(this.addUrl.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
     this.getSearchElement().click(this.search.bind(this));
