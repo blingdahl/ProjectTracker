@@ -46,7 +46,7 @@ GmailActions.init = function() {
   
   GmailActions.initialized = true;
   
-  GmailActions.archive = function(thread, row, subject) {
+  GmailActions.archive = function(result, thread, row, subject) {
     if (thread.isInInbox()) {
       Log.info('Archiving: ' + subject);
       thread.moveToArchive();
@@ -67,7 +67,7 @@ GmailActions.init = function() {
     }
   }
   
-  GmailActions.mute = function(thread, row, subject) {
+  GmailActions.mute = function(result, thread, row, subject) {
     if (thread.isInInbox()) {
       Log.info('Archiving (mute): ' + subject);
       thread.moveToArchive();
@@ -76,7 +76,7 @@ GmailActions.init = function() {
     }
   }
   
-  GmailActions.hasLabel = function(thread, row, label, subject) {
+  GmailActions.hasLabel = function(result, thread, row, label, subject) {
     var threadLabels = thread.getLabels();
     var hasLabel = false;
     threadLabels.forEach(function(threadLabel) {
@@ -87,7 +87,7 @@ GmailActions.init = function() {
     return hasLabel;
   }
   
-  GmailActions.removeLabel = function(thread, row, label, subject) {
+  GmailActions.removeLabel = function(result, thread, row, label, subject) {
     var threadLabels = thread.getLabels();
     var labelRemoved = false;
     threadLabels.forEach(function(threadLabel) {
@@ -105,14 +105,14 @@ GmailActions.init = function() {
     }
   }
   
-  GmailActions.markCompleted = function(thread, row, subject, noTrackLabel) {
+  GmailActions.markCompleted = function(result, thread, row, subject, noTrackLabel) {
     thread.addLabel(noTrackLabel);
     result.addScriptNote('Stopped tracking');
     row.setValue(TrackingSheet.COLUMNS.ACTION, '');
     Log.info('Stopped tracking: ' + subject);
   }
   
-  GmailActions.changeLabel = function(thread, row, subject, existingLabel, newLabel) {
+  GmailActions.changeLabel = function(result, thread, row, subject, existingLabel, newLabel) {
     thread.addLabel(newLabel);
     thread.removeLabel(existingLabel);
     result.addScriptNote('Changed label');
@@ -141,23 +141,23 @@ GmailActions.init = function() {
       }
       Log.info('Action: ' + action);
       if (action === 'archive') {
-        GmailActions.archive(thread, row, subject);
+        GmailActions.archive(result, thread, row, subject);
       } else if (action === 'Completed') {
         result.removeRow();
-        GmailActions.markCompleted(thread, row, subject, noTrackLabel);
+        GmailActions.markCompleted(result, thread, row, subject, noTrackLabel);
       } else if (action === 'Mute') {
-        GmailActions.mute(thread, row, subject);
+        GmailActions.mute(result, thread, row, subject);
       } else if (action === 'Unlabel') {
         result.removeRow();
-        GmailActions.removeLabel(thread, row, label, subject);
+        GmailActions.removeLabel(result, thread, row, label, subject);
       } else if (action === 'Inbox') {
-        GmailActions.inbox(thread, row, subject);
+        GmailActions.inbox(result, thread, row, subject);
       } else if (action) {
         if (action.startsWith('Move to ')) {
           var newLabelName = action.substring('Move to '.length);
           var newLabel = Label.getUserDefined(newLabelName);
           if (newLabel) {
-            GmailActions.changeLabel(thread, row, subject, label, newLabel);
+            GmailActions.changeLabel(result, thread, row, subject, label, newLabel);
             result.removeRow();
           } else {
             result.addScriptNote('Unknown Label: ' + newLabelName);
