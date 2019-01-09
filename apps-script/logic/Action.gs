@@ -7,7 +7,7 @@ Action.init = function() {
   }
   
   TrackingSheet.init();
-  Log.info('Overview.init()');
+  Log.info('Action.init()');
   
   Action.initialized = true;
   
