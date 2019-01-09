@@ -22,6 +22,29 @@ class OverviewController {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_NEW').text(rowData[key]);
   }
   
+  static makePriorityElement(rowData, key) {
+    let priorityElement = $('<a />');
+    priorityElement.text(rowData['PRIORITY']);
+    priorityElement.click(() => {
+      priorityElement.hide();
+      let cell = priorityElement.parent();
+      console.log(cell);
+      let priorityDropdown = $('<select />');
+      for (var i = 0; i != OverviewController.PRIORITIES.length; i++) {
+        let priority = OverviewController.PRIORITIES[i];
+        priorityDropdown.append($('<option />').attr('value', priority).attr('selected', priorityElement.text() === priority).text(priority));
+      }
+      priorityDropdown.change(() => {
+        var newPriority = priorityDropdown.val();
+        SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority);
+        priorityDropdown.remove();
+        priorityElement.text(newPriority).show();
+      });
+      cell.append(priorityDropdown);
+    });
+    return priorityElement;
+  }
+  
   static handleOverviewData(priority, msg) {
     let data = JSON.parse(msg);
     let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
@@ -30,7 +53,7 @@ class OverviewController {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
       overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
       overviewRow.find('.item').text(rowData['ITEM']);
-      overviewRow.find('.priority').text(rowData['PRIORITY']);
+      overviewRow.find('.priority').append(OverviewController.makePriorityElement(rowData));
       overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
       overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
       if (rowData['ACTION'] === 'Completed') {
@@ -43,10 +66,10 @@ class OverviewController {
       }
       overviewTable.append(overviewRow);
     });
-    let nextPriority = {'P0': 'P1', 'P1': 'P2', 'P2': 'P3', 'P3': 'P4'}[priority];
+    let nextPriority = OverviewController.getNextPriority(priority);
     let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
     $('.overviewPlaceholder').find('.priorityLoading').hide();
-    if (nextPriority) {
+    if (nextPriority !== '') {
       loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(nextPriority)).show();
     }
   }
@@ -102,6 +125,30 @@ class OverviewController {
     $('.overviewPlaceholder').empty();
     OverviewController.updateButtons(false);
   }
+  
+  static getNextPriority(priority) {
+    let useNext = false;
+    let done = false;
+    let ret = null;
+    // DO NOT SUBMIT
+    OverviewController.PRIORITIES.forEach(p => {
+      console.log(p);
+      if (done) {
+        console.log('done');
+        return;
+      }
+      if (useNext) {
+        console.log('useNext == true');
+        ret = p;
+      } else {
+        if (p === priority) {
+          console.log('useNext = true');
+          useNext = true;
+        }
+      }
+    });
+    return ret;
+  }
 
   static addListeners() {
     OverviewController.getShowOverviewElement().click(OverviewController.showOverview);
@@ -118,3 +165,5 @@ class OverviewController {
     });
   }
 }
+
+OverviewController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Waiting', ''];

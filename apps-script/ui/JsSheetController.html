@@ -74,6 +74,13 @@ class SheetController {
         callRpc();
   }
   
+  setPriority(uuid, priority) {
+    return new RpcConfig(runner => runner.Priority_setPriority(GlobalController.getSpreadsheetUrl(), this.getSheetId(), uuid, priority)).
+        output('Setting priority to ' + priority + '...').
+        retryOnTimeout().
+        callRpc();
+  }
+  
   // SECTION:
   // Click handlers
 

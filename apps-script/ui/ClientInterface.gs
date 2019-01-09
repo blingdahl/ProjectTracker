@@ -34,6 +34,14 @@ function Action_setAction(spreadsheetUrl, sheetId, uuid, action) {
   return ret;
 }
 
+function Priority_setPriority(spreadsheetUrl, sheetId, uuid, priority) {
+  Log.start('Priority_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
+  Priority.init();
+  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
+  var ret = Priority.setPriority(sheetId, uuid, priority);
+  Log.stop('Priority_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
+  return ret;
+}
 
 function AddUrl_addUrl(spreadsheetUrl, sheetId, url) {
   Log.start('AddUrl_addUrl', [spreadsheetUrl, sheetId, url]);
