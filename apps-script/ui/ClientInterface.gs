@@ -25,21 +25,21 @@ function Preferences_setTrackedForSheet(spreadsheetUrl, sheetId, tracked) {
   return tracked ? 'Added tracking' : 'Removed tracking';
 }
 
-function Action_setAction(spreadsheetUrl, sheetId, uuid, action) {
-  Log.start('Action_setAction', [spreadsheetUrl, sheetId, uuid, action]);
-  Action.init();
+function ChangeRowValue_setAction(spreadsheetUrl, sheetId, uuid, action) {
+  Log.start('ChangeRowValue_setAction', [spreadsheetUrl, sheetId, uuid, action]);
+  ChangeRowValue.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Action.setAction(sheetId, uuid, action);
-  Log.stop('Action_setAction', [spreadsheetUrl, sheetId, uuid, action]);
+  var ret = ChangeRowValue.setAction(sheetId, uuid, action);
+  Log.stop('ChangeRowValue_setAction', [spreadsheetUrl, sheetId, uuid, action]);
   return ret;
 }
 
-function Priority_setPriority(spreadsheetUrl, sheetId, uuid, priority) {
-  Log.start('Priority_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
-  Priority.init();
+function ChangeRowValue_setPriority(spreadsheetUrl, sheetId, uuid, priority) {
+  Log.start('ChangeRowValue_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
+  ChangeRowValue.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Priority.setPriority(sheetId, uuid, priority);
-  Log.stop('Priority_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
+  var ret = ChangeRowValue.setPriority(sheetId, uuid, priority);
+  Log.stop('ChangeRowValue_setPriority', [spreadsheetUrl, sheetId, uuid, priority]);
   return ret;
 }
 
