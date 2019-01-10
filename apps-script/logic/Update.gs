@@ -25,6 +25,11 @@ Update.init = function() {
     var syncResult = GmailSync.syncFromGmail(trackingSheet);
     var threadsById = {};
     var uuidsToRemove = [];
+    var countPerPriority = {};
+    for (var i = 0; i < TrackingSheet.PRIORITIES.length; i++) {
+      countPerPriority[TrackingSheet.PRIORITIES[i]] = 0;
+    }
+    countPerPriority[''] = 0;
     var dataRows = trackingSheet.getDataRows();
     for (var i = 0; i < dataRows.length; i++) {
       var dataRow = dataRows[i];
@@ -36,8 +41,6 @@ Update.init = function() {
       var threadId = dataRow.getValue(TrackingSheet.COLUMNS.THREAD_ID);
       if (threadId) {
         thread = syncResult.getThreadForThreadId(threadId);
-      } else {
-        
       }
       if (!dataRow.getValue(TrackingSheet.COLUMNS.UUID)) {
         dataRow.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
@@ -53,6 +56,8 @@ Update.init = function() {
       }
       if (actionsResult.getShouldRemove()) {
         uuidsToRemove.push(dataRow.getValue(TrackingSheet.COLUMNS.UUID));
+      } else {
+        countPerPriority[dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
       }
       dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, actionsResult.getScriptNotes());
     }
@@ -62,10 +67,17 @@ Update.init = function() {
     }
     trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
     taskSync.syncToTasks(trackingSheet);
-    if (syncResult.synced) {
-      return 'Synced ' + syncResult.numThreadsInSheet + '/' + syncResult.totalThreads + ' for ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' sheet';
-    } else {
-      return 'Updated';
+    var response = '';
+    var priorityStrings = [];
+    for (var priority in countPerPriority) {
+      if (countPerPriority[priority] !== 0) {
+        priorityStrings.push(countPerPriority[priority] + ' ' + (priority || 'unprioritized'));
+      }
     }
+    response += 'Updated ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' (' + priorityStrings.join(', ') + ')';
+    if (syncResult.synced) {
+      response += ': Synced ' + syncResult.numThreadsInSheet + '/' + syncResult.totalThreads;
+    }
+    return response;
   }
 }
