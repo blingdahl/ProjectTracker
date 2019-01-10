@@ -86,6 +86,15 @@ GmailSync.init = function() {
           row.setValue(TrackingSheet.COLUMNS.LINK, linkFormula);
         }
       }
+      if (thread.isInInbox()) {
+        var currPriority = row.getValue(TrackingSheet.COLUMNS.PRIORITY);
+        if (currPriority != 'P0' && currPriority != 'P1' && currPriority != '') {
+          thread.moveToArchive();
+          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Muted');
+        } else {
+          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Did not archive: ' + currPriority);
+        }
+      }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');
       row.setValue(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, thread.getLastMessageDate());
     }

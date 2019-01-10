@@ -16,15 +16,25 @@ Actions.init = function() {
                                     'Archive',
                                     'Unlabel',
                                     'Archive,Completed',
-                                     'Archive,Unlabel',
-                                    'Mute'];
+                                    'Archive,Unlabel'];
   
   Actions.GMAIL_ACTIONS_ARCHIVED = ['Completed',
+                                    'Obsolete',
                                     'Unlabel',
-                                    'Mute',
                                     'Inbox'];
   
-  Actions.NON_GMAIL_ACTIONS = ['Completed'];
+  Actions.NON_GMAIL_ACTIONS = ['Completed', 'Obsolete'];
+  
+  Actions.getGmailActions = function(otherLabelNames, thread) {
+    var actions = [];
+    if (thread.isInInbox()) {
+      actions = actions.concat(Actions.GMAIL_ACTIONS_IN_INBOX);
+    } else {
+      actions = actions.concat(Actions.GMAIL_ACTIONS_ARCHIVED);
+    }
+    otherLabelNames.forEach(function(otherLabelName) { actions.push('Move to ' + otherLabelName); });
+    return actions;
+  }
   
   Actions.Result = function() {
     this.scriptNotes = [];
@@ -72,12 +82,6 @@ Actions.init = function() {
     }
   }
   
-  Actions.mute = function(result, thread, row) {
-    if (thread.isInInbox()) {
-      thread.moveToArchive();
-    }
-  }
-  
   Actions.removeLabel = function(result, thread, row, label) {
     var threadLabels = thread.getLabels();
     var labelRemoved = false;
@@ -100,25 +104,27 @@ Actions.init = function() {
     } else {
       result.addScriptNote('Marked completed');
     }
-    row.setValue(TrackingSheet.COLUMNS.ACTION, '');
+    result.clearAction();
+    result.removeRow();
+  }
+  
+  Actions.markObsolete = function(result, thread, row) {
+    if (thread) {
+      thread.addLabel(GmailLabel.NO_TRACK);
+      result.addScriptNote('Stopped tracking');
+    } else {
+      result.addScriptNote('Marked obsolete');
+    }
+    result.clearAction();
+    result.removeRow();
   }
   
   Actions.changeLabel = function(result, thread, row, existingLabel, newLabel) {
     thread.addLabel(newLabel);
     thread.removeLabel(existingLabel);
     result.addScriptNote('Changed label');
-    row.setValue(TrackingSheet.COLUMNS.ACTION, '');
-  }
-  
-  Actions.getGmailActions = function(otherLabelNames, thread) {
-    var actions = [];
-    if (thread.isInInbox()) {
-      actions = actions.concat(Actions.ACTIONS_IN_INBOX);
-    } else {
-      actions = actions.concat(Actions.ACTIONS_ARCHIVED);
-    }
-    otherLabelNames.forEach(function(otherLabelName) { actions.push('Move to ' + otherLabelName); });
-    return actions;
+    result.clearAction();
+    result.removeRow();
   }
   
   Actions.processActions = function(actionsStr, thread, row, label) {
@@ -135,8 +141,9 @@ Actions.init = function() {
       } else if (action === 'Completed') {
         result.removeRow();
         Actions.markCompleted(result, thread, row);
-      } else if (action === 'Mute') {
-        Actions.mute(result, thread, row);
+      } else if (action === 'Obsolete') {
+        result.removeRow();
+        Actions.markCompleted(result, thread, row);
       } else if (action === 'Unlabel') {
         result.removeRow();
         Actions.removeLabel(result, thread, row, label);

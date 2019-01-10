@@ -17,8 +17,16 @@ Update.init = function() {
   
   Update.EXTRA_ROWS = 10;
   
+  Update.clearScriptNotes = function(trackingSheet) {
+    var dataRows = trackingSheet.getDataRows();
+    for (var i = 0; i < dataRows.length; i++) {
+      dataRows[i].setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, '');
+    }
+  }
+  
   Update.update = function(sheetId) {
     var trackingSheet = TrackingSheet.forSheetId(sheetId);
+    Update.clearScriptNotes(trackingSheet);
     var taskSync = TaskSync.forTrackingSheet(trackingSheet);
     taskSync.copyCompleted();
     trackingSheet.setNumBlankRows(Update.EXTRA_ROWS);
@@ -59,7 +67,9 @@ Update.init = function() {
       } else {
         countPerPriority[dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
       }
-      dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, actionsResult.getScriptNotes());
+      if (actionsResult.hasScriptNotes()) {
+        dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, actionsResult.getScriptNotes());
+      }
     }
     for (var i = 0; i < uuidsToRemove.length; i++) {
       Log.info('Removing thread ' + uuidsToRemove[i]);
