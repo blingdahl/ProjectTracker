@@ -14,6 +14,14 @@ class OverviewController {
   static getHideOverviewElement() {
     return $('.hideOverview');
   }
+  
+  static getPlaceholderElement() {
+    return $('.overviewPlaceholder');
+  }
+  
+  static getTemplateElement() {
+    return $('.overviewTemplate');
+  }
 
   // SECTION:
   // Click handlers
@@ -108,11 +116,12 @@ class OverviewController {
   static showOverview() {
     OverviewController.hideOverview(false);
     google.script.history.push(null, null, 'overview');
-    let overviewTemplate = $('.overviewTemplate');
+    let overviewTemplate = OverviewController.getTemplateElement();
     let overview = overviewTemplate.clone().removeClass('overviewTemplate');
     overview.find('.overviewRowTemplate').remove();
-    $('.overviewPlaceholder').append(overview.show());
-    $('.overviewPlaceholder').find('table').hide();
+    OverviewController.getPlaceholderElement().append(overview.show());
+    OverviewController.getPlaceholderElement().find('table').hide();
+    OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
     OverviewController.loadPriority('P0');
   }

@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<div class="message"></div>
-<div class="error"></div>
+<button class="clearCompleted">Clear completed</button>
 <div class="rpcMessages"></div>
-<a class="clearCompleted">Clear completed</a>
 <div class="controls">
   <div class="global" style="display: none" data-spreadsheet-url="<?= spreadsheetUrl ?>"></div>
   <table>
@@ -33,13 +31,13 @@
         </div>
       </td>
       <td>
-        <a class="update">Update</a>
+        <button class="update">Update</button>
       </td>
       <td>
-        <a class="addUrl">Add URL</a>
+        <button class="addUrl">Add URL</button>
       </td>
       <td>
-        <a class="search labelOnly">Search</a>
+        <button class="search labelOnly">Search</button>
       </td>
     </tr>
     <?
@@ -84,6 +82,7 @@
   </script>
   
   <div class="overviewTemplate" style="display: none">
+    <div class="loadTime"></div>
     <table class="overviewTable">
       <tr>
         <th>Sheet</th>
