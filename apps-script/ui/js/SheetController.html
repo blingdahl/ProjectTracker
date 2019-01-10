@@ -84,29 +84,11 @@ class SheetController {
   // SECTION:
   // Click handlers
 
-  organize() {
-    return new RpcConfig(runner => runner.Organize_organize(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
-        output('Organizing ' + this.getSheetName() + ' sheet...').
+  update() {
+    return new RpcConfig(runner => runner.Update_update(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
+        output('Updating ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc();
-  }
-
-  syncWithGmail() {
-    if (!this.labelPicker.getLabelName()) {
-      return Promise.resolve();
-    }
-    return new RpcConfig(runner => runner.Gmail_syncSheetWithGmail(GlobalController.getSpreadsheetUrl(), this.getSheetId())).
-        output('Syncing ' + this.getSheetName() + ' sheet with ' + this.labelPicker.getLabelName() + ' label...').
-        retryOnTimeout().
-        callRpc();
-  }
-
-  doYourThing() {
-    if (this.labelPicker.getLabelName()) {
-      return this.syncWithGmail();
-    } else {
-      return this.organize();
-    }
   }
 
   addUrl() {
@@ -137,9 +119,9 @@ class SheetController {
     window.open('https://mail.google.com/mail/u/0/#search/' + this.getSearchQuery());
   }
   
-  static doYourThings() {
+  static updateAll() {
     let promises = [];
-    SheetController.getAll().forEach(sheetController => promises.push(sheetController.doYourThing()));
+    SheetController.getAll().forEach(sheetController => promises.push(sheetController.update()));
     return Promise.all(promises).then(() => OverviewController.updateOverview());
   }
   
@@ -154,14 +136,14 @@ class SheetController {
   
   addListeners() {
     this.labelPicker.addListeners();
-    this.getUpdateElement().click(this.doYourThing.bind(this));
+    this.getUpdateElement().click(this.update.bind(this));
     this.getAddUrlElement().click(this.addUrl.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
     this.getSearchElement().click(this.search.bind(this));
   }
   
   static addGlobalListeners() {
-    SheetController.getDoAllTheThingsElement().click(SheetController.doYourThings);
+    SheetController.getDoAllTheThingsElement().click(SheetController.updateAll);
     SheetController.getTidyAllElement().click(SheetController.tidyAll);
   }
   
