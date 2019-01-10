@@ -1,19 +1,17 @@
-var Label = {};
-Label.initialized = false;
+var GmailLabel = {};
+GmailLabel.initialized = false;
 
-Label.init = function() {
-  if (Label.initialized) {
+GmailLabel.init = function() {
+  if (GmailLabel.initialized) {
     return;
   }
   
-  Log.info('Label.init()');
   
   Preferences.init();
-  Label.initialized = true
+  Log.info('GmailLabel.init()');
+  GmailLabel.initialized = true
   
-  Label.NO_TRACK_LABEL_NAME = 'No-Track';
-  
-  Label.getUserDefined = function(labelName, createIfNonexistent) {
+  GmailLabel.getUserDefined = function(labelName, createIfNonexistent) {
     var label = GmailApp.getUserLabelByName(labelName);
     if (!label && createIfNonexistent) {
       label = GmailApp.createLabel(labelName);
@@ -21,18 +19,22 @@ Label.init = function() {
     return label;
   }
   
-  Label.searchTerm = function(labelName) {
+  GmailLabel.MAKE_P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P0', true);
+  GmailLabel.MAKE_P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P1', true);
+  GmailLabel.NO_TRACK = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('No-Track', true);
+  
+  GmailLabel.searchTerm = function(labelName) {
     return 'label:' + labelName.replace(' ', '-');
   };
   
-  Label.searchQuery = function(labelName) {
+  GmailLabel.searchQuery = function(labelName) {
     if (!labelName) {
       return null;
     }
-    return Label.searchTerm(labelName) + ' -' + Label.searchTerm(Label.NO_TRACK_LABEL_NAME);
+    return GmailLabel.searchTerm(labelName) + ' -' + GmailLabel.searchTerm(GmailLabel.NO_TRACK.getName());
   }
   
-  Label.getAllLabelNames = function() {
+  GmailLabel.getAllLabelNames = function() {
     var ret = [];
     var labels = GmailApp.getUserLabels(); 
     for (var i = 0; i < labels.length; i++) {
@@ -42,7 +44,7 @@ Label.init = function() {
     return ret;
   };
   
-  Label.getSheetLabelNames = function() {
+  GmailLabel.getSheetLabelNames = function() {
     var ret = [];
     Spreadsheet.getSpreadsheet().getNativeSheets().forEach(function(sheet) {
       var sheetId = sheet.getSheetId();
@@ -55,7 +57,7 @@ Label.init = function() {
     return ret;
   };
   
-  Label.hasLabel = function(thread, row, label, subject) {
+  GmailLabel.hasLabel = function(thread, row, label, subject) {
     var threadLabels = thread.getLabels();
     var hasLabel = false;
     threadLabels.forEach(function(threadLabel) {

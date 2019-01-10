@@ -7,7 +7,7 @@ SheetInfo.init = function() {
   }
   
   Preferences.init();
-  Label.init();
+  GmailLabel.init();
   Log.info('SheetInfo.init()');
   
   SheetInfo.initialized = true;
@@ -21,7 +21,7 @@ SheetInfo.init = function() {
                'labelName': labelName,
                'isTracked': Preferences.Properties.get(Preferences.Names.tracked(sheetId)),
                'maxThreads': Preferences.Properties.get(Preferences.Names.maxThreads(sheetId)),
-               'searchQuery': Label.searchQuery(labelName)};
+               'searchQuery': GmailLabel.searchQuery(labelName)};
     Log.stop('getInfoForSheet', [sheetId]);
     return ret;
   }

@@ -52,37 +52,20 @@ function AddUrl_addUrl(spreadsheetUrl, sheetId, url) {
   return ret;
 }
 
-function Gmail_syncSheetWithGmail(spreadsheetUrl, sheetId) {
-  Log.start('Gmail_syncSheetWithGmail', [spreadsheetUrl, sheetId]);
-  Gmail.init();
+function Update_update(spreadsheetUrl, sheetId) {
+  Log.start('Update_update', [spreadsheetUrl, sheetId]);
+  Update.init();
   Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Gmail.syncSheet(sheetId);
-  Log.stop('Gmail_syncSheetWithGmail', [spreadsheetUrl, sheetId]);
+  var ret = Update.update(sheetId);
+  Log.stop('Update_update', [spreadsheetUrl, sheetId]);
   return ret;
-}
-
-function Gmail_renameLabel(spreadsheetUrl, sheetId, toLabelName) {
-  Log.start('Gmail_renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
-  Gmail.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  Gmail.renameLabel(sheetId, toLabelName);
-  Log.stop('Gmail_renameLabel', [spreadsheetUrl, sheetId, toLabelName]);
 }
 
 function Label_getAllLabels() {
   Log.start('Label_getAllLabels', []);
-  Label.init();
+  GmailLabel.init();
   var ret = JSON.stringify(Label.getAllLabelNames());
   Log.stop('Label_getAllLabels', []);
-  return ret;
-}
-
-function Organize_organize(spreadsheetUrl, sheetId) {
-  Log.start('Organize_organize', [spreadsheetUrl, sheetId]);
-  Organize.init();
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  var ret = Organize.organize(sheetId);
-  Log.stop('Organize_organize', [spreadsheetUrl, sheetId]);
   return ret;
 }
 
