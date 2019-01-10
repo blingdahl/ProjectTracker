@@ -28,7 +28,6 @@ class OverviewController {
     priorityElement.click(() => {
       priorityElement.hide();
       let cell = priorityElement.parent();
-      console.log(cell);
       let priorityDropdown = $('<select />');
       for (var i = 0; i != OverviewController.PRIORITIES.length; i++) {
         let priority = OverviewController.PRIORITIES[i];
@@ -69,7 +68,7 @@ class OverviewController {
     let nextPriority = OverviewController.getNextPriority(priority);
     let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
     $('.overviewPlaceholder').find('.priorityLoading').hide();
-    if (nextPriority !== '') {
+    if (nextPriority !== null) {
       loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(nextPriority)).show();
     }
   }
@@ -128,21 +127,15 @@ class OverviewController {
   
   static getNextPriority(priority) {
     let useNext = false;
-    let done = false;
     let ret = null;
-    // DO NOT SUBMIT
     OverviewController.PRIORITIES.forEach(p => {
-      console.log(p);
-      if (done) {
-        console.log('done');
+      if (ret) {
         return;
       }
       if (useNext) {
-        console.log('useNext == true');
         ret = p;
       } else {
         if (p === priority) {
-          console.log('useNext = true');
           useNext = true;
         }
       }
