@@ -74,7 +74,7 @@ Update.init = function() {
         priorityStrings.push(countPerPriority[priority] + ' ' + (priority || 'unprioritized'));
       }
     }
-    response += 'Updated ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' (' + priorityStrings.join(', ') + ')';
+    response += 'Updated ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' (' + priorityStrings.join(', ') + ', ' + uuidsToRemove.length + ' removed)';
     if (syncResult.synced) {
       response += ': Synced ' + syncResult.numThreadsInSheet + '/' + syncResult.totalThreads;
     }
