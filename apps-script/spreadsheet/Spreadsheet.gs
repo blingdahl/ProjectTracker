@@ -8,7 +8,6 @@ Spreadsheet.init = function() {
   
   Cache.init();
   Spreadsheet.initialized = true;
-  
   Log.info('Spreadsheet.init()');
   
   Spreadsheet.ColumnDefinition = function(key, header) {
@@ -188,7 +187,11 @@ Spreadsheet.init = function() {
   }
   
   Spreadsheet.Sheet.prototype.getLastDataRowNumber = function() {
-    return this.getDataRows().splice(-1)[0].getRowNumber();
+    var lastRow = this.getDataRows().splice(-1)[0];
+    if (lastRow) {
+      return lastRow.getRowNumber();
+    } 
+    return 0;
   }
   
   Spreadsheet.Sheet.prototype.resizeColumnToFit = function(columnHeader) {
@@ -382,6 +385,13 @@ Spreadsheet.init = function() {
     cell.setDataValidation(SpreadsheetApp.newDataValidation().setAllowInvalid(false).requireValueInList(options).build());
   };
   
+  Spreadsheet.Row.prototype.removeDataValidation = function(columnHeader, options) {
+    // Don't need to mark dirty, didn't change the data
+    var cell = this.getCell_(columnHeader);
+    // cell = SpreadsheetApp.getActiveRange()
+    cell.clearDataValidations();
+  };
+  
   Spreadsheet.Row.prototype.getCell_ = function(columnHeader) {
     return this.nativeRow.offset(0, this.columns.getColumnOffset(columnHeader), 1, 1);
   };
@@ -511,7 +521,7 @@ Spreadsheet.init = function() {
   Spreadsheet.setSpreadsheetUrl = function(spreadsheetUrl) {
     Spreadsheet.SPREADSHEET_URL = spreadsheetUrl;
   }
-    
+
   Spreadsheet.getSpreadsheetUrl = function(opt_spreadsheetUrl) {
     var spreadsheetUrl = opt_spreadsheetUrl || Spreadsheet.SPREADSHEET_URL;
     if (!spreadsheetUrl && SpreadsheetApp.getActive()) {

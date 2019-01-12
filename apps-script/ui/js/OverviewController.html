@@ -27,7 +27,7 @@ class OverviewController {
   // Click handlers
   
   static makeLink(rowData, key) {
-    return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_NEW').text(rowData[key]);
+    return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
   }
   
   static makePriorityElement(rowData, key) {
@@ -52,8 +52,42 @@ class OverviewController {
     return priorityElement;
   }
   
+  static makeStatusElement(rowData, key) {
+    let statusElement = $('<a />');
+    statusElement.text(rowData['STATUS'] || 'No status');
+    statusElement.click(() => {
+      statusElement.hide();
+      let cell = statusElement.parent();
+      let statusDropdown = $('<select />');
+      statusDropdown.append($('<option />').attr('value', '').text('No status'));
+      for (var i = 0; i != OverviewController.STATUSES.length; i++) {
+        let status = OverviewController.STATUSES[i];
+        statusDropdown.append($('<option />').attr('value', status).attr('selected', statusElement.text() === status).text(status));
+      }
+      statusDropdown.change(() => {
+        var newStatus = statusDropdown.val();
+        SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus);
+        statusDropdown.remove();
+        statusElement.text(newStatus).show();
+      });
+      cell.append(statusDropdown);
+    });
+    return statusElement;
+  }
+  
+  static statusIndex(row) {
+    var idx = OverviewController.STATUSES.indexOf(row['STATUS']);
+    if (idx == -1) {
+      idx = 20;
+    }
+    return idx;
+  }
+  
   static handleOverviewData(priority, msg) {
     let data = JSON.parse(msg);
+    data.sort(function(a, b) {
+      return OverviewController.statusIndex(a) - OverviewController.statusIndex(b);
+    });
     let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
     let overviewTable = $('.overviewPlaceholder').find('table').show();
     data.forEach(rowData => {
@@ -61,11 +95,11 @@ class OverviewController {
       overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
       overviewRow.find('.item').text(rowData['ITEM']);
       overviewRow.find('.priority').append(OverviewController.makePriorityElement(rowData));
+      overviewRow.find('.status').append(OverviewController.makeStatusElement(rowData));
       overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
       overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
-      if (rowData['ACTION'] === 'Completed') {
+      if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
         overviewRow.addClass('completed');
-        overviewRow.find('.action').text(rowData['ACTION']);
       } else {
         overviewRow.find('.markCompleted').show().click(() => SheetController.forSheet(rowData['SHEET_ID']).setAction(rowData['UUID'], 'Completed').then(() => {
             overviewRow.addClass('completed');
@@ -84,7 +118,7 @@ class OverviewController {
   static loadPriority(priority) {
     $('.overviewPlaceholder').find('.loadPriority').hide();
     $('.overviewPlaceholder').find('.priorityLoading').show();
-    new RpcConfig(runner => runner.Overview_getOverviewRows(GlobalController.getSpreadsheetUrl(), [priority])).
+    new RpcConfig(runner => runner.Overview_getOverviewRows([priority])).
         output('Loading ' + priority + '...').
         clearMessageOnSuccess().
         withSuccessFn(msg => OverviewController.handleOverviewData(priority, msg)).
@@ -168,4 +202,7 @@ class OverviewController {
   }
 }
 
-OverviewController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Waiting', ''];
+// TODO(lindahl) Get from server
+OverviewController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', ''];
+
+OverviewController.STATUSES = ['Completed', 'Obsolete', 'In Progress', 'On Deck', 'Waiting', 'Following', 'Backburner'];

@@ -38,6 +38,30 @@ GmailSync.init = function() {
     return this.threadsById[threadId];
   }
   
+  GmailSync.copyPriorityFromLabel = function(thread, row, priority) {
+    var label = GmailLabel['MAKE_' + priority.toUpperCase()];
+    if (GmailLabel.hasLabel(thread, label)) {
+      thread.removeLabel(label);
+      row.setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
+    }
+  }
+  
+  GmailSync.copyPriorityToLabel = function(thread, priority) {
+    TrackingSheet.PRIORITIES.forEach(function(currPriority) {
+      var currLabel = GmailLabel[currPriority.toUpperCase()];
+      Log.info(currPriority + ' vs ' + priority);
+      if (currPriority === priority) {
+        if (!GmailLabel.hasLabel(thread, currLabel)) {
+          thread.addLabel(currLabel);
+        }
+      } else {
+        if (GmailLabel.hasLabel(thread, currLabel)) {
+          thread.removeLabel(currLabel);
+        }
+      }
+    });
+  }
+  
   GmailSync.getOtherLabelNames = function(labelName) {
     var otherLabelNames = GmailLabel.getSheetLabelNames();
     for (var i = 0; i < otherLabelNames.length; i++) {
@@ -71,14 +95,16 @@ GmailSync.init = function() {
         row.setFormula(TrackingSheet.COLUMNS.EMAIL, Spreadsheet.hyperlinkFormula(thread.getPermalink(), 'Email'));
         row.setValue(TrackingSheet.COLUMNS.FROM, GmailExtractor.getFrom(thread));
       }
-      if (GmailLabel.hasLabel(thread, row, GmailLabel.MAKE_P0)) {
-        thread.removeLabel(GmailLabel.MAKE_P0);
-        row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P0');
-      } else if (GmailLabel.hasLabel(thread, row, GmailLabel.MAKE_P1)) {
-        thread.removeLabel(GmailLabel.MAKE_P1);
-        row.setValue(TrackingSheet.COLUMNS.PRIORITY, 'P1');
-      }
-      row.setDataValidation(TrackingSheet.COLUMNS.ACTION, Actions.getGmailActions(otherLabelNames, thread));
+      // End with highest priority because that is the one we want to keep around
+      GmailSync.copyPriorityFromLabel(thread, row, 'FOLLOWING');
+      GmailSync.copyPriorityFromLabel(thread, row, 'WAITING');
+      GmailSync.copyPriorityFromLabel(thread, row, 'P4');
+      GmailSync.copyPriorityFromLabel(thread, row, 'P3');
+      GmailSync.copyPriorityFromLabel(thread, row, 'P2');
+      GmailSync.copyPriorityFromLabel(thread, row, 'P1');
+      GmailSync.copyPriorityFromLabel(thread, row, 'P0');
+      GmailSync.copyPriorityToLabel(thread, row.getValue(TrackingSheet.COLUMNS.PRIORITY));
+      row.setDataValidation(TrackingSheet.COLUMNS.ACTION, ActionHandler.getGmailActions(otherLabelNames, thread));
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, thread.getFirstMessageSubject() || '(No Subject)');
       if (!row.getFormula(TrackingSheet.COLUMNS.LINK)) {
         var linkFormula = GmailLinkExtractor.extractLinkFormula(thread);
@@ -92,7 +118,7 @@ GmailSync.init = function() {
           thread.moveToArchive();
           row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Muted');
         } else {
-          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Did not archive: ' + currPriority);
+          row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, 'Did not archive: ' + (currPriority || 'No priority'));
         }
       }
       row.setValue(TrackingSheet.COLUMNS.INBOX, thread.isInInbox() ? 'Inbox' : 'Archived');

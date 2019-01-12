@@ -2,8 +2,7 @@ var TrackingSheet = {};
 TrackingSheet.initialized = false;
 
 
-TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', 'Following', 'Backburner', 'Waiting'];
-TrackingSheet.NON_GMAIL_ACTIONS = ['Completed'];
+TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4'];
 
 TrackingSheet.init = function() {
   if (TrackingSheet.initialized) {
@@ -14,11 +13,14 @@ TrackingSheet.init = function() {
   Preferences.init();
   Log.info('TrackingSheet.init()');
   TrackingSheet.initialized = true;
+  
+  Spreadsheet.setSpreadsheetUrl(Preferences.Properties.get(Preferences.Names.spreadsheetUrl()));
 
   TrackingSheet.COLUMNS = new Spreadsheet.ColumnDefinitions()
       .addColumn('ITEM', 'Item')
       .addColumn('PRIORITY', 'Priority')
       .addColumn('ACTION', 'Action')
+      .addColumn('STATUS', 'Status')
       .addColumn('EMAIL', 'Email')
       .addColumn('LINK', 'Link')
       .addColumn('TO_DO', 'To Do')

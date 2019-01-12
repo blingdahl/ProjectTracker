@@ -20,4 +20,9 @@ ChangeRowValue.init = function() {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
     return 'Set priority to ' + priority;
   }
+  
+  ChangeRowValue.setStatus = function(sheetId, uuid, status) {
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS.STATUS, status);
+    return 'Set status to ' + status;
+  }
 }

@@ -8,9 +8,10 @@ Update.init = function() {
   
   Preferences.init();
   TrackingSheet.init();
-  Actions.init();
   TaskSync.init();
   GmailSync.init();
+  ActionHandler.init();
+  StatusHandler.init();
   Log.info('Update.init()');
   
   Update.initialized = true;
@@ -42,6 +43,7 @@ Update.init = function() {
     for (var i = 0; i < dataRows.length; i++) {
       var dataRow = dataRows[i];
       dataRow.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
+      dataRow.setDataValidation(TrackingSheet.COLUMNS.STATUS, StatusHandler.STATUSES);
       if (!dataRow.getValue(TrackingSheet.COLUMNS.ITEM)) {
         continue;
       }
@@ -49,12 +51,15 @@ Update.init = function() {
       var threadId = dataRow.getValue(TrackingSheet.COLUMNS.THREAD_ID);
       if (threadId) {
         thread = syncResult.getThreadForThreadId(threadId);
+      } else {
+        dataRow.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
       }
       if (!dataRow.getValue(TrackingSheet.COLUMNS.UUID)) {
         dataRow.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
       }
-      var actionsResult = Actions.processActions(dataRow.getValue(TrackingSheet.COLUMNS.ACTION), thread, dataRow, syncResult.label);
-      if (!actionsResult.getShouldRemove() && threadId && !thread) {
+      var actionsResult = ActionHandler.processActions(dataRow.getValue(TrackingSheet.COLUMNS.ACTION), thread, syncResult.label);
+      var statusResult = StatusHandler.processStatus(dataRow.getValue(TrackingSheet.COLUMNS.STATUS), thread, syncResult.label);
+      if (!actionsResult.getShouldRemove() && !statusResult.getShouldRemove() && threadId && !thread) {
         if (dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)) {
           actionsResult.addScriptNote('Not labeled');
         } else {
@@ -62,13 +67,13 @@ Update.init = function() {
           actionsResult.removeRow();
         }
       }
-      if (actionsResult.getShouldRemove()) {
+      if (actionsResult.getShouldRemove() || statusResult.getShouldRemove()) {
         uuidsToRemove.push(dataRow.getValue(TrackingSheet.COLUMNS.UUID));
       } else {
         countPerPriority[dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
       }
-      if (actionsResult.hasScriptNotes()) {
-        dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, actionsResult.getScriptNotes());
+      if (actionsResult.hasScriptNotes() || statusResult.hasScriptNotes()) {
+        dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, [actionsResult.getScriptNotes(), statusResult.getScriptNotes()].join('\n'));
       }
     }
     for (var i = 0; i < uuidsToRemove.length; i++) {

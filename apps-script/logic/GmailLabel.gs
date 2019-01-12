@@ -21,17 +21,45 @@ GmailLabel.init = function() {
   
   GmailLabel.MAKE_P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P0', true);
   GmailLabel.MAKE_P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P1', true);
+  GmailLabel.MAKE_P2 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P2', true);
+  GmailLabel.MAKE_P3 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P3', true);
+  GmailLabel.MAKE_P4 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P4', true);
+  GmailLabel.MAKE_FOLLOWING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make Following', true);
+  GmailLabel.MAKE_WAITING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make Waiting', true);
+  GmailLabel.MAKE_BACKBURNER =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Make Backburner', true);
+
+  GmailLabel.P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P0', true);
+  GmailLabel.P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P1', true);
+  GmailLabel.P2 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P2', true);
+  GmailLabel.P3 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P3', true);
+  GmailLabel.P4 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P4', true);
+  
+  GmailLabel.COMPLETED =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Completed', true);
+  GmailLabel.OBSOLETE =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Obsolete', true);
+  GmailLabel.IN_PROGRESS =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('In Progress', true);
+  GmailLabel.ON_DECK =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('On Deck', true);
+  GmailLabel.FOLLOWING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Following', true);
+  GmailLabel.WAITING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Waiting', true);
+  GmailLabel.BACKBURNER =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Backburner', true);
+  
   GmailLabel.NO_TRACK = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('No-Track', true);
   
   GmailLabel.searchTerm = function(labelName) {
     return 'label:' + labelName.replace(' ', '-');
   };
   
+  GmailLabel.notSearchTerm = function(labelName) {
+    return '-' + GmailLabel.searchTerm(labelName);
+  };
+  
   GmailLabel.searchQuery = function(labelName) {
     if (!labelName) {
       return null;
     }
-    return GmailLabel.searchTerm(labelName) + ' -' + GmailLabel.searchTerm(GmailLabel.NO_TRACK.getName());
+    return [GmailLabel.searchTerm(labelName),
+            GmailLabel.notSearchTerm(GmailLabel.NO_TRACK.getName()),
+            GmailLabel.notSearchTerm(GmailLabel.COMPLETED.getName()),
+            GmailLabel.notSearchTerm(GmailLabel.OBSOLETE.getName())].join(' ');
   }
   
   GmailLabel.getAllLabelNames = function() {
@@ -57,7 +85,7 @@ GmailLabel.init = function() {
     return ret;
   };
   
-  GmailLabel.hasLabel = function(thread, row, label, subject) {
+  GmailLabel.hasLabel = function(thread, label) {
     var threadLabels = thread.getLabels();
     var hasLabel = false;
     threadLabels.forEach(function(threadLabel) {

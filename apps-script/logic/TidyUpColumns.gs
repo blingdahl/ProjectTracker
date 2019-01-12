@@ -19,6 +19,7 @@ TidyUpColumns.init = function() {
         resizeColumnToFit(TrackingSheet.COLUMNS.EMAIL).
         resizeColumnToFit(TrackingSheet.COLUMNS.LINK).
         resizeColumnToFit(TrackingSheet.COLUMNS.ACTION).
+        resizeColumnToFit(TrackingSheet.COLUMNS.STATUS).
         resizeColumnToFit(TrackingSheet.COLUMNS.PRIORITY).
         resizeColumnToFit(TrackingSheet.COLUMNS.INBOX).
         hideColumn(TrackingSheet.COLUMNS.THREAD_ID).
