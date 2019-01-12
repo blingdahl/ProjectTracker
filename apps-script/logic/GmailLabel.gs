@@ -24,9 +24,6 @@ GmailLabel.init = function() {
   GmailLabel.MAKE_P2 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P2', true);
   GmailLabel.MAKE_P3 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P3', true);
   GmailLabel.MAKE_P4 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P4', true);
-  GmailLabel.MAKE_FOLLOWING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make Following', true);
-  GmailLabel.MAKE_WAITING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make Waiting', true);
-  GmailLabel.MAKE_BACKBURNER =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('Make Backburner', true);
 
   GmailLabel.P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P0', true);
   GmailLabel.P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P1', true);
