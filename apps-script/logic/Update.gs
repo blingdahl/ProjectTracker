@@ -39,28 +39,29 @@ Update.init = function() {
       countPerPriority[TrackingSheet.PRIORITIES[i]] = 0;
     }
     countPerPriority[''] = 0;
-    var dataRows = trackingSheet.getDataRows();
-    for (var i = 0; i < dataRows.length; i++) {
-      var dataRow = dataRows[i];
-      dataRow.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
-      dataRow.setDataValidation(TrackingSheet.COLUMNS.STATUS, StatusHandler.STATUSES);
-      if (!dataRow.getValue(TrackingSheet.COLUMNS.ITEM)) {
+    var rows = trackingSheet.getDataRows(true);
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
+      row.setDataValidation(TrackingSheet.COLUMNS.STATUS, StatusHandler.STATUSES);
+      if (!row.getValue(TrackingSheet.COLUMNS.ITEM)) {
+        row.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
         continue;
       }
       var thread = null;
-      var threadId = dataRow.getValue(TrackingSheet.COLUMNS.THREAD_ID);
+      var threadId = row.getValue(TrackingSheet.COLUMNS.THREAD_ID);
       if (threadId) {
         thread = syncResult.getThreadForThreadId(threadId);
       } else {
-        dataRow.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
+        row.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
       }
-      if (!dataRow.getValue(TrackingSheet.COLUMNS.UUID)) {
-        dataRow.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
+      if (!row.getValue(TrackingSheet.COLUMNS.UUID)) {
+        row.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
       }
-      var actionsResult = ActionHandler.processActions(dataRow.getValue(TrackingSheet.COLUMNS.ACTION), thread, syncResult.label);
-      var statusResult = StatusHandler.processStatus(dataRow.getValue(TrackingSheet.COLUMNS.STATUS), thread, syncResult.label);
+      var actionsResult = ActionHandler.processActions(row.getValue(TrackingSheet.COLUMNS.ACTION), thread, syncResult.label);
+      var statusResult = StatusHandler.processStatus(row.getValue(TrackingSheet.COLUMNS.STATUS), thread, syncResult.label);
       if (!actionsResult.getShouldRemove() && !statusResult.getShouldRemove() && threadId && !thread) {
-        if (dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)) {
+        if (row.getValue(TrackingSheet.COLUMNS.PRIORITY)) {
           actionsResult.addScriptNote('Not labeled');
         } else {
           actionsResult.addScriptNote('Not labeled; removing');
@@ -68,19 +69,23 @@ Update.init = function() {
         }
       }
       if (actionsResult.getShouldRemove() || statusResult.getShouldRemove()) {
-        uuidsToRemove.push(dataRow.getValue(TrackingSheet.COLUMNS.UUID));
+        uuidsToRemove.push(row.getValue(TrackingSheet.COLUMNS.UUID));
       } else {
-        countPerPriority[dataRow.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
+        countPerPriority[row.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
       }
       if (actionsResult.hasScriptNotes() || statusResult.hasScriptNotes()) {
-        dataRow.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, [actionsResult.getScriptNotes(), statusResult.getScriptNotes()].join('\n'));
+        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, [actionsResult.getScriptNotes(), statusResult.getScriptNotes()].join('\n'));
       }
     }
     for (var i = 0; i < uuidsToRemove.length; i++) {
       Log.info('Removing thread ' + uuidsToRemove[i]);
       trackingSheet.removeRow(trackingSheet.getRowForUuid(uuidsToRemove[i]));
     }
-    trackingSheet.sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE).sortBy(TrackingSheet.COLUMNS.INBOX, false).sortBy(TrackingSheet.COLUMNS.PRIORITY);
+    trackingSheet.
+        sortBy(TrackingSheet.COLUMNS.EMAIL_LAST_DATE, false).
+        sortBy(TrackingSheet.COLUMNS.INBOX, false).
+        sortBy(TrackingSheet.COLUMNS.STATUS, true).
+        sortBy(TrackingSheet.COLUMNS.PRIORITY);
     taskSync.syncToTasks(trackingSheet);
     var response = '';
     var priorityStrings = [];
