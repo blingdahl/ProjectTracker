@@ -83,13 +83,13 @@ class OverviewController {
     return idx;
   }
   
-  static handleOverviewData(priority, msg) {
+  static handleOverviewData(overviewTable, priority, msg) {
     let data = JSON.parse(msg);
     data.sort(function(a, b) {
       return OverviewController.statusIndex(a) - OverviewController.statusIndex(b);
     });
     let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
-    let overviewTable = $('.overviewPlaceholder').find('table').show();
+    overviewTable.show();
     data.forEach(rowData => {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
       overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
@@ -111,17 +111,17 @@ class OverviewController {
     let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
     $('.overviewPlaceholder').find('.priorityLoading').hide();
     if (nextPriority !== null) {
-      loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(nextPriority)).show();
+      loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(overviewTable, nextPriority)).show();
     }
   }
   
-  static loadPriority(priority) {
+  static loadPriority(overviewTable, priority) {
     $('.overviewPlaceholder').find('.loadPriority').hide();
     $('.overviewPlaceholder').find('.priorityLoading').show();
     new RpcConfig(runner => runner.Overview_getOverviewRows([priority])).
         output('Loading ' + priority + '...').
         clearMessageOnSuccess().
-        withSuccessFn(msg => OverviewController.handleOverviewData(priority, msg)).
+        withSuccessFn(msg => OverviewController.handleOverviewData(overviewTable, priority, msg)).
         callRpc();
   }
   
@@ -154,10 +154,10 @@ class OverviewController {
     let overview = overviewTemplate.clone().removeClass('overviewTemplate');
     overview.find('.overviewRowTemplate').remove();
     OverviewController.getPlaceholderElement().append(overview.show());
-    OverviewController.getPlaceholderElement().find('table').hide();
+    var overviewTable = OverviewController.getPlaceholderElement().find('table').hide();
     OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
-    OverviewController.loadPriority('P0');
+    OverviewController.loadPriority(overviewTable, 'P0');
   }
   
   static hideOverview(opt_changeHistory) {
