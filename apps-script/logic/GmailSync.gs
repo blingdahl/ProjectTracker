@@ -38,28 +38,20 @@ GmailSync.init = function() {
     return this.threadsById[threadId];
   }
   
-  GmailSync.copyPriorityFromLabel = function(thread, row, priority) {
-    var label = GmailLabel['MAKE_' + priority.toUpperCase()];
-    if (GmailLabel.hasLabel(thread, label)) {
-      thread.removeLabel(label);
-      row.setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
+  GmailSync.copyPriorityFromLabel = function(thread, row) {
+    // End with highest priority because that is the one we want to keep around
+    var priorities = TrackingSheet.PRIORITIES.reverse();
+    for (var i = 0; i < priorities.length; i++) {
+      var priority = priorities[i];
+      var label = GmailLabel['MAKE_' + priority.toUpperCase()];
+      if (GmailLabel.removeLabel(thread, label)) {
+        row.setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
+      }
     }
   }
   
   GmailSync.copyPriorityToLabel = function(thread, priority) {
-    TrackingSheet.PRIORITIES.forEach(function(currPriority) {
-      var currLabel = GmailLabel[currPriority.toUpperCase()];
-      Log.info(currPriority + ' vs ' + priority);
-      if (currPriority === priority) {
-        if (!GmailLabel.hasLabel(thread, currLabel)) {
-          thread.addLabel(currLabel);
-        }
-      } else {
-        if (GmailLabel.hasLabel(thread, currLabel)) {
-          thread.removeLabel(currLabel);
-        }
-      }
-    });
+    GmailLabel.setActiveLabel(thread, GmailLabel[priority.toUpperCase()], GmailLabel.PRIORITY_LABELS);
   }
   
   GmailSync.getOtherLabelNames = function(labelName) {
@@ -95,14 +87,7 @@ GmailSync.init = function() {
         row.setFormula(TrackingSheet.COLUMNS.EMAIL, Spreadsheet.hyperlinkFormula(thread.getPermalink(), 'Email'));
         row.setValue(TrackingSheet.COLUMNS.FROM, GmailExtractor.getFrom(thread));
       }
-      // End with highest priority because that is the one we want to keep around
-      GmailSync.copyPriorityFromLabel(thread, row, 'FOLLOWING');
-      GmailSync.copyPriorityFromLabel(thread, row, 'WAITING');
-      GmailSync.copyPriorityFromLabel(thread, row, 'P4');
-      GmailSync.copyPriorityFromLabel(thread, row, 'P3');
-      GmailSync.copyPriorityFromLabel(thread, row, 'P2');
-      GmailSync.copyPriorityFromLabel(thread, row, 'P1');
-      GmailSync.copyPriorityFromLabel(thread, row, 'P0');
+      GmailSync.copyPriorityFromLabel(thread, row);
       GmailSync.copyPriorityToLabel(thread, row.getValue(TrackingSheet.COLUMNS.PRIORITY));
       row.setDataValidation(TrackingSheet.COLUMNS.ACTION, ActionHandler.getGmailActions(otherLabelNames, thread));
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, thread.getFirstMessageSubject() || '(No Subject)');
