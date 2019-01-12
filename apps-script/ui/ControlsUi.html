@@ -2,7 +2,6 @@
 <button class="clearCompleted">Clear completed</button>
 <div class="rpcMessages"></div>
 <div class="controls">
-  <div class="global" style="display: none" data-spreadsheet-url="<?= spreadsheetUrl ?>"></div>
   <table>
     <?
       for (var i = 0; i < trackedSheets.length; i++) {
@@ -43,12 +42,9 @@
     <?
       }
     ?>
-  </table>
   <?
     if (untrackedSheets.length > 0) {
   ?>
-  <h1>Untracked</h1>
-  <table>
     <?
       for (var i = 0; i < untrackedSheets.length; i++) {
         var sheetInfo = untrackedSheets[i];
@@ -62,10 +58,10 @@
     <?
       }
     ?>
-  </table>
   <?
     }
   ?>
+  </table>
   <h1>All Sheets</h1>
   <button class="doAllTheThings">Do all the things!</button>
   <button class="tidyAll">Tidy all</button>
