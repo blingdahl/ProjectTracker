@@ -111,7 +111,7 @@ class OverviewController {
     let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
     $('.overviewPlaceholder').find('.priorityLoading').hide();
     if (nextPriority !== null) {
-      loadPriorityLink.text('Load ' + nextPriority).click(() => OverviewController.loadPriority(overviewTable, nextPriority)).show();
+      loadPriorityLink.off('click').text('Load ' + nextPriority).click(() => OverviewController.loadPriority(overviewTable, nextPriority)).show();
     }
   }
   
