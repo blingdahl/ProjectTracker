@@ -95,14 +95,18 @@ Update.init = function() {
         sortBy(TrackingSheet.COLUMNS.PRIORITY);
     taskSync.syncToTasks(trackingSheet);
     var response = '';
-    var priorityStrings = [];
+    var parentheticalMessages = [];
     for (var i = 0; i < TrackingSheet.PRIORITIES.length; i++) {
       var priority = TrackingSheet.PRIORITIES[i];
       if (countPerPriority[priority] !== 0) {
-        priorityStrings.push(countPerPriority[priority] + ' ' + (priority || 'unprioritized'));
+        parentheticalMessages.push(countPerPriority[priority] + ' ' + (priority || 'unprioritized'));
       }
     }
-    response += 'Updated ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' (' + priorityStrings.join(', ') + ', ' + uuidsToRemove.length + ' removed)';
+    if (countPerPriority[''] !== 0) {
+      parentheticalMessages.push(countPerPriority[''] + ' unprioritized');
+    }
+    parentheticalMessages.push(uuidsToRemove.length + ' removed');
+    response += 'Updated ' + TrackingSheet.forSheetId(sheetId).getSheetName() + ' (' + parentheticalMessages.join(', ') + ')';
     if (syncResult.synced) {
       response += ': Synced ' + syncResult.numThreadsInSheet + '/' + syncResult.totalThreads;
     }
