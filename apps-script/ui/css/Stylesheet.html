@@ -1,0 +1,87 @@
+<style>
+  h1 {
+    font-family: sans-serif;
+    font-size: 13px;
+  }
+  
+  td, div {
+    font-family: sans-serif;
+  }
+  
+  error {
+    color: red;
+  }
+  
+  .labelName {
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 13px;
+    color: blue;
+  }
+  
+  .maxThreads {
+    width: 30px;
+  }
+  
+  h1 {
+    margin-top: 30px;
+  }
+  
+  [data-mode="SELECT"] .labelDisplayMode {
+    display: none;
+  }
+  
+  [data-mode="DISPLAY"] .labelSelectMode {
+    display: none;
+  }
+  
+  [data-label-name=""] .labelOnly {
+    display: none;
+  }
+  
+  [data-label-name]:not([data-label-name=""]) .nonLabelOnly {
+    display: none;
+  }
+  
+  .removeLog {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 8px;
+  }
+  
+  a {
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .clearSpreadsheetUrl {
+    display: block;
+    margin-top: 20px;
+  }
+  
+  .overviewTable tr:nth-child(even) {
+    background: #DDD;
+  }
+
+  .overviewTable tr:nth-child(odd) {
+    background: #FFF;
+  }
+
+  .overviewTable tr.completed {
+    color: #999;
+  }
+
+  .overviewTable tr.completed .action a {
+    display: none;
+  }
+  
+  .loadTime {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  
+  .status {
+    width: 90px;
+  }
+</style>
