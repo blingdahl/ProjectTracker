@@ -74,7 +74,14 @@ Update.init = function() {
         countPerPriority[row.getValue(TrackingSheet.COLUMNS.PRIORITY)]++;
       }
       if (actionsResult.hasScriptNotes() || statusResult.hasScriptNotes()) {
-        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, [actionsResult.getScriptNotes(), statusResult.getScriptNotes()].join('\n'));
+        var scriptNotes = [];
+        if (actionsResult.hasScriptNotes()) {
+          scriptNotes.getScriptNotes();
+        }
+        if (statusResult.hasScriptNotes()) {
+          statusResult.getScriptNotes();
+        }
+        row.setValue(TrackingSheet.COLUMNS.SCRIPT_NOTES, scriptNotes.join('\n'));
       }
     }
     for (var i = 0; i < uuidsToRemove.length; i++) {
@@ -89,7 +96,8 @@ Update.init = function() {
     taskSync.syncToTasks(trackingSheet);
     var response = '';
     var priorityStrings = [];
-    for (var priority in countPerPriority) {
+    for (var i = 0; i < TrackingSheet.PRIORITIES.length; i++) {
+      var priority = TrackingSheet.PRIORITIES[i];
       if (countPerPriority[priority] !== 0) {
         priorityStrings.push(countPerPriority[priority] + ' ' + (priority || 'unprioritized'));
       }
