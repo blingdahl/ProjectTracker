@@ -88,6 +88,22 @@ function Overview_getOverviewRows(priorities) {
   return JSON.stringify(objectRows);
 }
 
+function Overview_getRowsByPriority() {
+  Log.start('Overview_getRowsByPriority', []);
+  Overview.init();
+  TrackingSheet.init();
+  var rowsByPriority = Overview.getTrackingRowsByPriority();
+  var objectVersion = {};
+  for (var priority in rowsByPriority) {
+    objectVersion[priority] = [];
+    rowsByPriority[priority].forEach(function(row) {
+      objectVersion[priority].push(row.toObject());
+    });
+  }
+  Log.stop('Overview_getRowsByPriority', []);
+  return JSON.stringify(objectVersion);
+}
+
 function TidyUpColumns_tidyUpColumns(sheetId) {
   Log.start('TidyUpColumns_tidyUpColumns', [sheetId]);
   TidyUpColumns.init();

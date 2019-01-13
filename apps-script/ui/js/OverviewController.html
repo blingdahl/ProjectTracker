@@ -30,53 +30,56 @@ class OverviewController {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
   }
   
-  static statusIndex(row) {
-    var idx = OverviewController.STATUSES.indexOf(row['STATUS']);
+  static statusIndex(rowData) {
+    var idx = OverviewController.STATUSES.indexOf(rowData['STATUS']);
     if (idx == -1) {
       idx = 20;
     }
     return idx;
   }
   
-  static handleOverviewData(overviewTable, priority, msg) {
-    let data = JSON.parse(msg);
-    data.sort(function(a, b) {
-      return OverviewController.statusIndex(a) - OverviewController.statusIndex(b);
-    });
-    let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
-    overviewTable.show();
-    var priorityDropdownMaker = new DropdownPickerMaker(OverviewController.PRIORITIES,
-        (rowData, newPriority) => SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority), 'No Priority')
-    var statusDropdownMaker = new DropdownPickerMaker(OverviewController.STATUSES,
-        (rowData, newStatus) => SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus), 'No Status')
-    data.forEach(rowData => {
-      let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
-      overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
-      overviewRow.find('.item').text(rowData['ITEM']);
-      overviewRow.find('.priority').append(priorityDropdownMaker.makeElement(rowData, 'PRIORITY'));
-      overviewRow.find('.status').append(statusDropdownMaker.makeElement(rowData, 'STATUS'));
-      overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
-      overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
-      if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
-        overviewRow.addClass('completed');
-      }
-      overviewTable.append(overviewRow);
-    });
-    let nextPriority = OverviewController.getNextPriority(priority);
-    let loadPriorityLink = $('.overviewPlaceholder').find('.loadPriority');
-    $('.overviewPlaceholder').find('.priorityLoading').hide();
-    if (nextPriority !== null) {
-      loadPriorityLink.off('click').text('Load ' + nextPriority).click(() => OverviewController.loadPriority(overviewTable, nextPriority)).show();
+  static priorityIndex(rowData) {
+    var idx = OverviewController.PRIORITIES.indexOf(rowData['PRIORITY']);
+    if (idx == -1) {
+      idx = 20;
     }
+    return idx;
   }
   
-  static loadPriority(overviewTable, priority) {
-    $('.overviewPlaceholder').find('.loadPriority').hide();
-    $('.overviewPlaceholder').find('.priorityLoading').show();
-    new RpcConfig(runner => runner.Overview_getOverviewRows([priority])).
-        output('Loading ' + priority + '...').
+  static addRow(overviewTable, overviewRowTemplate, rowData) {
+    let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
+    overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
+    overviewRow.find('.item').text(rowData['ITEM']);
+    overviewRow.find('.priority').append(OverviewController.PRIORITY_DROPDOWN_MAKER.makeElement(rowData, 'PRIORITY'));
+    overviewRow.find('.status').append(OverviewController.STATUS_DROPDOWN_MAKER.makeElement(rowData, 'STATUS'));
+    overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
+    overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
+    if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
+      overviewRow.addClass('completed');
+    }
+    overviewTable.append(overviewRow);
+  }
+  
+  static handleDataByPriority(overviewTable, msg) {
+    let rowsByPriority = JSON.parse(msg);
+    let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
+    overviewTable.show();
+    OverviewController.PRIORITIES.forEach(priority => {
+      var rowsForPriority = rowsByPriority[priority];
+      rowsForPriority.sort((a, b) => OverviewController.statusIndex(a) - OverviewController.statusIndex(b));
+      rowsForPriority.forEach(rowData => {
+        OverviewController.addRow(overviewTable, overviewRowTemplate, rowData);
+      });
+    });
+    $('.overviewPlaceholder').find('.overviewLoading').hide();
+  }
+  
+  static load(overviewTable) {
+    $('.overviewPlaceholder').find('.overviewLoading').show();
+    new RpcConfig(runner => runner.Overview_getRowsByPriority()).
+        output('Loading overview...').
         clearMessageOnSuccess().
-        withSuccessFn(msg => OverviewController.handleOverviewData(overviewTable, priority, msg)).
+        withSuccessFn(msg => OverviewController.handleDataByPriority(overviewTable, msg)).
         callRpc();
   }
   
@@ -112,7 +115,7 @@ class OverviewController {
     var overviewTable = OverviewController.getPlaceholderElement().find('table').hide();
     OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
-    OverviewController.loadPriority(overviewTable, 'P0');
+    OverviewController.load(overviewTable);
   }
   
   static hideOverview(opt_changeHistory) {
@@ -121,24 +124,6 @@ class OverviewController {
     }
     $('.overviewPlaceholder').empty();
     OverviewController.updateButtons(false);
-  }
-  
-  static getNextPriority(priority) {
-    let useNext = false;
-    let ret = null;
-    OverviewController.PRIORITIES.forEach(p => {
-      if (ret) {
-        return;
-      }
-      if (useNext) {
-        ret = p;
-      } else {
-        if (p === priority) {
-          useNext = true;
-        }
-      }
-    });
-    return ret;
   }
 
   static addListeners() {
@@ -161,3 +146,9 @@ class OverviewController {
 OverviewController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', ''];
 
 OverviewController.STATUSES = ['Completed', 'Obsolete', 'In Progress', 'On Deck', 'Waiting', 'Following', 'Backburner'];
+
+OverviewController.PRIORITY_DROPDOWN_MAKER = new DropdownPickerMaker(OverviewController.PRIORITIES,
+    (rowData, newPriority) => SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority), 'No Priority')
+
+OverviewController.STATUS_DROPDOWN_MAKER = new DropdownPickerMaker(OverviewController.STATUSES,
+    (rowData, newStatus) => SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus), 'No Status')

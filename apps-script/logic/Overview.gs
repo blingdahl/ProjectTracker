@@ -33,4 +33,21 @@ Overview.init = function() {
     Log.stop('Overview.getTrackingRowsForPriorities', [priorities]);
     return rows;
   }
+  
+  Overview.getTrackingRowsByPriority = function() {
+    Log.start('Overview.getTrackingRowsByPriority', []);
+    var rowsByPriority = {};
+    var trackingSheets = TrackingSheet.getAll();
+    trackingSheets.forEach(function(trackingSheet) {
+      var rowsByPriorityFromSheet = trackingSheet.getRowsByPriority(trackingSheet);
+      for (var priority in rowsByPriorityFromSheet) {
+        if (!rowsByPriority[priority]) {
+          rowsByPriority[priority] = [];
+        }
+        rowsByPriority[priority] = rowsByPriority[priority].concat(rowsByPriorityFromSheet[priority]);
+      }
+    });
+    Log.stop('Overview.getTrackingRowsByPriority', []);
+    return rowsByPriority;
+  }
 }
