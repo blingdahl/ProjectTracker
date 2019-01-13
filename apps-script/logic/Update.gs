@@ -76,7 +76,7 @@ Update.init = function() {
       if (actionsResult.hasScriptNotes() || statusResult.hasScriptNotes()) {
         var scriptNotes = [];
         if (actionsResult.hasScriptNotes()) {
-          scriptNotes.getScriptNotes();
+          actionsResult.getScriptNotes();
         }
         if (statusResult.hasScriptNotes()) {
           statusResult.getScriptNotes();
