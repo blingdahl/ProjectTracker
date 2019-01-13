@@ -2,72 +2,14 @@
 <button class="clearCompleted">Clear completed</button>
 <div class="rpcMessages"></div>
 <div class="controls">
-  <table>
-    <?
-      for (var i = 0; i < trackedSheets.length; i++) {
-        var sheetInfo = trackedSheets[i];
-    ?>
-    <tr class="sheetController"
-        data-sheet-id="<?= sheetInfo.sheetId ?>"
-        data-sheet-name="<?= sheetInfo.sheetName ?>"
-        data-label-name="<?= sheetInfo.labelName || '' ?>"
-        data-max-threads="<?= sheetInfo.maxThreads ?>"
-        data-search-query="<?= sheetInfo.searchQuery || '' ?>">
-      <td><a href="<?= spreadsheetUrl ?>#gid=<?= sheetInfo.sheetId ?>" target="_new"><?= sheetInfo.sheetName ?></a></td>
-      <td>
-        <div class="labelPicker">
-          <div class="labelDisplayMode">
-            <span class="labelName"></span>
-          </div>
-          <div class="labelSelectMode">
-            <select class="selectLabel">
-            </select>
-            <input type="text" class="maxThreads">
-            <a class="saveLabel">Save</a>
-            <a class="cancelLabel">Cancel</a>
-            <a class="removeLabel">Remove</a>
-          </div>
-        </div>
-      </td>
-      <td>
-        <button class="update">Update</button>
-      </td>
-      <td>
-        <button class="addUrl">Add URL</button>
-      </td>
-      <td>
-        <button class="search labelOnly">Search</button>
-      </td>
-    </tr>
-    <?
-      }
-    ?>
-  <?
-    if (untrackedSheets.length > 0) {
-  ?>
-    <?
-      for (var i = 0; i < untrackedSheets.length; i++) {
-        var sheetInfo = untrackedSheets[i];
-    ?>
-    <tr class="sheetController"
-        data-sheet-id="<?= sheetInfo.sheetId ?>"
-        data-sheet-name="<?= sheetInfo.sheetName ?>">
-      <td><?= sheetInfo.sheetName ?></td>
-      <td><a class="addTracking">Track</a></td>
-    </tr>
-    <?
-      }
-    ?>
-  <?
-    }
-  ?>
-  </table>
+  <?!= renderSheetsTable() ?>
   <h1>All Sheets</h1>
   <button class="doAllTheThings">Do all the things!</button>
   <button class="tidyAll">Tidy all</button>
   <button class="showOverview">Show Overview</button>
   <button class="updateOverview" style="display: none">Update Overview</button>
   <button class="hideOverview" style="display: none">Hide Overview</button>
+  <?!= include("ui/OverviewTemplate"); ?>  
   <script>
     <?!= include("ui/js/RpcConfig"); ?>
     <?!= include("ui/js/Widgets"); ?>
@@ -77,39 +19,5 @@
     <?!= include("ui/js/OverviewController"); ?>
     <?!= include("ui/js/Controls"); ?>
   </script>
-  
-  <div class="overviewTemplate" style="display: none">
-    <div class="loadTime"></div>
-    <table class="overviewTable">
-      <tr>
-        <th>Sheet</th>
-        <th>Priority</th>
-        <th>Status</th>
-        <th>Email</th>
-        <th>Link</th>
-        <th>Item</th>
-      </tr>
-      <tr class="overviewRowTemplate overviewRow">
-        <td class="sheet"></td>
-        <td class="priority"></td>
-        <td class="status"></td>
-        <td class="email"></td>
-        <td class="link"></td>
-        <td class="item"></td>
-      </tr>
-    </table>
-    <div class="overviewLoading">
-    <div id="floatingBarsG">
-      <div class="blockG" id="rotateG_01"></div>
-      <div class="blockG" id="rotateG_02"></div>
-      <div class="blockG" id="rotateG_03"></div>
-      <div class="blockG" id="rotateG_04"></div>
-      <div class="blockG" id="rotateG_05"></div>
-      <div class="blockG" id="rotateG_06"></div>
-      <div class="blockG" id="rotateG_07"></div>
-      <div class="blockG" id="rotateG_08"></div>
-  </div>
-    </div>
-  </div>
 </div>
 <div class="overviewPlaceholder"></div>

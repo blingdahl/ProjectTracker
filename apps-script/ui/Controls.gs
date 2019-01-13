@@ -1,8 +1,15 @@
-function renderControls(spreadsheetUrl) {
+function renderControls() {
   SheetInfo.init();
+  TrackingSheet.init();
   var template = HtmlService.createTemplateFromFile('ui/ControlsUi');
-  Spreadsheet.setSpreadsheetUrl(spreadsheetUrl);
-  template.spreadsheetUrl = spreadsheetUrl;
+  return template.evaluate().getContent();
+}
+
+function renderSheetsTable() {
+  SheetInfo.init();
+  TrackingSheet.init();
+  var template = HtmlService.createTemplateFromFile('ui/SheetsTable');
+  template.spreadsheetUrl = Preferences.Properties.get(Preferences.Names.spreadsheetUrl());
   template.trackedSheets = [];
   template.untrackedSheets = [];
   var sheets = Spreadsheet.getSpreadsheet().getNativeSheets();
