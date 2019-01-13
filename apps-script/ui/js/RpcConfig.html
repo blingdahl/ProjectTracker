@@ -92,6 +92,9 @@ class RpcConfig {
   }
   
   handleSuccess_(msg) {
+    if (this.startTime) {
+      console.log('Success in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
+    }
     this.successOut_(msg);
     if (this.successFn_) {
       this.successFn_(msg);
@@ -102,6 +105,9 @@ class RpcConfig {
   }
   
   handleFailure_(msg) {
+    if (this.startTime) {
+      console.log('Failure in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
+    }
     this.failureOut_(msg);
     if (this.failureFn_) {
       this.failureFn_(msg);
@@ -131,6 +137,7 @@ class RpcConfig {
   }
   
   callRpc() {
+    this.startTime = new Date();
     return new Promise(function(resolve, reject) {
           this.callFn_(
               google.script.run.
