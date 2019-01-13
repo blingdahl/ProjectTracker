@@ -30,51 +30,6 @@ class OverviewController {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
   }
   
-  static makePriorityElement(rowData, key) {
-    let priorityElement = $('<a />');
-    priorityElement.text(rowData['PRIORITY']);
-    priorityElement.click(() => {
-      priorityElement.hide();
-      let cell = priorityElement.parent();
-      let priorityDropdown = $('<select />');
-      for (var i = 0; i != OverviewController.PRIORITIES.length; i++) {
-        let priority = OverviewController.PRIORITIES[i];
-        priorityDropdown.append($('<option />').attr('value', priority).attr('selected', priorityElement.text() === priority).text(priority));
-      }
-      priorityDropdown.change(() => {
-        var newPriority = priorityDropdown.val();
-        SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority);
-        priorityDropdown.remove();
-        priorityElement.text(newPriority).show();
-      });
-      cell.append(priorityDropdown);
-    });
-    return priorityElement;
-  }
-  
-  static makeStatusElement(rowData, key) {
-    let statusElement = $('<a />');
-    statusElement.text(rowData['STATUS'] || 'No status');
-    statusElement.click(() => {
-      statusElement.hide();
-      let cell = statusElement.parent();
-      let statusDropdown = $('<select />');
-      statusDropdown.append($('<option />').attr('value', '').text('No status'));
-      for (var i = 0; i != OverviewController.STATUSES.length; i++) {
-        let status = OverviewController.STATUSES[i];
-        statusDropdown.append($('<option />').attr('value', status).attr('selected', statusElement.text() === status).text(status));
-      }
-      statusDropdown.change(() => {
-        var newStatus = statusDropdown.val();
-        SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus);
-        statusDropdown.remove();
-        statusElement.text(newStatus).show();
-      });
-      cell.append(statusDropdown);
-    });
-    return statusElement;
-  }
-  
   static statusIndex(row) {
     var idx = OverviewController.STATUSES.indexOf(row['STATUS']);
     if (idx == -1) {
@@ -90,20 +45,20 @@ class OverviewController {
     });
     let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
     overviewTable.show();
+    var priorityDropdownMaker = new DropdownPickerMaker(OverviewController.PRIORITIES,
+        (rowData, newPriority) => SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority), 'No Priority')
+    var statusDropdownMaker = new DropdownPickerMaker(OverviewController.STATUSES,
+        (rowData, newStatus) => SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus), 'No Status')
     data.forEach(rowData => {
       let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
       overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
       overviewRow.find('.item').text(rowData['ITEM']);
-      overviewRow.find('.priority').append(OverviewController.makePriorityElement(rowData));
-      overviewRow.find('.status').append(OverviewController.makeStatusElement(rowData));
+      overviewRow.find('.priority').append(priorityDropdownMaker.makeElement(rowData, 'PRIORITY'));
+      overviewRow.find('.status').append(statusDropdownMaker.makeElement(rowData, 'STATUS'));
       overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
       overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
       if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
         overviewRow.addClass('completed');
-      } else {
-        overviewRow.find('.markCompleted').show().click(() => SheetController.forSheet(rowData['SHEET_ID']).setAction(rowData['UUID'], 'Completed').then(() => {
-            overviewRow.addClass('completed');
-        }));
       }
       overviewTable.append(overviewRow);
     });

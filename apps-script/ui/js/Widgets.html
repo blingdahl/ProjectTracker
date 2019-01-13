@@ -1,0 +1,33 @@
+class DropdownPickerMaker {
+  
+  constructor(allValues, changeCallback, emptyText) {
+    this.allValues = allValues;
+    this.changeCallback = changeCallback;
+    this.emptyText = emptyText;
+  }
+  
+  makeElement(rowData, key) {
+    let element = $('<a />');
+    element.text(rowData[key] || this.emptyText);
+    element.click(() => {
+      element.hide();
+      let cell = element.parent();
+      let dropdown = $('<select />');
+      if (this.emptyText) {
+        dropdown.append($('<option />').attr('value', '').text(this.emptyText));
+      }
+      for (var i = 0; i != this.allValues.length; i++) {
+        let currValue = this.allValues[i];
+        dropdown.append($('<option />').attr('value', currValue).attr('selected', element.text() === currValue).text(currValue));
+      }
+      dropdown.change(() => {
+        var newValue = dropdown.val();
+        this.changeCallback(rowData, newValue);
+        dropdown.remove();
+        element.text(newValue).show();
+      });
+      cell.append(dropdown);
+    });
+    return element;
+  }
+}
