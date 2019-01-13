@@ -66,6 +66,9 @@ class OverviewController {
     overviewTable.show();
     OverviewController.PRIORITIES.forEach(priority => {
       var rowsForPriority = rowsByPriority[priority];
+      if (!rowsForPriority) {
+        return;
+      }
       rowsForPriority.sort((a, b) => OverviewController.statusIndex(a) - OverviewController.statusIndex(b));
       rowsForPriority.forEach(rowData => {
         OverviewController.addRow(overviewTable, overviewRowTemplate, rowData);
