@@ -70,8 +70,9 @@ class AddItemDialog {
   
   show() {
     this.getSubmitElement().click(() => {
-      new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, this.getTitle(), this.getUrl(), this.getPriority())).
-          output('Adding task to ' + this.sheetName + '...').
+      var title = this.getTitle();
+      new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
+          output('Adding ' + title + ' to ' + this.sheetName + '...').
           retryOnTimeout().
           callRpc();
     });
