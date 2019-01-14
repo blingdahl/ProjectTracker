@@ -22,6 +22,26 @@ class OverviewController {
   static getTemplateElement() {
     return $('.overviewTemplate');
   }
+  
+  static getPriorityFilterElement() {
+    return OverviewController.getPlaceholderElement().find('.priorityFilter');
+  }
+  
+  static getStatusFilterElement() {
+    return OverviewController.getPlaceholderElement().find('.statusFilter');
+  }
+  
+  static getSheetFilterElement() {
+    return OverviewController.getPlaceholderElement().find('.sheetFilter');
+  }
+  
+  static getFilterElements() {
+    return OverviewController.getPlaceholderElement().find('.filter');
+  }
+  
+  static getDataRowElements() {
+    return OverviewController.getPlaceholderElement().find('tr[data-sheet-id]');
+  }
 
   // SECTION:
   // Click handlers
@@ -57,6 +77,9 @@ class OverviewController {
     if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
       overviewRow.addClass('completed');
     }
+    overviewRow.attr('data-sheet-id', rowData['SHEET_ID']);
+    overviewRow.attr('data-priority', rowData['PRIORITY']);
+    overviewRow.attr('data-status', rowData['STATUS']);
     overviewTable.append(overviewRow);
   }
   
@@ -74,6 +97,7 @@ class OverviewController {
         OverviewController.addRow(overviewTable, overviewRowTemplate, rowData);
       });
     });
+    OverviewController.applyFilters();
     $('.overviewPlaceholder').find('.overviewLoading').hide();
   }
   
@@ -108,6 +132,39 @@ class OverviewController {
     }
   }
   
+  static populateFilter(filterElement, values) {
+    values.forEach(value => filterElement.append($('<option />').attr('value', value).text(value)));
+  }
+  
+  static applyFilterToRow(priority, status, sheetId, dataRowElt) {
+    var show = true;
+    if (priority && priority != dataRowElt.attr('data-priority')) {
+      show = false;
+      console.log('Not showing');
+    }
+    if (status && status != dataRowElt.attr('data-status')) {
+      show = false;
+    }
+    if (sheetId && sheetId != dataRowElt.attr('data-sheet-id')) {
+      show = false;
+    }
+    if (show) {
+      dataRowElt.show();
+    } else {
+      dataRowElt.hide();
+    }
+  }
+  
+  static applyFilters() {
+    var priority = OverviewController.getPriorityFilterElement().val();
+    var status = OverviewController.getStatusFilterElement().val();
+    var sheetId = OverviewController.getSheetFilterElement().val();
+    console.log(priority);
+    console.log(status);
+    console.log(sheetId);
+    this.getDataRowElements().each((idx, elt) => OverviewController.applyFilterToRow(priority, status, sheetId, $(elt)));
+  }
+  
   static showOverview() {
     OverviewController.hideOverview(false);
     google.script.history.push(null, null, 'overview');
@@ -118,6 +175,9 @@ class OverviewController {
     var overviewTable = OverviewController.getPlaceholderElement().find('table').hide();
     OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
+    OverviewController.populateFilter(OverviewController.getPriorityFilterElement(), OverviewController.PRIORITIES);
+    OverviewController.populateFilter(OverviewController.getStatusFilterElement(), OverviewController.STATUSES);
+    OverviewController.getFilterElements().change(() => this.applyFilters());
     OverviewController.load(overviewTable);
   }
   
