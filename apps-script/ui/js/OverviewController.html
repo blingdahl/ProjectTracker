@@ -136,11 +136,15 @@ class OverviewController {
     values.forEach(value => filterElement.append($('<option />').attr('value', value).text(value)));
   }
   
+  static populateSheetFilter(filterElement, sheetInfos) {
+    sheetInfos.sort((a, b) => a.sheetName > b.sheetName ? 1 : a.sheetName != b.sheetName ? -1 : 0);
+    sheetInfos.forEach(sheetInfo => filterElement.append($('<option />').attr('value', sheetInfo.sheetId).text(sheetInfo.sheetName)));
+  }
+  
   static applyFilterToRow(priority, status, sheetId, dataRowElt) {
     var show = true;
     if (priority && priority != dataRowElt.attr('data-priority')) {
       show = false;
-      console.log('Not showing');
     }
     if (status && status != dataRowElt.attr('data-status')) {
       show = false;
@@ -159,9 +163,6 @@ class OverviewController {
     var priority = OverviewController.getPriorityFilterElement().val();
     var status = OverviewController.getStatusFilterElement().val();
     var sheetId = OverviewController.getSheetFilterElement().val();
-    console.log(priority);
-    console.log(status);
-    console.log(sheetId);
     this.getDataRowElements().each((idx, elt) => OverviewController.applyFilterToRow(priority, status, sheetId, $(elt)));
   }
   
@@ -177,6 +178,7 @@ class OverviewController {
     OverviewController.updateButtons(true);
     OverviewController.populateFilter(OverviewController.getPriorityFilterElement(), OverviewController.PRIORITIES);
     OverviewController.populateFilter(OverviewController.getStatusFilterElement(), OverviewController.STATUSES);
+    OverviewController.populateSheetFilter(OverviewController.getSheetFilterElement(), SheetController.getSheetInfos());
     OverviewController.getFilterElements().change(() => this.applyFilters());
     OverviewController.load(overviewTable);
   }
