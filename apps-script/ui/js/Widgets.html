@@ -72,7 +72,7 @@ class AddItemDialog {
     this.getSubmitElement().click(() => {
       var title = this.getTitle();
       new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
-          output('Adding ' + title + ' to ' + this.sheetName + '...').
+          output('Adding "' + title + '" to ' + this.sheetName + '...').
           retryOnTimeout().
           callRpc();
     });
