@@ -68,33 +68,82 @@ class AddItemDialog {
     return this.itemForm.find('.addItem');
   }
   
+  getFieldElements() {
+    return this.itemForm.find('.field');
+  }
+  
+  getErrorElement() {
+    return this.itemForm.find('.error');
+  }
+  
+  isDirty() {
+    return this.getTitle() || this.getUrl() || this.getPriority();
+  }
+  
+  validate(dirtyOnly) {
+    let errors = [];
+    if (!dirtyOnly || this.isDirty()) {
+      if (!this.getTitle()) {
+        errors.push('Title is a required field');
+      }
+    }
+    if (errors.length > 0) {
+      this.getErrorElement().text(errors.join(', ')).show();
+      return false;
+    }
+    this.getErrorElement().hide();
+    return true;
+  }
+  
+  save() {
+    if (!this.validate(false)) {
+      console.log('not saving');
+      return false;
+    }
+    var title = this.getTitle();
+    new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
+        output('Adding "' + title + '" to ' + this.sheetName + '...').
+        retryOnTimeout().
+        callRpc();
+    return true;
+  }
+  
   show() {
-    this.getSubmitElement().click(() => {
-      var title = this.getTitle();
-      new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
-          output('Adding "' + title + '" to ' + this.sheetName + '...').
-          retryOnTimeout().
-          callRpc();
-    });
-    // TODO(lindahl) Wait a bit to make the call
+    this.getFieldElements().change(() => this.validate(true));
     this.getUrlElement().change(() => {
-      var title = this.getTitle();
-      var url = this.getUrl();
+      let title = this.getTitle();
+      let url = this.getUrl();
       if (!title && url) {
-      console.log(title);
-      console.log(url);
         new RpcConfig(runner => runner.AddItem_getPageTitle(url)).
             retryOnTimeout().
             clearMessageOnSuccess().
             withSuccessFn(successMsg => {
               if (!this.getTitle()) {
                 this.getTitleElement().val(successMsg);
+                this.validate(true);
               }
             }).
             callRpc();
       }
     });
-    console.log(this.itemForm);
-    this.itemForm.dialog();
+    let _this = this;
+    this.itemForm.dialog({
+      title: 'Add item to ' + this.sheetName,
+      minWidth: 500,
+      buttons: [
+        {text: "Add Item",
+         click: () => {
+           if (this.save()) {
+             this.itemForm.dialog("close");
+           }
+         }
+        },
+        {text: "Cancel",
+         click: () => {
+           this.itemForm.dialog("close");
+         }
+        }
+      ]
+    });
   }
 }

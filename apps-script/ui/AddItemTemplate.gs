@@ -1,8 +1,15 @@
 <div class="itemFormTemplate itemForm" style="display: none">
-<h2>Add item to <span class="sheetName"></span></h2>
-<input type="hidden" class="sheetId">
-Item: <input type="text" class="title"><br>
-URL: <input type="text" class="url"><br>
-Priority: <select class="priority"></select>
-<button class="addItem">Add item</button>
+<div class="error"></div>
+<div class="titleField">
+<div class="promptText">Title</div>
+<input type="text" class="title field">
+</div>
+<div class="urlField">
+<div class="promptText">URL</div>
+<input type="text" class="url field">
+</div>
+<div class="priorityField">
+<div class="promptText">Priority</div>
+<select class="priority field"></select>
+</div>
 </div>
