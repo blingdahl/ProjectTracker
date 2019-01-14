@@ -5,11 +5,27 @@ class GlobalController {
   
   // SECTION:
   // Attributes
-
-  static addListeners() {
+  
+  static statusIndex(rowData) {
+    var idx = GlobalController.STATUSES.indexOf(rowData['STATUS']);
+    if (idx == -1) {
+      idx = 20;
+    }
+    return idx;
+  }
+  
+  static priorityIndex(rowData) {
+    var idx = GlobalController.PRIORITIES.indexOf(rowData['PRIORITY']);
+    if (idx == -1) {
+      idx = 20;
+    }
+    return idx;
   }
   
   static init() {
-    GlobalController.addListeners();
   }
 }
+
+GlobalController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', ''];
+
+GlobalController.STATUSES = ['Completed', 'Obsolete', 'In Progress', 'On Deck', 'Waiting', 'Following', 'Backburner'];

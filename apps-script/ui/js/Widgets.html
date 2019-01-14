@@ -1,5 +1,4 @@
 class DropdownPickerMaker {
-  
   constructor(allValues, changeCallback, emptyText) {
     this.allValues = allValues;
     this.changeCallback = changeCallback;
@@ -29,5 +28,72 @@ class DropdownPickerMaker {
       cell.append(dropdown);
     });
     return element;
+  }
+}
+
+class AddItemDialog {
+  constructor(sheetId, sheetName) {
+    this.itemForm = $('.itemFormTemplate').first().clone().removeClass('itemFormTemplate');
+    this.sheetName = sheetName;
+    this.sheetId = sheetId;
+    this.getPriorityElement().append($('<option />').attr('value', '').text('No Priority'));
+    GlobalController.PRIORITIES.forEach(priority => this.getPriorityElement().append($('<option />').attr('value', priority).text(priority)));
+  }
+  
+  getTitleElement() {
+    return this.itemForm.find('.title');
+  }
+  
+  getTitle() {
+    return this.getTitleElement().val();
+  }
+  
+  getUrlElement() {
+    return this.itemForm.find('.url');
+  }
+  
+  getUrl() {
+    return this.getUrlElement().val();
+  }
+  
+  getPriorityElement() {
+    return this.itemForm.find('.priority');
+  }
+  
+  getPriority() {
+    return this.getPriorityElement().val();
+  }
+  
+  getSubmitElement() {
+    return this.itemForm.find('.addItem');
+  }
+  
+  show() {
+    this.getSubmitElement().click(() => {
+      new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, this.getTitle(), this.getUrl(), this.getPriority())).
+          output('Adding task to ' + this.sheetName + '...').
+          retryOnTimeout().
+          callRpc();
+    });
+    // TODO(lindahl) Wait a bit to make the call
+    this.getUrlElement().change(() => {
+      var title = this.getTitle();
+      var url = this.getUrl();
+      if (!title && url) {
+      console.log(title);
+      console.log(url);
+        new RpcConfig(runner => runner.AddItem_getPageTitle(url)).
+            retryOnTimeout().
+            clearMessageOnSuccess().
+            withSuccessFn(successMsg => {
+              if (!this.getTitle()) {
+                this.getTitleElement().val(successMsg);
+              }
+            }).
+            callRpc();
+      }
+    });
+    console.log(this.itemForm);
+    this.itemForm.dialog();
   }
 }

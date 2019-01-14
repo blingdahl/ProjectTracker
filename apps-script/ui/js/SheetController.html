@@ -15,8 +15,8 @@ class SheetController {
     return this.jq.find('.update');
   }
   
-  getAddUrlElement() {
-    return this.jq.find('.addUrl');
+  getAddElement() {
+    return this.jq.find('.add');
   }
   
   getTidyUpColumnsElement() {
@@ -98,14 +98,8 @@ class SheetController {
         callRpc();
   }
 
-  addUrl() {
-    let url = window.prompt('URL');
-    if (url) {
-      new RpcConfig(runner => runner.AddUrl_addUrl(this.getSheetId(), url)).
-          output('Adding ' + url + ' to ' + this.getSheetName() + '...').
-          retryOnTimeout().
-          callRpc();
-    }
+  add() {
+    new AddItemDialog(this.getSheetId(), this.getSheetName(), GlobalController.PRIORITIES).show();
   }
 
   tidyUpColumns() {
@@ -144,7 +138,7 @@ class SheetController {
   addListeners() {
     this.labelPicker.addListeners();
     this.getUpdateElement().click(this.update.bind(this));
-    this.getAddUrlElement().click(this.addUrl.bind(this));
+    this.getAddElement().click(this.add.bind(this));
     this.getAddTrackingElement().click(this.addTracking.bind(this));
     this.getSearchElement().click(this.search.bind(this));
   }
@@ -156,6 +150,13 @@ class SheetController {
   
   static getAll() {
     return SheetController.ALL;
+  }
+  
+  static getSheetInfos() {
+    var allSheetControllers = SheetController.getAll();
+    var sheetInfos = [];
+    allSheetControllers.forEach(sheetController => sheetInfos.push({sheetId: sheetController.getSheetId(), sheetName: sheetController.getSheetName()}));
+    return sheetInfos;
   }
   
   static forSheet(sheetId) {

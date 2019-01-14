@@ -50,22 +50,6 @@ class OverviewController {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
   }
   
-  static statusIndex(rowData) {
-    var idx = OverviewController.STATUSES.indexOf(rowData['STATUS']);
-    if (idx == -1) {
-      idx = 20;
-    }
-    return idx;
-  }
-  
-  static priorityIndex(rowData) {
-    var idx = OverviewController.PRIORITIES.indexOf(rowData['PRIORITY']);
-    if (idx == -1) {
-      idx = 20;
-    }
-    return idx;
-  }
-  
   static addRow(overviewTable, overviewRowTemplate, rowData) {
     let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
     overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
@@ -87,12 +71,12 @@ class OverviewController {
     let rowsByPriority = JSON.parse(msg);
     let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
     overviewTable.show();
-    OverviewController.PRIORITIES.forEach(priority => {
+    GlobalController.PRIORITIES.forEach(priority => {
       var rowsForPriority = rowsByPriority[priority];
       if (!rowsForPriority) {
         return;
       }
-      rowsForPriority.sort((a, b) => OverviewController.statusIndex(a) - OverviewController.statusIndex(b));
+      rowsForPriority.sort((a, b) => GlobalController.statusIndex(a) - GlobalController.statusIndex(b));
       rowsForPriority.forEach(rowData => {
         OverviewController.addRow(overviewTable, overviewRowTemplate, rowData);
       });
@@ -176,8 +160,8 @@ class OverviewController {
     var overviewTable = OverviewController.getPlaceholderElement().find('table').hide();
     OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
-    OverviewController.populateFilter(OverviewController.getPriorityFilterElement(), OverviewController.PRIORITIES);
-    OverviewController.populateFilter(OverviewController.getStatusFilterElement(), OverviewController.STATUSES);
+    OverviewController.populateFilter(OverviewController.getPriorityFilterElement(), GlobalController.PRIORITIES);
+    OverviewController.populateFilter(OverviewController.getStatusFilterElement(), GlobalController.STATUSES);
     OverviewController.populateSheetFilter(OverviewController.getSheetFilterElement(), SheetController.getSheetInfos());
     OverviewController.getFilterElements().change(() => this.applyFilters());
     OverviewController.load(overviewTable);
@@ -208,12 +192,8 @@ class OverviewController {
 }
 
 // TODO(lindahl) Get from server
-OverviewController.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4', ''];
-
-OverviewController.STATUSES = ['Completed', 'Obsolete', 'In Progress', 'On Deck', 'Waiting', 'Following', 'Backburner'];
-
-OverviewController.PRIORITY_DROPDOWN_MAKER = new DropdownPickerMaker(OverviewController.PRIORITIES,
+OverviewController.PRIORITY_DROPDOWN_MAKER = new DropdownPickerMaker(GlobalController.PRIORITIES,
     (rowData, newPriority) => SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority), 'No Priority')
 
-OverviewController.STATUS_DROPDOWN_MAKER = new DropdownPickerMaker(OverviewController.STATUSES,
+OverviewController.STATUS_DROPDOWN_MAKER = new DropdownPickerMaker(GlobalController.STATUSES,
     (rowData, newStatus) => SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus), 'No Status')

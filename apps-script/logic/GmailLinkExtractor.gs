@@ -81,14 +81,9 @@ GmailLinkExtractor.UrlStrategy.prototype.extractFromBody = function(body) {
   }
   for (var i = 0; i < urls.length; i++) {
     var url = urls[i];
-    if (url.startsWith('https://docs.')) {
-      if (url.includes('/document')) {
-        return Spreadsheet.hyperlinkFormula(url, 'Doc')
-      } else if (url.includes('/spreadsheet')) {
-        return Spreadsheet.hyperlinkFormula(url, 'Sheet')
-      } else {
-        return Spreadsheet.hyperlinkFormula(url, 'Link')
-      }
+    var docType = Docs.getType(url);
+    if (docType) {
+      return Spreadsheet.hyperlinkFormula(url, docType);
     } else if (url.startsWith('http://go/')) {
       return Spreadsheet.hyperlinkFormula(url, url.replace('http://', ''));
     } else if (url.startsWith('https://goto.google.com/')) {

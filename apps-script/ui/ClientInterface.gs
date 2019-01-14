@@ -49,12 +49,20 @@ function ChangeRowValue_setStatus(sheetId, uuid, status) {
   return ret;
 }
 
-function AddUrl_addUrl(sheetId, url) {
-  Log.start('AddUrl_addUrl', [sheetId, url]);
-  AddUrl.init();
+function AddItem_addItem(sheetId, title, url, priority) {
+  Log.start('AddItem_addItem', [sheetId, title, url, priority]);
+  AddItem.init();
   TrackingSheet.init();
-  var ret = AddUrl.addUrl(sheetId, url);
-  Log.stop('AddUrl_addUrl', [sheetId, url]);
+  var ret = AddItem.addItem(sheetId, title, url, priority);
+  Log.stop('AddItem_addItem', [sheetId, title, url, priority]);
+  return ret;
+}
+
+function AddItem_getPageTitle(url) {
+  Log.start('AddItem_getPageTitle', [url]);
+  AddItem.init();
+  var ret = AddItem.getPageTitle(url);
+  Log.stop('AddItem_getPageTitle', [url]);
   return ret;
 }
 
