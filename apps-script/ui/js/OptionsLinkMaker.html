@@ -1,4 +1,4 @@
-class DropdownLinkMaker {
+class OptionsLinkMaker {
   constructor(allValues, emptyText, linkClass, changeCallback) {
     this.allValues = allValues;
     this.emptyText = emptyText;
@@ -25,23 +25,23 @@ class DropdownLinkMaker {
   
   linkClicked(e) {
     var link = $(e.currentTarget);
-    link.parent().append(this.makeDropdown(link.attr('data-value'), link));
+    link.parent().append(this.makeOptions(link.attr('data-value'), link));
     link.hide();
   }
   
-  makeDropdown(currValue, link) {
-    let dropdown = $('<select />');
+  makeOptions(currValue, link) {
+    let options = $('<select />');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
-      dropdown.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue || this.emptyText));
+      options.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue || this.emptyText));
     }
-    dropdown.change(() => {
-      var newValue = dropdown.val();
-      dropdown.remove();
+    options.change(() => {
+      var newValue = options.val();
+      options.remove();
       this.changeCallback(link, newValue);
       link.attr('data-value', newValue);
       link.text(this.makeLinkText(newValue)).show();
     });
-    return dropdown;
+    return options;
   }
 }

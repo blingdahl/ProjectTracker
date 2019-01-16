@@ -3,8 +3,8 @@ class OverviewController {
   constructor() {
     this.jq = null;
     this.rowTemplateJq = null;
-    this.priorityMaker = new DropdownLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', this.handlePriorityChange.bind(this));
-    this.statusMaker = new DropdownLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', this.handleStatusChange.bind(this));
+    this.priorityMaker = new OptionsLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', this.handlePriorityChange.bind(this));
+    this.statusMaker = new OptionsLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', this.handleStatusChange.bind(this));
   }
 
   // SECTION:
@@ -52,6 +52,10 @@ class OverviewController {
   
   getLoadTimeElement() {
     return this.jq.find('.loadTime');
+  }
+  
+  getDisplayCountElement() {
+    return this.jq.find('.displayCount');
   }
   
   getLoadingElement() {
@@ -190,6 +194,7 @@ class OverviewController {
     this.getDataRowElements().each((idx, elt) => this.applyFilterToRow(
         this.getPriorityFilterElement().val(), this.getStatusFilterElement().val(), this.getSheetFilterElement().val(), $(elt)));
     this.getShowColumnElements().each((idx, elt) => this.setColumnShown($(elt)));
+    this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
   }
   
   initFilters() {
