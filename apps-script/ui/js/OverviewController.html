@@ -46,6 +46,10 @@ class OverviewController {
     return this.jq.find('.filter');
   }
   
+  getShowColumnElements() {
+    return this.jq.find('.showColumn');
+  }
+  
   getLoadTimeElement() {
     return this.jq.find('.loadTime');
   }
@@ -64,6 +68,10 @@ class OverviewController {
   
   getDataRowElements() {
     return this.getTbodyElement().find('tr[data-sheet-id]');
+  }
+  
+  getColumnCells(columnKey) {
+    return this.getTableElement().find('[data-key="' + columnKey + '"]');
   }
 
   // SECTION:
@@ -111,12 +119,11 @@ class OverviewController {
   addRow(rowData) {
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
     rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
-    rowJq.find('.item').text(rowData['ITEM']);
-    rowJq.find('.from').text(rowData['FROM']);
     rowJq.find('.priority').append(this.priorityMaker.makeLink(rowData['PRIORITY']));
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
     rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
+    rowJq.find('td[data-key]').each((index, elt) => $(elt).text(rowData[$(elt).attr('data-key')]));
     rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
     rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
     rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
@@ -161,11 +168,20 @@ class OverviewController {
     }
   }
   
+  setColumnShown(showColumnJq) {
+    let columnKey = showColumnJq.attr('data-key');
+    let shown = showColumnJq.is(':checked');
+    if (shown) {
+      this.getColumnCells(columnKey).show();
+    } else {
+      this.getColumnCells(columnKey).hide();
+    }
+  }
+  
   applyFilters() {
-    var priority = this.getPriorityFilterElement().val();
-    var status = this.getStatusFilterElement().val();
-    var sheetId = this.getSheetFilterElement().val();
-    this.getDataRowElements().each((idx, elt) => this.applyFilterToRow(priority, status, sheetId, $(elt)));
+    this.getDataRowElements().each((idx, elt) => this.applyFilterToRow(
+        this.getPriorityFilterElement().val(), this.getStatusFilterElement().val(), this.getSheetFilterElement().val(), $(elt)));
+    this.getShowColumnElements().each((idx, elt) => this.setColumnShown($(elt)));
   }
   
   initFilters() {
@@ -173,6 +189,7 @@ class OverviewController {
     this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
     this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
     this.getFilterElements().change(() => this.applyFilters());
+    this.getShowColumnElements().change(() => this.applyFilters());
   }
   
   initListeners() {

@@ -10,6 +10,8 @@
     <select class="sheetFilter filter">
       <option value="">Show Sheet...</option>
     </select>
+    <input type="checkbox" class="fromColumn showColumn" data-key="FROM"> From column
+    <input type="checkbox" class="dateColumn showColumn" data-key="EMAIL_LAST_DATE"> Date column
   </div>
   <table class="overviewTable">
     <tr>
@@ -19,6 +21,8 @@
       <th>Email</th>
       <th>Link</th>
       <th>Item</th>
+      <th data-key="FROM">From</th>
+      <th data-key="EMAIL_LAST_DATE">Last Date</th>
     </tr>
     <tbody>
       <tr class="overviewRowTemplate overviewRow">
@@ -27,8 +31,9 @@
         <td class="status"></td>
         <td class="email"></td>
         <td class="link"></td>
-        <td class="item"></td>
-        <td class="from"></td>
+        <td class="item" data-key="ITEM"></td>
+        <td class="from" data-key="FROM"></td>
+        <td class="emailLastDate" data-key="EMAIL_LAST_DATE"></td>
       </tr>
     </tbody>
   </table>
