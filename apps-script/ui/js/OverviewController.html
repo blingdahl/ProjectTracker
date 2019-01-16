@@ -116,6 +116,7 @@ class OverviewController {
     this.getDataRowElements().sort(
       compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
                        OverviewController.compareAttributeFn('data-status-index'),
+                       OverviewController.compareAttributeFn('data-sheet-id'),
                        OverviewController.compareAttributeFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
