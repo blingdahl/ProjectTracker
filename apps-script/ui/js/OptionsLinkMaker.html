@@ -30,18 +30,22 @@ class OptionsLinkMaker {
   }
   
   makeOptions(currValue, link) {
-    let options = $('<select />');
+    let options = $('<div />').addClass('linkOptions');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
-      options.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue || this.emptyText));
+      let option = $('<div />').attr('data-value', optionValue).text(optionValue || this.emptyText);
+      if (currValue === optionValue) {
+        option.addClass('currValue');
+      }
+      options.append(option);
+      option.click((event) => {
+        let newValue = $(event.currentTarget).attr('data-value');
+        options.remove();
+        this.changeCallback(link, newValue);
+        link.attr('data-value', newValue);
+        link.text(this.makeLinkText(newValue)).show();
+      });
     }
-    options.change(() => {
-      var newValue = options.val();
-      options.remove();
-      this.changeCallback(link, newValue);
-      link.attr('data-value', newValue);
-      link.text(this.makeLinkText(newValue)).show();
-    });
     return options;
   }
 }
