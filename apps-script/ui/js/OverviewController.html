@@ -108,7 +108,6 @@ class OverviewController {
   }
   
   addRow(rowData) {
-    console.log('Showing ', rowData['ITEM']);
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
     rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
     rowJq.find('.item').text(rowData['ITEM']);
@@ -125,7 +124,6 @@ class OverviewController {
   }
   
   handleDataByPriority(msg) {
-    console.log('handleDataByPriority');
     let rowsByPriority = JSON.parse(msg);
     this.getTableElement().show();
     GlobalController.PRIORITIES.forEach(priority => {
@@ -141,41 +139,12 @@ class OverviewController {
   }
   
   load() {
-    console.log('load');
     $('.overviewPlaceholder').find('.overviewLoading').show();
     new RpcConfig(runner => runner.Overview_getRowsByPriority()).
         output('Loading overview...').
         clearMessageOnSuccess().
         withSuccessFn(msg => this.handleDataByPriority(msg)).
         callRpc();
-  }
-  
-  updateOverview(opt_sheetId) {
-    if (OverviewController.isDisplayed()) {
-      if (opt_sheetId) {
-        // TODO(lindahl) Clear out rows matching the sheet id
-        // TODO(lindahl) Add the rows
-        // TODO(lindahl) Re-sort the rows
-      } else {
-        this.show();
-      }
-    }
-  }
-  
-  static updateOverview() {
-    
-  }
-  
-  static updateButtons(showingOverview) {
-    if (showingOverview) {
-      OverviewController.getShowOverviewElement().hide();
-      OverviewController.getUpdateOverviewElement().show();
-      OverviewController.getHideOverviewElement().show();
-    } else {
-      OverviewController.getShowOverviewElement().show();
-      OverviewController.getUpdateOverviewElement().hide();
-      OverviewController.getHideOverviewElement().hide();
-    }
   }
   
   populateFilter(filterElement, values) {
@@ -219,10 +188,6 @@ class OverviewController {
     this.getFilterElements().change(() => this.applyFilters());
   }
   
-  showPriorityDropdown(a) {
-    
-  }
-  
   initListeners() {
     this.priorityMaker.attachClickHandler(this.jq);
     this.statusMaker.attachClickHandler(this.jq);
@@ -241,9 +206,37 @@ class OverviewController {
     return this;
   }
   
+  updateOverviewForSheet(sheetId) {
+    // TODO(lindahl) Clear out rows matching the sheet id
+    // TODO(lindahl) Add the rows
+    // TODO(lindahl) Re-sort the rows
+  }
+  
+  static updateOverview(opt_sheetId) {
+    if (opt_sheetId && OverviewController.current) {
+      OverviewController.updateOverviewForSheet(opt_sheetId);
+    } else {
+      OverviewController.hideOverview(false);
+      OverviewController.showOverview();
+    }
+  }
+  
+  static updateButtons(showingOverview) {
+    if (showingOverview) {
+      OverviewController.getShowOverviewElement().hide();
+      OverviewController.getUpdateOverviewElement().show();
+      OverviewController.getHideOverviewElement().show();
+    } else {
+      OverviewController.getShowOverviewElement().show();
+      OverviewController.getUpdateOverviewElement().hide();
+      OverviewController.getHideOverviewElement().hide();
+    }
+  }
+  
   show() {
     this.init();
     OverviewController.getPlaceholderElement().append(this.jq.show());
+    return this;
   }
   
   static showOverview() {
@@ -257,21 +250,33 @@ class OverviewController {
     if (opt_changeHistory === undefined || opt_changeHistory === true) {
       google.script.history.push(null, null, '');
     }
-    $('.overviewPlaceholder').empty();
+    this.jq.remove();
     OverviewController.updateButtons(false);
   }
   
   static hideOverview(opt_changeHistory) {
     if (OverviewController.current) {
       OverviewController.current.hide(opt_changeHistory);
-      this.current = null;
+      OverviewController.current = null;
     }
+  }
+  
+  static handleShowOverviewClick() {
+    OverviewController.showOverview();
+  }
+  
+  static handleUpdateOverviewClick() {
+    OverviewController.updateOverview();
+  }
+  
+  static handleHideOverviewClick() {
+    OverviewController.hideOverview();
   }
 
   static addListeners() {
-    OverviewController.getShowOverviewElement().click(OverviewController.showOverview);
-    OverviewController.getUpdateOverviewElement().click(OverviewController.updateOverview);
-    OverviewController.getHideOverviewElement().click(OverviewController.hideOverview);
+    OverviewController.getShowOverviewElement().click(OverviewController.handleShowOverviewClick);
+    OverviewController.getUpdateOverviewElement().click(OverviewController.handleUpdateOverviewClick);
+    OverviewController.getHideOverviewElement().click(OverviewController.handleHideOverviewClick);
   }
   
   static init() {
