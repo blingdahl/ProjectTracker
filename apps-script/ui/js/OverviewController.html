@@ -104,6 +104,7 @@ class OverviewController {
     this.getDataRowElements().sort(
       compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
                        OverviewController.compareAttributeFn('data-status-index'),
+                       OverviewController.compareAttributeFn('data-sheet-id'),
                        OverviewController.compareAttributeFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
@@ -144,7 +145,6 @@ class OverviewController {
   
   applyFilterToRow(priority, status, sheetId, dataRowElt) {
     var show = true;
-    console.log(priority, status, sheetId);
     if (priority && priority != dataRowElt.attr('data-priority')) {
       show = false;
     }
