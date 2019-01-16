@@ -73,8 +73,8 @@ class OverviewController {
     let tr = $(link).closest('tr[data-sheet-id]');
     let sheetId = tr.attr('data-sheet-id');
     let uuid = tr.attr('data-uuid');
-    console.log(sheetId);
-    console.log(SheetController.forSheet(sheetId));
+    tr.attr('data-status', newStatus);
+    tr.attr('data-status-index', String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
     SheetController.forSheet(sheetId).setStatus(uuid, newStatus);
   }
   
@@ -82,6 +82,7 @@ class OverviewController {
     let tr = $(link).closest('tr[data-sheet-id]');
     let sheetId = tr.attr('data-sheet-id');
     let uuid = tr.attr('data-uuid');
+    tr.attr('data-priority', newPriority);
     SheetController.forSheet(sheetId).setPriority(uuid, newPriority);
   }
   
@@ -118,7 +119,7 @@ class OverviewController {
     rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
     rowJq.attr('data-priority', rowData['PRIORITY'] || 'PUnknown');
     rowJq.attr('data-status', rowData['STATUS']);
-    rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData)).padStart(2, '0'));
+    rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
     this.getTbodyElement().append(rowJq);
   }

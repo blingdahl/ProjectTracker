@@ -42,6 +42,7 @@ class DropdownLinkMaker {
       var newValue = dropdown.val();
       dropdown.remove();
       this.changeCallback(link, newValue);
+      link.attr('data-value', newValue);
       link.text(this.makeLinkText(newValue)).show();
     });
     return dropdown;
