@@ -31,12 +31,9 @@ class DropdownLinkMaker {
   
   makeDropdown(currValue, link) {
     let dropdown = $('<select />');
-    if (this.emptyText) {
-      dropdown.append($('<option />').attr('value', '').text(this.emptyText));
-    }
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
-      dropdown.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue));
+      dropdown.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue || this.emptyText));
     }
     dropdown.change(() => {
       var newValue = dropdown.val();

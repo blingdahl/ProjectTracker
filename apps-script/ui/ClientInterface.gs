@@ -83,33 +83,26 @@ function Label_getAllLabels() {
   return ret;
 }
 
-function Overview_getOverviewRows(priorities) {
-  Log.start('Overview_getOverviewRows', [priorities]);
+function Overview_getRows() {
+  Log.start('Overview_getRows', []);
   Overview.init();
   TrackingSheet.init();
-  var trackingRows = Overview.getTrackingRowsForPriorities(priorities);
-  var objectRows = [];
-  trackingRows.forEach(function(trackingRow) {
-    objectRows.push(trackingRow.toObject());
-  });
-  Log.stop('Overview_getOverviewRows', [priorities]);
-  return JSON.stringify(objectRows);
+  var rows = Overview.getRows();
+  var ret = [];
+  rows.forEach(function(row) { ret.push(row.toObject()); });
+  Log.stop('Overview_getRows', []);
+  return JSON.stringify(ret);
 }
 
-function Overview_getRowsByPriority() {
-  Log.start('Overview_getRowsByPriority', []);
+function Overview_getRowsForSheetId(sheetId) {
+  Log.start('Overview_getRowsForSheetId', []);
   Overview.init();
   TrackingSheet.init();
-  var rowsByPriority = Overview.getTrackingRowsByPriority();
-  var objectVersion = {};
-  for (var priority in rowsByPriority) {
-    objectVersion[priority] = [];
-    rowsByPriority[priority].forEach(function(row) {
-      objectVersion[priority].push(row.toObject());
-    });
-  }
-  Log.stop('Overview_getRowsByPriority', []);
-  return JSON.stringify(objectVersion);
+  var rows = Overview.getRowsForSheetId(sheetId);
+  var ret = [];
+  rows.forEach(function(row) { ret.push(row.toObject()); });
+  Log.stop('Overview_getRowsForSheetId', []);
+  return JSON.stringify(ret);
 }
 
 function TidyUpColumns_tidyUpColumns(sheetId) {

@@ -3,8 +3,8 @@ class OverviewController {
   constructor() {
     this.jq = null;
     this.rowTemplateJq = null;
-    this.priorityMaker = new DropdownLinkMaker(GlobalController.PRIORITIES, 'No Priority', 'priorityLink', this.handlePriorityChange.bind(this));
-    this.statusMaker = new DropdownLinkMaker(GlobalController.STATUSES, 'No Status', 'statusLink', this.handleStatusChange.bind(this));
+    this.priorityMaker = new DropdownLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', this.handlePriorityChange.bind(this));
+    this.statusMaker = new DropdownLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', this.handleStatusChange.bind(this));
   }
 
   // SECTION:
@@ -103,7 +103,8 @@ class OverviewController {
   sortRows() {
     this.getDataRowElements().sort(
       compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
-                       OverviewController.compareAttributeFn('data-status-index'))
+                       OverviewController.compareAttributeFn('data-status-index'),
+                       OverviewController.compareAttributeFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
   
@@ -116,39 +117,24 @@ class OverviewController {
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
     rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
     rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
-    rowJq.attr('data-priority', rowData['PRIORITY'] || 'PUnknown');
-    rowJq.attr('data-status', rowData['STATUS']);
+    rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
+    rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
     this.getTbodyElement().append(rowJq);
   }
   
-  handleDataByPriority(msg) {
-    let rowsByPriority = JSON.parse(msg);
+  handleData(msg) {
+    let rows = JSON.parse(msg);
     this.getTableElement().show();
-    GlobalController.PRIORITIES.forEach(priority => {
-      var rowsForPriority = rowsByPriority[priority];
-      if (!rowsForPriority) {
-        return;
-      }
-      rowsForPriority.forEach(rowData => this.addRow(rowData));
-    });
+    rows.forEach(rowData => this.addRow(rowData));
     this.sortRows();
     this.applyFilters();
     this.getLoadingElement().hide();
   }
   
-  load() {
-    $('.overviewPlaceholder').find('.overviewLoading').show();
-    new RpcConfig(runner => runner.Overview_getRowsByPriority()).
-        output('Loading overview...').
-        clearMessageOnSuccess().
-        withSuccessFn(msg => this.handleDataByPriority(msg)).
-        callRpc();
-  }
-  
-  populateFilter(filterElement, values) {
-    values.forEach(value => filterElement.append($('<option />').attr('value', value).text(value)));
+  populateFilter(filterElement, values, emptyKey, emptyName) {
+    values.forEach(value => filterElement.append($('<option />').attr('value', value || emptyKey).text(value || emptyName)));
   }
   
   populateSheetFilter(filterElement, sheetInfos) {
@@ -158,6 +144,7 @@ class OverviewController {
   
   applyFilterToRow(priority, status, sheetId, dataRowElt) {
     var show = true;
+    console.log(priority, status, sheetId);
     if (priority && priority != dataRowElt.attr('data-priority')) {
       show = false;
     }
@@ -182,8 +169,8 @@ class OverviewController {
   }
   
   initFilters() {
-    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES);
-    this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES);
+    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_KEY, OverviewController.NO_PRIORITY_TEXT);
+    this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
     this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
     this.getFilterElements().change(() => this.applyFilters());
   }
@@ -206,21 +193,6 @@ class OverviewController {
     return this;
   }
   
-  updateOverviewForSheet(sheetId) {
-    // TODO(lindahl) Clear out rows matching the sheet id
-    // TODO(lindahl) Add the rows
-    // TODO(lindahl) Re-sort the rows
-  }
-  
-  static updateOverview(opt_sheetId) {
-    if (opt_sheetId && OverviewController.current) {
-      OverviewController.updateOverviewForSheet(opt_sheetId);
-    } else {
-      OverviewController.hideOverview(false);
-      OverviewController.showOverview();
-    }
-  }
-  
   static updateButtons(showingOverview) {
     if (showingOverview) {
       OverviewController.getShowOverviewElement().hide();
@@ -230,6 +202,38 @@ class OverviewController {
       OverviewController.getShowOverviewElement().show();
       OverviewController.getUpdateOverviewElement().hide();
       OverviewController.getHideOverviewElement().hide();
+    }
+  }
+  
+  updateOverviewForSheet(sheetId) {
+    this.getDataRowElements().filter('[data-sheet-id="' + sheetId + '"]').remove();
+    $('.overviewPlaceholder').find('.overviewLoading').show();
+    new RpcConfig(runner => runner.Overview_getRowsForSheetId(sheetId)).
+        output('Loading overview for ' + SheetController.forSheet(sheetId).getSheetName() + '...').
+        clearMessageOnSuccess().
+        withSuccessFn(msg => this.handleData(msg)).
+        callRpc();
+  }
+  
+  load() {
+    $('.overviewPlaceholder').find('.overviewLoading').show();
+    new RpcConfig(runner => runner.Overview_getRows()).
+        output('Loading overview...').
+        clearMessageOnSuccess().
+        withSuccessFn(msg => this.handleData(msg)).
+        callRpc();
+  }
+  
+  static updateOverview() {
+    OverviewController.hideOverview(false);
+    OverviewController.showOverview();
+  }
+  
+  static updateOverviewForSheet(sheetId) {
+    if (OverviewController.current) {
+      OverviewController.current.updateOverviewForSheet(sheetId);
+    } else {
+      OverviewController.updateOverview();
     }
   }
   
@@ -290,3 +294,8 @@ class OverviewController {
 }
 
 OverviewController.current = null;
+
+OverviewController.NO_PRIORITY_KEY = 'PUnknown';
+OverviewController.NO_PRIORITY_TEXT = 'No Priority';
+OverviewController.NO_STATUS_KEY = 'NoStatus';
+OverviewController.NO_STATUS_TEXT = 'No Status';

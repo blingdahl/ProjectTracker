@@ -67,18 +67,18 @@
   .overviewTable tr:nth-child(odd) {
     background: #FFF;
   }
-
-  .overviewTable tr.completed {
+  
+  .overviewTable tr[data-status="Completed"], .overviewTable tr[data-status="Obsolete"] {
     color: #999;
-  }
-
-  .overviewTable tr.completed .action a {
-    display: none;
   }
   
   .loadTime {
     font-size: 11px;
     margin-top: 4px;
+  }
+  
+  .priority {
+    width: 90px;
   }
   
   .status {
