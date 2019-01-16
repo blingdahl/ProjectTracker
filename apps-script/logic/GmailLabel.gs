@@ -6,7 +6,6 @@ GmailLabel.init = function() {
     return;
   }
   
-  
   Preferences.init();
   Log.info('GmailLabel.init()');
   GmailLabel.initialized = true
