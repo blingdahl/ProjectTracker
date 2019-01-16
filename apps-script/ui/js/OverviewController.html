@@ -116,6 +116,14 @@ class OverviewController {
     ).appendTo(this.getTbodyElement());
   }
   
+  fillTextFromDataKey(cellJq, rowData) {
+    if (cellJq.hasClass('dateField')) {
+      cellJq.text(rowData[cellJq.attr('data-key') + '_FORMATTED']);
+    } else {
+      cellJq.text(rowData[cellJq.attr('data-key')]);
+    }
+  }
+  
   addRow(rowData) {
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
     rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
@@ -123,7 +131,7 @@ class OverviewController {
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
     rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
-    rowJq.find('td[data-key]').each((index, elt) => $(elt).text(rowData[$(elt).attr('data-key')]));
+    rowJq.find('td[data-key]').each((index, elt) => this.fillTextFromDataKey($(elt), rowData));
     rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
     rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
     rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
