@@ -10,6 +10,12 @@ if (typeof String.prototype.includes != 'function') {
   };
 };
 
+if (typeof String.prototype.compare != 'function') {
+  String.prototype.compare = function(str) {
+    return this > str ? 1 : this === str ? 0 : -1;
+  };
+};
+
 function typeOf(value) {
   var s = typeof value;
   if (s === 'object') {
