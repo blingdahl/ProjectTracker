@@ -162,7 +162,7 @@ class SheetController {
   static forSheet(sheetId) {
     let ret = null;
     SheetController.ALL.forEach(sheetController => {
-      if (sheetController.getSheetId() === sheetId) {
+      if (sheetController.getSheetId() == sheetId) {
         ret = sheetController;
       }
     });

@@ -1,5 +1,12 @@
 class OverviewController {
 
+  constructor() {
+    this.jq = null;
+    this.rowTemplateJq = null;
+    this.priorityMaker = new DropdownLinkMaker(GlobalController.PRIORITIES, 'No Priority', 'priorityLink', this.handlePriorityChange.bind(this));
+    this.statusMaker = new DropdownLinkMaker(GlobalController.STATUSES, 'No Status', 'statusLink', this.handleStatusChange.bind(this));
+  }
+
   // SECTION:
   // Elements
   
@@ -23,85 +30,139 @@ class OverviewController {
     return $('.overviewTemplate');
   }
   
-  static getPriorityFilterElement() {
-    return OverviewController.getPlaceholderElement().find('.priorityFilter');
+  getPriorityFilterElement() {
+    return this.jq.find('.priorityFilter');
   }
   
-  static getStatusFilterElement() {
-    return OverviewController.getPlaceholderElement().find('.statusFilter');
+  getStatusFilterElement() {
+    return this.jq.find('.statusFilter');
   }
   
-  static getSheetFilterElement() {
-    return OverviewController.getPlaceholderElement().find('.sheetFilter');
+  getSheetFilterElement() {
+    return this.jq.find('.sheetFilter');
   }
   
-  static getFilterElements() {
-    return OverviewController.getPlaceholderElement().find('.filter');
+  getFilterElements() {
+    return this.jq.find('.filter');
   }
   
-  static getDataRowElements() {
-    return OverviewController.getPlaceholderElement().find('tr[data-sheet-id]');
+  getLoadTimeElement() {
+    return this.jq.find('.loadTime');
+  }
+  
+  getLoadingElement() {
+    return this.jq.find('.overviewLoading');
+  }
+  
+  getTableElement() {
+    return this.jq.find('table');
+  }
+  
+  getTbodyElement() {
+    return this.jq.find('tbody').first();
+  }
+  
+  getDataRowElements() {
+    return this.getTbodyElement().find('tr[data-sheet-id]');
   }
 
   // SECTION:
   // Click handlers
   
+  handleStatusChange(link, newStatus) {
+    let tr = $(link).closest('tr[data-sheet-id]');
+    let sheetId = tr.attr('data-sheet-id');
+    let uuid = tr.attr('data-uuid');
+    console.log(sheetId);
+    console.log(SheetController.forSheet(sheetId));
+    SheetController.forSheet(sheetId).setStatus(uuid, newStatus);
+  }
+  
+  handlePriorityChange(link, newPriority) {
+    let tr = $(link).closest('tr[data-sheet-id]');
+    let sheetId = tr.attr('data-sheet-id');
+    let uuid = tr.attr('data-uuid');
+    SheetController.forSheet(sheetId).setPriority(uuid, newPriority);
+  }
+  
   static makeLink(rowData, key) {
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
   }
   
-  static addRow(overviewTable, overviewRowTemplate, rowData) {
-    let overviewRow = overviewRowTemplate.clone().removeClass('overviewRowTemplate');
-    overviewRow.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
-    overviewRow.find('.item').text(rowData['ITEM']);
-    overviewRow.find('.priority').append(OverviewController.PRIORITY_DROPDOWN_MAKER.makeElement(rowData, 'PRIORITY'));
-    overviewRow.find('.status').append(OverviewController.STATUS_DROPDOWN_MAKER.makeElement(rowData, 'STATUS'));
-    overviewRow.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
-    overviewRow.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
-    if (rowData['STATUS'] === 'Completed' || rowData['STATUS'] === 'Obsolete') {
-      overviewRow.addClass('completed');
-    }
-    overviewRow.attr('data-sheet-id', rowData['SHEET_ID']);
-    overviewRow.attr('data-priority', rowData['PRIORITY']);
-    overviewRow.attr('data-status', rowData['STATUS']);
-    overviewTable.append(overviewRow);
+  static compareAttribute(a, b, attrName) {
+    return a.attr('data-priority').compare(b.attr(attrName))
   }
   
-  static handleDataByPriority(overviewTable, msg) {
+  static compareAttributeFn(attrName) {
+    return function(a, b) {
+      return compare($(a).attr(attrName), $(b).attr(attrName));
+    };
+  }
+  
+  sortRows() {
+    this.getDataRowElements().sort(
+      compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
+                       OverviewController.compareAttributeFn('data-status-index'))
+    ).appendTo(this.getTbodyElement());
+  }
+  
+  addRow(rowData) {
+    console.log('Showing ', rowData['ITEM']);
+    let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
+    rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
+    rowJq.find('.item').text(rowData['ITEM']);
+    rowJq.find('.priority').append(this.priorityMaker.makeLink(rowData['PRIORITY']));
+    rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
+    rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
+    rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
+    rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
+    rowJq.attr('data-priority', rowData['PRIORITY'] || 'PUnknown');
+    rowJq.attr('data-status', rowData['STATUS']);
+    rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData)).padStart(2, '0'));
+    rowJq.attr('data-uuid', rowData['UUID']);
+    this.getTbodyElement().append(rowJq);
+  }
+  
+  handleDataByPriority(msg) {
+    console.log('handleDataByPriority');
     let rowsByPriority = JSON.parse(msg);
-    let overviewRowTemplate = $('.overviewTemplate').find('.overviewRowTemplate');
-    overviewTable.show();
+    this.getTableElement().show();
     GlobalController.PRIORITIES.forEach(priority => {
       var rowsForPriority = rowsByPriority[priority];
       if (!rowsForPriority) {
         return;
       }
-      rowsForPriority.sort((a, b) => GlobalController.statusIndex(a) - GlobalController.statusIndex(b));
-      rowsForPriority.forEach(rowData => {
-        OverviewController.addRow(overviewTable, overviewRowTemplate, rowData);
-      });
+      rowsForPriority.forEach(rowData => this.addRow(rowData));
     });
-    OverviewController.applyFilters();
-    $('.overviewPlaceholder').find('.overviewLoading').hide();
+    this.sortRows();
+    this.applyFilters();
+    this.getLoadingElement().hide();
   }
   
-  static load(overviewTable) {
+  load() {
+    console.log('load');
     $('.overviewPlaceholder').find('.overviewLoading').show();
     new RpcConfig(runner => runner.Overview_getRowsByPriority()).
         output('Loading overview...').
         clearMessageOnSuccess().
-        withSuccessFn(msg => OverviewController.handleDataByPriority(overviewTable, msg)).
+        withSuccessFn(msg => this.handleDataByPriority(msg)).
         callRpc();
   }
   
-  static isDisplayed() {
-    return $('.overviewPlaceholder').find('table').length > 0;
+  updateOverview(opt_sheetId) {
+    if (OverviewController.isDisplayed()) {
+      if (opt_sheetId) {
+        // TODO(lindahl) Clear out rows matching the sheet id
+        // TODO(lindahl) Add the rows
+        // TODO(lindahl) Re-sort the rows
+      } else {
+        this.show();
+      }
+    }
   }
   
   static updateOverview() {
-    if (OverviewController.isDisplayed()) {
-      OverviewController.showOverview();
-    }
+    
   }
   
   static updateButtons(showingOverview) {
@@ -116,16 +177,16 @@ class OverviewController {
     }
   }
   
-  static populateFilter(filterElement, values) {
+  populateFilter(filterElement, values) {
     values.forEach(value => filterElement.append($('<option />').attr('value', value).text(value)));
   }
   
-  static populateSheetFilter(filterElement, sheetInfos) {
+  populateSheetFilter(filterElement, sheetInfos) {
     sheetInfos.sort((a, b) => a.sheetName > b.sheetName ? 1 : a.sheetName != b.sheetName ? -1 : 0);
     sheetInfos.forEach(sheetInfo => filterElement.append($('<option />').attr('value', sheetInfo.sheetId).text(sheetInfo.sheetName)));
   }
   
-  static applyFilterToRow(priority, status, sheetId, dataRowElt) {
+  applyFilterToRow(priority, status, sheetId, dataRowElt) {
     var show = true;
     if (priority && priority != dataRowElt.attr('data-priority')) {
       show = false;
@@ -143,36 +204,67 @@ class OverviewController {
     }
   }
   
-  static applyFilters() {
-    var priority = OverviewController.getPriorityFilterElement().val();
-    var status = OverviewController.getStatusFilterElement().val();
-    var sheetId = OverviewController.getSheetFilterElement().val();
-    this.getDataRowElements().each((idx, elt) => OverviewController.applyFilterToRow(priority, status, sheetId, $(elt)));
+  applyFilters() {
+    var priority = this.getPriorityFilterElement().val();
+    var status = this.getStatusFilterElement().val();
+    var sheetId = this.getSheetFilterElement().val();
+    this.getDataRowElements().each((idx, elt) => this.applyFilterToRow(priority, status, sheetId, $(elt)));
+  }
+  
+  initFilters() {
+    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES);
+    this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES);
+    this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
+    this.getFilterElements().change(() => this.applyFilters());
+  }
+  
+  showPriorityDropdown(a) {
+    
+  }
+  
+  initListeners() {
+    this.priorityMaker.attachClickHandler(this.jq);
+    this.statusMaker.attachClickHandler(this.jq);
+  }
+  
+  init() {
+    let templateJq = OverviewController.getTemplateElement();
+    this.rowTemplateJq = templateJq.find('.overviewRowTemplate');
+    this.jq = templateJq.clone().removeClass('overviewTemplate');
+    this.jq.find('.overviewRowTemplate').remove();
+    this.getTableElement().hide();
+    this.getLoadTimeElement().text(new Date());
+    this.initFilters();
+    this.load();
+    this.initListeners();
+    return this;
+  }
+  
+  show() {
+    this.init();
+    OverviewController.getPlaceholderElement().append(this.jq.show());
   }
   
   static showOverview() {
     OverviewController.hideOverview(false);
     google.script.history.push(null, null, 'overview');
-    let overviewTemplate = OverviewController.getTemplateElement();
-    let overview = overviewTemplate.clone().removeClass('overviewTemplate');
-    overview.find('.overviewRowTemplate').remove();
-    OverviewController.getPlaceholderElement().append(overview.show());
-    var overviewTable = OverviewController.getPlaceholderElement().find('table').hide();
-    OverviewController.getPlaceholderElement().find('.loadTime').text(new Date());
     OverviewController.updateButtons(true);
-    OverviewController.populateFilter(OverviewController.getPriorityFilterElement(), GlobalController.PRIORITIES);
-    OverviewController.populateFilter(OverviewController.getStatusFilterElement(), GlobalController.STATUSES);
-    OverviewController.populateSheetFilter(OverviewController.getSheetFilterElement(), SheetController.getSheetInfos());
-    OverviewController.getFilterElements().change(() => this.applyFilters());
-    OverviewController.load(overviewTable);
+    OverviewController.current = new OverviewController().show();
   }
   
-  static hideOverview(opt_changeHistory) {
+  hide(opt_changeHistory) {
     if (opt_changeHistory === undefined || opt_changeHistory === true) {
       google.script.history.push(null, null, '');
     }
     $('.overviewPlaceholder').empty();
     OverviewController.updateButtons(false);
+  }
+  
+  static hideOverview(opt_changeHistory) {
+    if (OverviewController.current) {
+      OverviewController.current.hide(opt_changeHistory);
+      this.current = null;
+    }
   }
 
   static addListeners() {
@@ -191,9 +283,4 @@ class OverviewController {
   }
 }
 
-// TODO(lindahl) Get from server
-OverviewController.PRIORITY_DROPDOWN_MAKER = new DropdownPickerMaker(GlobalController.PRIORITIES,
-    (rowData, newPriority) => SheetController.forSheet(rowData['SHEET_ID']).setPriority(rowData['UUID'], newPriority), 'No Priority')
-
-OverviewController.STATUS_DROPDOWN_MAKER = new DropdownPickerMaker(GlobalController.STATUSES,
-    (rowData, newStatus) => SheetController.forSheet(rowData['SHEET_ID']).setStatus(rowData['UUID'], newStatus), 'No Status')
+OverviewController.current = null;

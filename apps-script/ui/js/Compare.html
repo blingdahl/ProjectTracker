@@ -1,0 +1,198 @@
+/**
+ * @fileoverview Comparators.
+ */
+
+/**
+ * Coompare a vs b
+ *
+ * -1: a < b
+ * 0: a == b
+ * 1: a > b
+ *
+ * If opt_comparator is:
+ * - Undefined, and a and b:
+ *   - Have a compare method, compares using a.compare(b)
+ *   - Do not have a compare method, compares using a < b
+ * - Function, compares using opt_comparator(a, b)
+ * - String, compares the opt_comparator property of a to b
+ *
+ * @param {object!} a
+ * @param {object!} b
+ * @param {string|function(object!, object!):boolean?=} opt_comparator
+ * @return {number}
+ **/
+function compare(a, b, opt_comparator) {
+  if (!opt_comparator) {
+    if (a.compare) {
+      return a.compare(b);
+    }
+    if (a > b) {
+      return 1;
+    }
+    if (a != b) {
+      return -1;
+    }
+    return 0;
+  }
+  if (typeof opt_comparator === 'function') {
+    return opt_comparator(a, b);
+  } else if (typeof opt_comparator === 'string' ||
+             opt_comparator instanceof String) {
+    return compare(a[opt_comparator], b[opt_comparator]);
+  }
+  throw new Error('Unexpected type ' + typeof opt_comparator + ': ' + opt_comparator);
+}
+
+/**
+ * Add comparison convenience functions to the type.  Requires that the type has
+ * a compare method.
+ *
+ * @param {class!} type
+ **/
+compare.addConvenienceFunctions = function(type) {
+  let prototype = type.prototype;
+  if (!prototype.compare) {
+    throw new Error('No compare function for ' + type);
+  }
+  prototype.equals = function(other) {
+    return this.compare(other) === 0;
+  };
+  prototype.isBefore = function(other) {
+    return !(this.compare(other) >= 0);
+  };
+  prototype.isAfter = function(other) {
+    return this.compare(other) > 0;
+  };
+  prototype.equalsOrBefore = function(other) {
+    return !(this.compare(other) > 0);
+  };
+  prototype.equalsOrAfter = function(other) {
+    return this.compare(other) >= 0;
+  };
+};
+
+/**
+ * @param {object!} a
+ * @param {object!} b
+ * @param {string|function(object!):boolean} comparator Property name
+ * or function.
+ * @return {number}
+ **/
+compare.not = function(a, b, comparator) {
+  return -1 * compare(a, b, comparator);
+};
+
+/**
+ * @param {object!} a
+ * @param {object!} b
+ * @param {Array.<string|function(object!):boolean>!} comparators Property name
+ * or function.
+ * @return {number}
+ **/
+compare.chain = function(a, b, ...comparators) {
+  let result;
+  comparators.some(function(comparator) {
+    result = compare(a, b, comparator);
+    return result !== 0;
+  });
+  return result;
+};
+
+compare.fn = {};
+
+/**
+ * @param {string|function(object!):boolean} comparator Property name
+ * or function.
+ * @return {function(object!,object!):number}
+ **/
+compare.fn.compare = function(comparator) {
+  return function(a, b) {
+    return compare(a, b, comparator);
+  };
+};
+
+/**
+ * @param {string|function(object!):boolean} comparator Property name
+ * or function.
+ * @return {function(object!, object!):number}
+ **/
+compare.fn.not = function(comparator) {
+  return function(a, b) {
+    return compare.not(a, b, comparator);
+  };
+};
+
+/**
+ * @param {Array.<string|function(object!):boolean>!} comparators Property name
+ * or function.
+ * @return {function(object!, object!):number}
+ **/
+compare.fn.chain = function(...comparators) {
+  return function(a, b) {
+    return compare.chain(a, b, ...comparators);
+  };
+};
+
+compare.Comparator = class Comparator {
+  constructor() {
+    this.comparators = [];
+  }
+
+  /**
+   * @param {string|function(object!):boolean} comparator Property name
+   * or function.
+   * @return {compare.Comparator!} this
+   **/
+  then(comparator) {
+    this.comparators.push(comparator);
+    return this;
+  }
+
+  /**
+   * @param {string|function(object!):boolean} comparator Property name
+   * or function.
+   * @return {compare.Comparator!} this
+   **/
+  thenNot(comparator) {
+    return this.then(compare.fn.not(comparator));
+  }
+
+  /**
+   * @param {object!} a
+   * @param {object!} b
+   * @return {number}
+   **/
+  compare(a, b) {
+    if (this.comparators.length > 0) {
+      return compare.chain(a, b, ...this.comparators);
+    }
+    return compare(a, b);
+  }
+};
+
+compare.Set = class CompareSet {
+  /**
+   * @param {compare.Comparator?=} opt_comparator
+   **/
+  constructor(opt_comparator) {
+    this.comparator = opt_comparator || new compare.Comparator();
+    this.items = [];
+  }
+
+  /**
+   * @param {object!} newItem
+   **/
+  add(newItem) {
+    if (!this.items.some(
+            item => this.comparator.compare(item, newItem) === 0)) {
+      this.items.push(newItem);
+    }
+  }
+
+  /**
+   * @param {function(object!)} fn
+   **/
+  forEach(fn) {
+    this.items.forEach(fn);
+  }
+};

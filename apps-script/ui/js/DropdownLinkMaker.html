@@ -1,0 +1,49 @@
+class DropdownLinkMaker {
+  constructor(allValues, emptyText, linkClass, changeCallback) {
+    this.allValues = allValues;
+    this.emptyText = emptyText;
+    this.linkClass = linkClass;
+    this.changeCallback = changeCallback;
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.linkClass, this.linkClicked.bind(this));
+  }
+  
+  makeLinkText(currValue) {
+    return currValue || this.emptyText;
+  }
+  
+  makeLink(currValue) {
+    let link = $('<a />');
+    link.text(this.makeLinkText(currValue));
+    link.addClass(this.linkClass);
+    link.attr('data-value', currValue);
+    return link;
+  }
+  
+  linkClicked(e) {
+    var link = $(e.currentTarget);
+    link.parent().append(this.makeDropdown(link.attr('data-value'), link));
+    link.hide();
+  }
+  
+  makeDropdown(currValue, link) {
+    let dropdown = $('<select />');
+    if (this.emptyText) {
+      dropdown.append($('<option />').attr('value', '').text(this.emptyText));
+    }
+    for (var i = 0; i != this.allValues.length; i++) {
+      let optionValue = this.allValues[i];
+      dropdown.append($('<option />').attr('value', optionValue).attr('selected', currValue === optionValue).text(optionValue));
+    }
+    dropdown.change(() => {
+      var newValue = dropdown.val();
+      dropdown.remove();
+      this.changeCallback(link, newValue);
+      link.text(this.makeLinkText(newValue)).show();
+    });
+    return dropdown;
+  }
+}
