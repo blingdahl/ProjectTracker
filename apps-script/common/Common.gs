@@ -16,6 +16,25 @@ if (typeof String.prototype.compare != 'function') {
   };
 };
 
+
+if (typeof String.prototype.padStart != 'function') {
+  String.prototype.padStart = function(num, padChar) {
+    var ret = this;
+    for (var i = this.length; i < num; i++) {
+      ret = padChar + ret;
+    }
+    return ret;
+  };
+};
+
+function padStart(str, num, padChar) {
+  var ret = String(str);
+  for (var i = str.length; i < num; i++) {
+    ret = padChar + ret;
+  }
+  return ret;
+}
+
 function typeOf(value) {
   var s = typeof value;
   if (s === 'object') {

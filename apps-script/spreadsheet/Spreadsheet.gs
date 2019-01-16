@@ -470,7 +470,11 @@ Spreadsheet.init = function() {
   Spreadsheet.Row.prototype.toObject = function() {
     var ret = {};
     this.columns.columnDefinitions.columnDefinitionsInOrder.forEach(function(columnDefinition) {
-      ret[columnDefinition.key] = this.getValue(columnDefinition.header);
+      var value = this.getValue(columnDefinition.header);
+      ret[columnDefinition.key] = value;
+      if (value.getMonth) {
+        ret[columnDefinition.key + '_FORMATTED'] = value.getYear() + '/' + String(value.getMonth() + 1).padStart(2, '0') + '/' + String(value.getDate()).padStart(2, '0');
+      }
       var formula = this.getFormula(columnDefinition.header);
       if (formula) {
         ret[columnDefinition.key + '_URL'] = Spreadsheet.getUrlFromHyperlinkFormula(formula);
