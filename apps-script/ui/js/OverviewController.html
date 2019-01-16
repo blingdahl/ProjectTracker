@@ -104,7 +104,6 @@ class OverviewController {
     this.getDataRowElements().sort(
       compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
                        OverviewController.compareAttributeFn('data-status-index'),
-                       OverviewController.compareAttributeFn('data-sheet-id'),
                        OverviewController.compareAttributeFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
@@ -113,6 +112,7 @@ class OverviewController {
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
     rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
     rowJq.find('.item').text(rowData['ITEM']);
+    rowJq.find('.from').text(rowData['FROM']);
     rowJq.find('.priority').append(this.priorityMaker.makeLink(rowData['PRIORITY']));
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
