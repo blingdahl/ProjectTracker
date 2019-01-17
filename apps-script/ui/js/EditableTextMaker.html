@@ -13,13 +13,16 @@ class EditableTextMaker {
     let link = $('<a />');
     link.text(currValue);
     link.addClass(this.linkClass);
+    link.addClass('editableField');
     link.attr('data-value', currValue);
     return link;
   }
   
   linkClicked(e) {
     var link = $(e.currentTarget);
-    link.parent().append(this.makeInput(link.attr('data-value'), link));
+    let input = this.makeInput(link.attr('data-value'), link);
+    link.parent().append(input);
+    input.focus();
     link.hide();
   }
   
@@ -35,7 +38,14 @@ class EditableTextMaker {
         event.stopPropagation();
       }
     });
-    input.focus();
+    input.keydown((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 27) {
+        link.show();
+        input.hide();
+        event.stopPropagation();
+      }
+    });
     return input;
   }
 }

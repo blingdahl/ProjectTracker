@@ -13,13 +13,6 @@
     color: red;
   }
   
-  .labelName {
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 13px;
-    color: blue;
-  }
-  
   .maxThreads {
     width: 30px;
   }
@@ -50,10 +43,22 @@
     margin-left: 8px;
   }
   
-  a {
-    font-size: 13px;
+  a, .labelName {
+    font-size: 16px;
     text-decoration: underline;
     cursor: pointer;
+    color: blue;
+  }
+  
+  a.editableField {
+    text-decoration: none;
+    cursor: pointer;
+    color: black;
+  }
+  
+  .textInput {
+    font-size: 16px;
+    width: 100%;
   }
   
   .clearSpreadsheetUrl {

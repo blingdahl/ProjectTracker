@@ -19,6 +19,7 @@ class OptionsLinkMaker {
     let link = $('<a />');
     link.text(this.makeLinkText(currValue));
     link.addClass(this.linkClass);
+    link.addClass('editableField');
     link.attr('data-value', currValue);
     return link;
   }
