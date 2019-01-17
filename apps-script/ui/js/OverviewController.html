@@ -54,6 +54,10 @@ class OverviewController {
     return this.jq.find('.loadTime');
   }
   
+  getDisplayCountWrapperElement() {
+    return this.jq.find('.displayCountWrapper');
+  }
+  
   getDisplayCountElement() {
     return this.jq.find('.displayCount');
   }
@@ -124,7 +128,7 @@ class OverviewController {
   fillTextFromDataKey(cellJq, rowData) {
     if (cellJq.hasClass('dateField')) {
       cellJq.text(rowData[cellJq.attr('data-key') + '_FORMATTED']);
-    } else {
+    } else if (!cellJq.hasClass('customFill')) {
       cellJq.text(rowData[cellJq.attr('data-key')]);
     }
   }
@@ -147,7 +151,7 @@ class OverviewController {
   
   handleData(msg) {
     let rows = JSON.parse(msg);
-    this.getTableElement().show();
+    this.setTableShown(true);
     rows.forEach(rowData => this.addRow(rowData));
     this.sortRows();
     this.applyFilters();
@@ -211,12 +215,22 @@ class OverviewController {
     this.statusMaker.attachClickHandler(this.jq);
   }
   
+  setTableShown(show) {
+    if (show) {
+      this.getTableElement().show();
+      this.getDisplayCountWrapperElement().show();
+    } else {
+      this.getTableElement().hide();
+      this.getDisplayCountWrapperElement().hide();
+    }
+  }
+  
   init() {
     let templateJq = OverviewController.getTemplateElement();
     this.rowTemplateJq = templateJq.find('.overviewRowTemplate');
     this.jq = templateJq.clone().removeClass('overviewTemplate');
     this.jq.find('.overviewRowTemplate').remove();
-    this.getTableElement().hide();
+    this.setTableShown(false);
     this.getLoadTimeElement().text(new Date());
     this.initFilters();
     this.load();

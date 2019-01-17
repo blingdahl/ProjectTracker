@@ -10,8 +10,11 @@
     <select class="sheetFilter filter">
       <option value="">Show Sheet...</option>
     </select>
-    <input type="checkbox" class="fromColumn showColumn" data-key="FROM"> From column
-    <input type="checkbox" class="dateColumn showColumn" data-key="EMAIL_LAST_DATE"> Date column
+    Columns:
+    <input type="checkbox" class="fromColumn showColumn" data-key="LINK"> Link
+    <input type="checkbox" class="fromColumn showColumn" data-key="EMAIL"> Email
+    <input type="checkbox" class="fromColumn showColumn" data-key="FROM"> From
+    <input type="checkbox" class="dateColumn showColumn" data-key="EMAIL_LAST_DATE"> Date
     <div class="displayCountWrapper"><span class="displayCount">#</span> messages</div>
   </div>
   <table class="overviewTable">
@@ -19,9 +22,9 @@
       <th>Sheet</th>
       <th>Priority</th>
       <th>Status</th>
-      <th>Email</th>
-      <th>Link</th>
-      <th>Item</th>
+      <th data-key="ITEM">Item</th>
+      <th data-key="EMAIL">Email</th>
+      <th data-key="LINK">Link</th>
       <th data-key="FROM">From</th>
       <th data-key="EMAIL_LAST_DATE">Last Date</th>
     </tr>
@@ -30,9 +33,9 @@
         <td class="sheet"></td>
         <td class="priority"></td>
         <td class="status"></td>
-        <td class="email"></td>
-        <td class="link"></td>
         <td class="item" data-key="ITEM"></td>
+        <td class="email customFill" data-key="EMAIL"></td>
+        <td class="link customFill" data-key="LINK"></td>
         <td class="from" data-key="FROM"></td>
         <td class="emailLastDate dateField" data-key="EMAIL_LAST_DATE"></td>
       </tr>
