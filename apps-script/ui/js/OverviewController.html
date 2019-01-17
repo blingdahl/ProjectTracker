@@ -200,6 +200,31 @@ class OverviewController {
         this.getPriorityFilterElement().val(), this.getStatusFilterElement().val(), this.getSheetFilterElement().val(), $(elt)));
     this.getShowColumnElements().each((idx, elt) => this.setColumnShown($(elt)));
     this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
+    this.saveShowColumns();
+  }
+  
+  showColumnStorageKey(dataKey) {
+    return 'show_' + dataKey;
+  }
+  
+  saveShowColumns() {
+    this.getShowColumnElements().each((idx, elt) => {
+      let jq = $(elt);
+      var dataKey = jq.attr('data-key');
+      sessionStorage.setItem(this.showColumnStorageKey(dataKey), String(jq.is(':checked')));
+    });
+  }
+  
+  initShowColumns() {
+    this.getShowColumnElements().each((idx, elt) => {
+      let jq = $(elt);
+      var dataKey = jq.attr('data-key');
+      let checked = sessionStorage.getItem(this.showColumnStorageKey(dataKey)) === 'true';
+      if (checked) {
+        jq.attr('checked', true);
+      }
+    });
+    this.getShowColumnElements().change(() => this.applyFilters());
   }
   
   initFilters() {
@@ -207,7 +232,7 @@ class OverviewController {
     this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
     this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
     this.getFilterElements().change(() => this.applyFilters());
-    this.getShowColumnElements().change(() => this.applyFilters());
+    this.initShowColumns();
   }
   
   initListeners() {
