@@ -11,18 +11,8 @@ ChangeRowValue.init = function() {
   
   ChangeRowValue.initialized = true;
   
-  ChangeRowValue.setAction = function(sheetId, uuid, action) {
-    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS.ACTION, action);
-    return 'Set action to ' + action;
-  }
-  
-  ChangeRowValue.setPriority = function(sheetId, uuid, priority) {
-    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
-    return 'Set priority to ' + priority;
-  }
-  
-  ChangeRowValue.setStatus = function(sheetId, uuid, status) {
-    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS.STATUS, status);
-    return 'Set status to ' + status;
+  ChangeRowValue.setValue = function(sheetId, uuid, columnName, columnKey, newValue) {
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS[columnKey], newValue);
+    return 'Set ' + columnName + ' to ' + newValue;
   }
 }

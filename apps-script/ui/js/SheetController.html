@@ -67,23 +67,9 @@ class SheetController {
     this.jq.show();
   }
   
-  setAction(uuid, action) {
-    return new RpcConfig('ChangeRowValue_setAction', runner => runner.ChangeRowValue_setAction(this.getSheetId(), uuid, action)).
-        output('Setting action to ' + action + '...').
-        retryOnTimeout().
-        callRpc();
-  }
-  
-  setPriority(uuid, priority) {
-    return new RpcConfig('ChangeRowValue_setPriority', runner => runner.ChangeRowValue_setPriority(this.getSheetId(), uuid, priority)).
-        output('Setting priority to ' + priority + '...').
-        retryOnTimeout().
-        callRpc();
-  }
-  
-  setStatus(uuid, status) {
-    return new RpcConfig('ChangeRowValue_setStatus', runner => runner.ChangeRowValue_setStatus(this.getSheetId(), uuid, status)).
-        output('Setting status to ' + status + '...').
+  setValue(uuid, columnName, columnKey, newValue) {
+    return new RpcConfig('ChangeRowValue_setValue', runner => runner.ChangeRowValue_setValue(this.getSheetId(), uuid, columnName, columnKey, newValue)).
+        output('Setting ' + columnName + ' to ' + newValue + '...').
         retryOnTimeout().
         callRpc();
   }

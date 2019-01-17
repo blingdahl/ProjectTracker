@@ -5,6 +5,7 @@ class OverviewController {
     this.rowTemplateJq = null;
     this.priorityMaker = new OptionsLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', this.handlePriorityChange.bind(this));
     this.statusMaker = new OptionsLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', this.handleStatusChange.bind(this));
+    this.itemMaker = new EditableTextMaker('itemLink', this.handleItemChange.bind(this));
   }
 
   // SECTION:
@@ -91,7 +92,7 @@ class OverviewController {
     let uuid = tr.attr('data-uuid');
     tr.attr('data-status', newStatus);
     tr.attr('data-status-index', String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
-    SheetController.forSheet(sheetId).setStatus(uuid, newStatus);
+    SheetController.forSheet(sheetId).setValue(uuid, 'Status', 'STATUS', newStatus);
   }
   
   handlePriorityChange(link, newPriority) {
@@ -99,7 +100,15 @@ class OverviewController {
     let sheetId = tr.attr('data-sheet-id');
     let uuid = tr.attr('data-uuid');
     tr.attr('data-priority', newPriority);
-    SheetController.forSheet(sheetId).setPriority(uuid, newPriority);
+    SheetController.forSheet(sheetId).setValue(uuid, 'Priority', 'PRIORITY', newPriority);
+  }
+  
+  handleItemChange(link, newValue) {
+    let tr = $(link).closest('tr[data-sheet-id]');
+    let sheetId = tr.attr('data-sheet-id');
+    let uuid = tr.attr('data-uuid');
+    tr.attr('data-item', newValue);
+    SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'ITEM', newValue);
   }
   
   static makeLink(rowData, key) {
@@ -138,6 +147,7 @@ class OverviewController {
     rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
     rowJq.find('.priority').append(this.priorityMaker.makeLink(rowData['PRIORITY']));
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
+    rowJq.find('.item').append(this.itemMaker.makeLink(rowData['ITEM']));
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
     rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
     rowJq.find('td[data-key]').each((index, elt) => this.fillTextFromDataKey($(elt), rowData));
@@ -238,6 +248,7 @@ class OverviewController {
   initListeners() {
     this.priorityMaker.attachClickHandler(this.jq);
     this.statusMaker.attachClickHandler(this.jq);
+    this.itemMaker.attachClickHandler(this.jq);
   }
   
   setTableShown(show) {

@@ -22,30 +22,12 @@ function Preferences_setTrackedForSheet(sheetId, tracked) {
   return tracked ? 'Added tracking' : 'Removed tracking';
 }
 
-function ChangeRowValue_setAction(sheetId, uuid, action) {
-  Log.start('ChangeRowValue_setAction', [sheetId, uuid, action]);
+function ChangeRowValue_setValue(sheetId, uuid, columnName, columnKey, newValue) {
+  Log.start('ChangeRowValue_setValue', [sheetId, uuid, columnName, columnKey, newValue]);
   ChangeRowValue.init();
   TrackingSheet.init();
-  var ret = ChangeRowValue.setAction(sheetId, uuid, action);
-  Log.stop('ChangeRowValue_setAction', [sheetId, uuid, action]);
-  return ret;
-}
-
-function ChangeRowValue_setPriority(sheetId, uuid, priority) {
-  Log.start('ChangeRowValue_setPriority', [sheetId, uuid, priority]);
-  ChangeRowValue.init();
-  TrackingSheet.init();
-  var ret = ChangeRowValue.setPriority(sheetId, uuid, priority);
-  Log.stop('ChangeRowValue_setPriority', [sheetId, uuid, priority]);
-  return ret;
-}
-
-function ChangeRowValue_setStatus(sheetId, uuid, status) {
-  Log.start('ChangeRowValue_setStatus', [sheetId, uuid, status]);
-  ChangeRowValue.init();
-  TrackingSheet.init();
-  var ret = ChangeRowValue.setStatus(sheetId, uuid, status);
-  Log.stop('ChangeRowValue_setStatus', [sheetId, uuid, status]);
+  var ret = ChangeRowValue.setValue(sheetId, uuid, columnName, columnKey, newValue);
+  Log.stop('ChangeRowValue_setValue', [sheetId, uuid, columnName, columnKey, newValue]);
   return ret;
 }
 

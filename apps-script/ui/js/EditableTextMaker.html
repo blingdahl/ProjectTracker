@@ -1,0 +1,41 @@
+class EditableTextMaker {
+  constructor(linkClass, changeCallback) {
+    this.linkClass = linkClass;
+    this.changeCallback = changeCallback;
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.linkClass, this.linkClicked.bind(this));
+  }
+  
+  makeLink(currValue) {
+    let link = $('<a />');
+    link.text(currValue);
+    link.addClass(this.linkClass);
+    link.attr('data-value', currValue);
+    return link;
+  }
+  
+  linkClicked(e) {
+    var link = $(e.currentTarget);
+    link.parent().append(this.makeInput(link.attr('data-value'), link));
+    link.hide();
+  }
+  
+  makeInput(currValue, link) {
+    let input = $('<input />').addClass('textInput').val(currValue);
+    input.keypress((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 13) {
+        let newValue = input.val();
+        this.changeCallback(link, newValue);
+        link.text(newValue).show();
+        input.hide();
+        event.stopPropagation();
+      }
+    });
+    input.focus();
+    return input;
+  }
+}
