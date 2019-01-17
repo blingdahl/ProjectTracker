@@ -281,8 +281,8 @@ class OverviewController {
     new RpcConfig(runner => runner.Overview_getRowsForSheetId(sheetId)).
         output('Loading overview for ' + SheetController.forSheet(sheetId).getSheetName() + '...').
         clearMessageOnSuccess().
-        withSuccessFn(msg => this.handleData(msg)).
-        callRpc();
+        callRpc().
+        then(msg => this.handleData(msg));
   }
   
   load() {
@@ -290,8 +290,8 @@ class OverviewController {
     new RpcConfig(runner => runner.Overview_getRows()).
         output('Loading overview...').
         clearMessageOnSuccess().
-        withSuccessFn(msg => this.handleData(msg)).
-        callRpc();
+        callRpc().
+        then(msg => this.handleData(msg));
   }
   
   static updateOverview() {

@@ -56,23 +56,24 @@ class AddItemDialog {
     }
     if (errors.length > 0) {
       this.getErrorElement().text(errors.join(', ')).show();
-      return false;
+      throw new Error(errors.join(', '));
     }
     this.getErrorElement().hide();
-    return true;
+    return Promise.resolve();
   }
   
   save() {
-    if (!this.validate(false)) {
-      console.log('not saving');
-      return false;
-    }
+    this.validate(false);
     var title = this.getTitle();
-    new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
+    return new RpcConfig(runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         retryOnTimeout().
         callRpc();
-    return true;
+  }
+  
+  clearForm() {
+    this.getTitleElement().val('');
+    this.getUrlElement().val('');
   }
   
   show() {
@@ -84,13 +85,13 @@ class AddItemDialog {
         new RpcConfig(runner => runner.AddItem_getPageTitle(url)).
             retryOnTimeout().
             clearMessageOnSuccess().
-            withSuccessFn(successMsg => {
+            callRpc().
+            then(successMsg => {
               if (!this.getTitle()) {
                 this.getTitleElement().val(successMsg);
                 this.validate(true);
               }
-            }).
-            callRpc();
+            });
       }
     });
     let _this = this;
@@ -98,14 +99,22 @@ class AddItemDialog {
       title: 'Add item to ' + this.sheetName,
       minWidth: 500,
       buttons: [
-        {text: 'Add Item',
+        {text: 'Add and Update',
          click: () => {
-           if (this.save()) {
-             this.itemForm.dialog("close");
-           }
+           var validatePromise = this.validate(false);
+           var savePromise = this.save();
+           savePromise.then(() => SheetController.forSheet(this.sheetId).update());
+           validatePromise.then(() => this.itemForm.dialog("close"));
          }
         },
-        {text: "Cancel",
+        {text: 'Add',
+         click: () => {
+           var validatePromise = this.validate(false);
+           this.save();
+           validatePromise.then(this.clearForm());
+         }
+        },
+        {text: "Close",
          click: () => {
            this.itemForm.dialog("close");
          }

@@ -95,8 +95,8 @@ class SheetController {
     return new RpcConfig(runner => runner.Update_update(this.getSheetId())).
         output('Updating ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
-        withSuccessFn(() => OverviewController.updateOverviewForSheet(this.getSheetId())).
-        callRpc();
+        callRpc().
+        then(() => OverviewController.updateOverviewForSheet(this.getSheetId()));
   }
 
   add() {

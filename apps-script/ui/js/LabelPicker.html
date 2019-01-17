@@ -95,8 +95,8 @@ class LabelPicker {
     new RpcConfig(runner => runner.Label_getAllLabels()).
         retryOnTimeout().
         logAll().
-        withSuccessFn(successMsg => this.populateSelect(JSON.parse(successMsg))).
-        callRpc();
+        callRpc().
+        then(successMsg => this.populateSelect(JSON.parse(successMsg)));
   }
   
   updateLabelFromSelect() {
