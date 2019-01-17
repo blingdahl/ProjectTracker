@@ -92,7 +92,7 @@ class LabelPicker {
   populateLabelSelect() {
     this.clearSelectOptions('Populating...');
     this.getMaxThreadsElement().val(this.getMaxThreads());
-    new RpcConfig(runner => runner.Label_getAllLabels()).
+    new RpcConfig('Label_getAllLabels', runner => runner.Label_getAllLabels()).
         retryOnTimeout().
         logAll().
         callRpc().
@@ -113,7 +113,7 @@ class LabelPicker {
   }
   
   renameLabel(newLabel) {
-    new RpcConfig(runner => runner.Gmail_renameLabel(this.sheetId, newLabel)).
+    new RpcConfig('Gmail_renameLabel', runner => runner.Gmail_renameLabel(this.sheetId, newLabel)).
         output('Renaming label ' + this.getLabelName() + ' to ' + newLabel).
         callRpc();
     this.setLabelName(newLabel);
@@ -122,7 +122,7 @@ class LabelPicker {
   
   clearLabel() {
     this.setLabelName(null);
-    new RpcConfig(runner => runner.Preferences_clearLabelNameForSheet(this.sheetId)).
+    new RpcConfig('Preferences_clearLabelNameForSheet', runner => runner.Preferences_clearLabelNameForSheet(this.sheetId)).
         retryOnTimeout().
         callRpc();
   }
@@ -137,7 +137,7 @@ class LabelPicker {
   }
   
   saveClicked() {
-    new RpcConfig(runner => runner.Preferences_setLabelNameForSheet(this.sheetId,
+    new RpcConfig('Preferences_setLabelNameForSheet', runner => runner.Preferences_setLabelNameForSheet(this.sheetId,
                                                         this.updateLabelFromSelect(),
                                                         this.updateMaxThreadsFromInput())).
         retryOnTimeout().
@@ -154,7 +154,7 @@ class LabelPicker {
   
   removeLabelClicked() {
     this.clearLabel();
-    new RpcConfig(runner => runner.Preferences_clearLabelForSheet(this.sheetId)).callRpc();
+    new RpcConfig('Preferences_clearLabelForSheet', runner => runner.Preferences_clearLabelForSheet(this.sheetId)).callRpc();
     this.setMode(LabelPicker.MODE.DISPLAY);
   }
   

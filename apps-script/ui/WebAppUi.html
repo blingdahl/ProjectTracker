@@ -27,7 +27,7 @@
       </div>
       <script>
         function updatePreferences() {
-          new RpcConfig(runner => runner.Preferences_updateScriptPreferences($('.spreadsheetUrl').val(), $('.appTitle').val(), $('.scriptUrl').val())).
+          new RpcConfig('Preferences_updateScriptPreferences', runner => runner.Preferences_updateScriptPreferences($('.spreadsheetUrl').val(), $('.appTitle').val(), $('.scriptUrl').val())).
               output('Updating Preferences...').
               retryOnTimeout().
               callRpc();
@@ -49,7 +49,7 @@
         <?!= include("ui/js/RpcConfig"); ?>
         function setSpreadsheetUrl() {
           console.log($('.spreadsheetUrl').val());
-          new RpcConfig(runner => runner.setSpreadsheetUrl($('.spreadsheetUrl').val())).
+          new RpcConfig('setSpreadsheetUrl', runner => runner.setSpreadsheetUrl($('.spreadsheetUrl').val())).
               output('Setting spreadsheet url...').
               retryOnTimeout().
               callRpc();

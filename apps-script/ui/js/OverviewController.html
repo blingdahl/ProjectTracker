@@ -278,7 +278,7 @@ class OverviewController {
   updateOverviewForSheet(sheetId) {
     this.getDataRowElements().filter('[data-sheet-id="' + sheetId + '"]').remove();
     $('.overviewPlaceholder').find('.overviewLoading').show();
-    new RpcConfig(runner => runner.Overview_getRowsForSheetId(sheetId)).
+    new RpcConfig('Overview_getRowsForSheetId', runner => runner.Overview_getRowsForSheetId(sheetId)).
         output('Loading overview for ' + SheetController.forSheet(sheetId).getSheetName() + '...').
         clearMessageOnSuccess().
         callRpc().
@@ -287,7 +287,7 @@ class OverviewController {
   
   load() {
     $('.overviewPlaceholder').find('.overviewLoading').show();
-    new RpcConfig(runner => runner.Overview_getRows()).
+    new RpcConfig('Overview_getRows', runner => runner.Overview_getRows()).
         output('Loading overview...').
         clearMessageOnSuccess().
         callRpc().

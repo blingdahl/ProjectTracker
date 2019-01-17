@@ -1,5 +1,6 @@
 class RpcConfig {
-  constructor(callFn) {
+  constructor(name, callFn) {
+    this.name_ = name;
     this.callFn_ = callFn;
     this.successOut_ = this.output.bind(this);
     this.failureOut_ = this.append.bind(this);
@@ -80,7 +81,7 @@ class RpcConfig {
   
   handleSuccess_(msg) {
     if (this.startTime) {
-      console.log('Success in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
+      console.log(this.name_ + ': Success in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
     }
     this.successOut_(msg);
     if (this.rpcDiv_) {
@@ -91,7 +92,7 @@ class RpcConfig {
   
   handleFailure_(msg) {
     if (this.startTime) {
-      console.log('Failure in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
+      console.log(this.name_ + ': Failure in ' + (new Date().getTime() - this.startTime.getTime()) + 'ms');
     }
     this.failureOut_(msg);
     if (this.rpcDiv_) {
