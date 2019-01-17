@@ -23,6 +23,10 @@ class OverviewController {
     return $('.hideOverview');
   }
   
+  static getSortOverviewElement() {
+    return $('.sortOverview');
+  }
+  
   static getPlaceholderElement() {
     return $('.overviewPlaceholder');
   }
@@ -279,10 +283,12 @@ class OverviewController {
       OverviewController.getShowOverviewElement().hide();
       OverviewController.getUpdateOverviewElement().show();
       OverviewController.getHideOverviewElement().show();
+      OverviewController.getSortOverviewElement().show();
     } else {
       OverviewController.getShowOverviewElement().show();
       OverviewController.getUpdateOverviewElement().hide();
       OverviewController.getHideOverviewElement().hide();
+      OverviewController.getSortOverviewElement().hide();
     }
   }
   
@@ -346,6 +352,12 @@ class OverviewController {
     }
   }
   
+  static sortOverview() {
+    if (OverviewController.current) {
+      OverviewController.current.sortRows();
+    }
+  }
+  
   static handleShowOverviewClick() {
     OverviewController.showOverview();
   }
@@ -357,11 +369,16 @@ class OverviewController {
   static handleHideOverviewClick() {
     OverviewController.hideOverview();
   }
+  
+  static handleSortOverviewClick() {
+    OverviewController.sortRows();
+  }
 
   static addListeners() {
     OverviewController.getShowOverviewElement().click(OverviewController.handleShowOverviewClick);
     OverviewController.getUpdateOverviewElement().click(OverviewController.handleUpdateOverviewClick);
     OverviewController.getHideOverviewElement().click(OverviewController.handleHideOverviewClick);
+    OverviewController.getSortOverviewElement().click(OverviewController.handleSortOverviewClick);
   }
   
   static init() {
