@@ -128,7 +128,27 @@ class OverviewController {
   }
   
   static makeLink(rowData, key, opt_text) {
+    let url = rowData[key + '_URL'];
+    if (!url) {
+      return null;
+    }
     return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(opt_text || rowData[key]);
+  }
+  
+  static makeAddLink(rowData) {
+    return $('<a />').text('Add Link...').click(() => {
+      let url = window.prompt('URL');
+      if (url) {
+        let sheetId = rowData['SHEET_ID'];
+        let uuid = rowData['UUID'];
+        new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(sheetId, uuid, 'Link', 'LINK', url)).
+            output('Add URL ' + url + '...').
+            callRpc().
+            then(() => {
+              OverviewController.updateOverviewForSheet(sheetId);
+            });
+      }
+    });
   }
   
   static getSheetOptions() {
@@ -172,7 +192,7 @@ class OverviewController {
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
     rowJq.find('.item').append(this.itemMaker.makeLink(rowData['ITEM']));
     rowJq.find('.email').append(OverviewController.makeLink(rowData, 'EMAIL'));
-    rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK'));
+    rowJq.find('.link').append(OverviewController.makeLink(rowData, 'LINK') || OverviewController.makeAddLink(rowData));
     rowJq.find('td[data-key]').each((index, elt) => this.fillTextFromDataKey($(elt), rowData));
     rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
     rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
@@ -391,7 +411,7 @@ class OverviewController {
   }
   
   static handleSortOverviewClick() {
-    OverviewController.sortRows();
+    OverviewController.current.sortRows();
   }
 
   static addListeners() {
