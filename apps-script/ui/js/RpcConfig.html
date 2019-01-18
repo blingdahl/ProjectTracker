@@ -136,6 +136,14 @@ class RpcConfig {
   
   static addGlobalListeners() {
     $('.clearCompleted').click(RpcConfig.clearCompleted);
+    $(document).keydown((event) => {
+      console.log(event);
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 27) {
+        RpcConfig.clearCompleted();
+        event.stopPropagation();
+      }
+    });
   }
   
   static init() {
