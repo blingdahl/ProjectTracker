@@ -31,6 +31,15 @@ function ChangeRowValue_setValue(sheetId, uuid, columnName, columnKey, newValue)
   return ret;
 }
 
+function ChangeRowValue_changeSheet(fromSheetId, toSheetId, uuid) {
+  Log.start('ChangeRowValue_changeSheet', [fromSheetId, toSheetId, uuid]);
+  ChangeRowValue.init();
+  TrackingSheet.init();
+  var ret = ChangeRowValue.changeSheet(fromSheetId, toSheetId, uuid);
+  Log.stop('ChangeRowValue_changeSheet', [fromSheetId, toSheetId, uuid]);
+  return ret;
+}
+
 function AddItem_addItem(sheetId, title, url, priority) {
   Log.start('AddItem_addItem', [sheetId, title, url, priority]);
   AddItem.init();

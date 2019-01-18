@@ -3,6 +3,7 @@ class OverviewController {
   constructor() {
     this.jq = null;
     this.rowTemplateJq = null;
+    this.changeSheetMaker = new OptionsLinkMaker(OverviewController.getSheetOptions(), 'Unexpected', 'changeSheetLink', this.handleSheetChange.bind(this));
     this.priorityMaker = new OptionsLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', this.handlePriorityChange.bind(this));
     this.statusMaker = new OptionsLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', this.handleStatusChange.bind(this));
     this.itemMaker = new EditableTextMaker('itemLink', this.handleItemChange.bind(this));
@@ -115,8 +116,25 @@ class OverviewController {
     SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'ITEM', newValue);
   }
   
-  static makeLink(rowData, key) {
-    return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(rowData[key]);
+  handleSheetChange(link, newSheetId) {
+    let tr = $(link).closest('tr[data-sheet-id]');
+    let sheetId = tr.attr('data-sheet-id');
+    if (sheetId == newSheetId) {
+      return;
+    }
+    let uuid = tr.attr('data-uuid');
+    tr.attr('data-sheet-id', newSheetId);
+    SheetController.forSheet(sheetId).changeSheet(uuid, newSheetId);
+  }
+  
+  static makeLink(rowData, key, opt_text) {
+    return $('<a />').attr('href', rowData[key + '_URL']).attr('target', '_blank').text(opt_text || rowData[key]);
+  }
+  
+  static getSheetOptions() {
+    let ret = [];
+    SheetController.getSheetInfos().forEach(sheetInfo => ret.push({text: sheetInfo.sheetName, value: sheetInfo.sheetId}));
+    return ret;
   }
   
   static compareAttribute(a, b, attrName) {
@@ -148,7 +166,8 @@ class OverviewController {
   
   addRow(rowData) {
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
-    rowJq.find('.sheet').append(OverviewController.makeLink(rowData, 'SHEET'));
+    rowJq.find('.sheet').append(this.changeSheetMaker.makeLink(rowData['SHEET_ID'], rowData['SHEET']));
+    rowJq.find('.viewSheet').append(OverviewController.makeLink(rowData, 'SHEET', 'View'));
     rowJq.find('.priority').append(this.priorityMaker.makeLink(rowData['PRIORITY']));
     rowJq.find('.status').append(this.statusMaker.makeLink(rowData['STATUS']));
     rowJq.find('.item').append(this.itemMaker.makeLink(rowData['ITEM']));
@@ -250,6 +269,7 @@ class OverviewController {
   }
   
   initListeners() {
+    this.changeSheetMaker.attachClickHandler(this.jq);
     this.priorityMaker.attachClickHandler(this.jq);
     this.statusMaker.attachClickHandler(this.jq);
     this.itemMaker.attachClickHandler(this.jq);

@@ -74,6 +74,13 @@ class SheetController {
         callRpc();
   }
   
+  changeSheet(uuid, toSheetId) {
+    return new RpcConfig('ChangeRowValue_changeSheet', runner => runner.ChangeRowValue_changeSheet(this.getSheetId(), toSheetId, uuid)).
+        output('Moving to ' + SheetController.forSheet(toSheetId).getSheetName() + '...').
+        retryOnTimeout().
+        callRpc();
+  }
+  
   // SECTION:
   // Click handlers
 
@@ -136,10 +143,13 @@ class SheetController {
   }
   
   static getSheetInfos() {
-    var allSheetControllers = SheetController.getAll();
-    var sheetInfos = [];
-    allSheetControllers.forEach(sheetController => sheetInfos.push({sheetId: sheetController.getSheetId(), sheetName: sheetController.getSheetName()}));
-    return sheetInfos;
+    if (!SheetController.SHEET_INFOS) {
+      var allSheetControllers = SheetController.getAll();
+      SheetController.SHEET_INFOS = [];
+      allSheetControllers.forEach(sheetController => SheetController.SHEET_INFOS.push({sheetId: sheetController.getSheetId(), sheetName: sheetController.getSheetName()}));
+      SheetController.SHEET_INFOS.sort((a, b) => a.sheetName > b.sheetName ? 1 : a.sheetName != b.sheetName ? -1 : 0);
+    }
+    return SheetController.SHEET_INFOS;
   }
   
   static forSheet(sheetId) {
@@ -164,3 +174,5 @@ class SheetController {
 }
 
 SheetController.ALL = [];
+
+SheetController.SHEET_INFOS = null;

@@ -11,16 +11,20 @@ class OptionsLinkMaker {
     ancestorJq.on('click', '.' + this.linkClass, this.linkClicked.bind(this));
   }
   
-  makeLinkText(currValue) {
-    return currValue || this.emptyText;
+  makeLinkText(currText) {
+    return currText || this.emptyText;
   }
   
-  makeLink(currValue) {
+  makeLink(currValue, opt_currText) {
     let link = $('<a />');
-    link.text(this.makeLinkText(currValue));
+    if(!opt_currText) {
+      opt_currText = currValue;
+    }
+    link.text(this.makeLinkText(opt_currText));
     link.addClass(this.linkClass);
     link.addClass('editableField');
     link.attr('data-value', currValue);
+    link.attr('data-text', opt_currText);
     return link;
   }
   
@@ -34,17 +38,31 @@ class OptionsLinkMaker {
     let options = $('<div />').addClass('linkOptions');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
-      let option = $('<div />').attr('data-value', optionValue).text(optionValue || this.emptyText);
-      if (currValue === optionValue) {
+      let text;
+      let value = optionValue;
+      if (typeof optionValue === 'string') {
+        text = optionValue || this.emptyText;
+        value = optionValue;
+      } else {
+        text = optionValue.text;
+        value = optionValue.value;
+      }
+      let option = $('<div />').attr('data-value', value).attr('data-text', text).text(text);
+      console.log('currValue', currValue);
+      console.log('value', value);
+      if (currValue == value) {
         option.addClass('currValue');
       }
       options.append(option);
       option.click((event) => {
-        let newValue = $(event.currentTarget).attr('data-value');
+        let jq = $(event.currentTarget);
+        let newValue = jq.attr('data-value');
+        let newText = jq.text();
         options.remove();
         this.changeCallback(link, newValue);
+        link.attr('data-text', newText);
         link.attr('data-value', newValue);
-        link.text(this.makeLinkText(newValue)).show();
+        link.text(this.makeLinkText(newText)).show();
       });
     }
     return options;

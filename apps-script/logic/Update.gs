@@ -112,4 +112,29 @@ Update.init = function() {
     }
     return response;
   }
+  
+  Update.changeSheet = function(fromSheetId, toSheetId, uuid) {
+    var fromSheet = TrackingSheet.forSheetId(fromSheetId);
+    var fromRow = fromSheet.getRowForUuid(uuid);
+    var threadId = fromRow.getValue(TrackingSheet.COLUMNS.THREAD_ID);
+    if (threadId) {
+      var thread = GmailApp.getThreadById(threadId);
+      var fromLabelName = Preferences.Properties.get(Preferences.Names.labelName(fromSheetId));
+      var toLabelName = Preferences.Properties.get(Preferences.Names.labelName(toSheetId));
+      if (!fromLabelName) {
+        throw new Error('From sheet does not have a label');
+      }
+      if (!toLabelName) {
+        throw new Error('To sheet does not have a label');
+      }
+      var fromLabel = GmailLabel.getUserDefined(fromLabelName);
+      var toLabel = GmailLabel.getUserDefined(toLabelName);
+      GmailLabel.removeLabel(thread, fromLabel);
+      GmailLabel.addLabel(thread, toLabel);
+    }
+    var toSheet = TrackingSheet.forSheetId(toSheetId);
+    toSheet.addCopyOfRow(fromRow);
+    fromSheet.removeRow(fromRow);
+    return 'Moved to ' + toSheet.getSheetName();
+  }
 }
