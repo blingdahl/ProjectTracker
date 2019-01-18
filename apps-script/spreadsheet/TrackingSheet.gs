@@ -4,6 +4,14 @@ TrackingSheet.initialized = false;
 
 TrackingSheet.PRIORITIES = ['P0', 'P1', 'P2', 'P3', 'P4'];
 
+TrackingSheet.STATUSES = ['Completed',
+                          'Obsolete',
+                          'In Progress',
+                          'On Deck',
+                          'Waiting',
+                          'Following',
+                          'Backburner'];
+
 TrackingSheet.init = function() {
   if (TrackingSheet.initialized) {
     return;

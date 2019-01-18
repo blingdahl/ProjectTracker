@@ -12,14 +12,6 @@ StatusHandler.init = function() {
   Log.info('StatusHandler.init()');
   
   StatusHandler.initialized = true;
-
-  StatusHandler.STATUSES = ['Completed',
-                            'Obsolete',
-                            'In Progress',
-                            'On Deck',
-                            'Waiting',
-                            'Following',
-                            'Backburner'];
   
   StatusHandler.markStatus = function(status, label, rowMutation, thread, removeRow) {
     if (thread) {
