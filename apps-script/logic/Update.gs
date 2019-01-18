@@ -43,7 +43,7 @@ Update.init = function() {
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
-      row.setDataValidation(TrackingSheet.COLUMNS.STATUS, StatusHandler.STATUSES);
+      row.setDataValidation(TrackingSheet.COLUMNS.STATUS, TrackingSheet.STATUSES);
       if (!row.getValue(TrackingSheet.COLUMNS.ITEM)) {
         row.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
         continue;
