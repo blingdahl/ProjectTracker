@@ -40,18 +40,32 @@ GmailSync.init = function() {
   
   GmailSync.copyPriorityFromLabel = function(thread, row) {
     // End with highest priority because that is the one we want to keep around
-    var priorities = TrackingSheet.PRIORITIES.reverse();
+    var priorities = TrackingSheet.PRIORITIES.concat([]).reverse();
     for (var i = 0; i < priorities.length; i++) {
       var priority = priorities[i];
-      var label = GmailLabel['MAKE_' + priority.toUpperCase()];
+      var label = GmailLabel.MAKE_PRIORITY_LABEL_MAP[priority];
       if (GmailLabel.removeLabel(thread, label)) {
         row.setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
       }
     }
   }
   
+  GmailSync.copyStatusFromLabel = function(thread, row) {
+    var statuses = [''].concat(TrackingSheet.STATUSES).reverse();
+    for (var i = 0; i < statuses.length; i++) {
+      var status = statuses[i];
+      var label = GmailLabel.MARK_STATUS_LABEL_MAP[status];
+      if (!label) {
+        throw new Error('No label for ' + status);
+      }
+      if (GmailLabel.removeLabel(thread, label)) {
+        row.setValue(TrackingSheet.COLUMNS.STATUS, status);
+      }
+    }
+  }
+  
   GmailSync.copyPriorityToLabel = function(thread, priority) {
-    GmailLabel.setActiveLabel(thread, GmailLabel[priority.toUpperCase()], GmailLabel.PRIORITY_LABELS);
+    GmailLabel.setActiveLabel(thread, GmailLabel.PRIORITY_LABEL_MAP[priority], GmailLabel.PRIORITY_LABELS);
   }
   
   GmailSync.getOtherLabelNames = function(labelName) {
@@ -88,6 +102,7 @@ GmailSync.init = function() {
         row.setValue(TrackingSheet.COLUMNS.FROM, GmailExtractor.getFrom(thread));
       }
       GmailSync.copyPriorityFromLabel(thread, row);
+      GmailSync.copyStatusFromLabel(thread, row);
       GmailSync.copyPriorityToLabel(thread, row.getValue(TrackingSheet.COLUMNS.PRIORITY));
       row.setDataValidation(TrackingSheet.COLUMNS.ACTION, ActionHandler.getGmailActions(otherLabelNames, thread));
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, thread.getFirstMessageSubject() || '(No Subject)');
