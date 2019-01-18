@@ -47,13 +47,13 @@
     font-size: 16px;
     text-decoration: underline;
     cursor: pointer;
-    color: blue;
+    color: #0000ff;
   }
   
   a.editableField {
     text-decoration: none;
     cursor: pointer;
-    color: black;
+    color: #000000;
   }
   
   .textInput {
@@ -67,18 +67,27 @@
   }
   
   .overviewTable tr:nth-child(even) {
-    background: #DDD;
+    background: #dddddd;
   }
 
   .overviewTable tr:nth-child(odd) {
-    background: #FFF;
+    background: #ffffff;
   }
   
   .overviewTable tr[data-status="Completed"],
   .overviewTable tr[data-status="Obsolete"],
   .overviewTable tr[data-status="Completed"]  a.editableField,
   .overviewTable tr[data-status="Obsolete"]  a.editableField {
-    color: #999;
+    color: #999999;
+  }
+  
+  a.addLink {
+    color: #9999cc;
+  }
+  
+  .overviewTable tr[data-status="Completed"] a.addLink,
+  .overviewTable tr[data-status="Obsolete"] a.addLink {
+    display: none;
   }
   
   .loadTime {
@@ -106,8 +115,8 @@
   .linkOptions {
     margin-top: 5px;
     border-radius: 4px;
-    border: 1px solid #333;
-    background: #eee;
+    border: 1px solid #333333;
+    background: #eeeeee;
   }
   
   .linkOptions div {
@@ -118,11 +127,11 @@
     margin-top: 1px;
     margin-right: 3px;
     margin-left: 3px;
-    border-top: 1px solid #333;
+    border-top: 1px solid #333333;
   }
   
   .linkOptions div.currValue {
-    background: #ccc;
+    background: #cccccc;
   }
   
   .linkOptions div:first-child {
@@ -131,6 +140,6 @@
   }
   
   .linkOptions div:hover {
-    background: #aaa;
+    background: #aaaaaa;
   }
 </style>

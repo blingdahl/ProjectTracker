@@ -136,7 +136,7 @@ class OverviewController {
   }
   
   static makeAddLink(rowData) {
-    return $('<a />').text('Add Link...').click(() => {
+    return $('<a />').text('Add...').addClass('addLink').click(() => {
       let url = window.prompt('URL');
       if (url) {
         let sheetId = rowData['SHEET_ID'];
