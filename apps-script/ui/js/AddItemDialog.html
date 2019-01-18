@@ -99,7 +99,7 @@ class AddItemDialog {
   }
   
   show() {
-    this.getFieldElements().change(() => this.getErrors(true)));
+    this.getFieldElements().change(() => this.getErrors(true));
     this.getFieldElements().keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 13) {
@@ -128,7 +128,6 @@ class AddItemDialog {
             });
       }
     });
-    console.log('Set up change listener ', this.getUrlElement());
     this.itemForm.dialog({
       title: 'Add item to ' + this.sheetName,
       minWidth: 500,
