@@ -58,11 +58,11 @@ function AddItem_addItem(sheetId, title, url, priority) {
   return ret;
 }
 
-function AddItem_getPageTitle(url) {
-  Log.start('AddItem_getPageTitle', [url]);
-  AddItem.init();
-  var ret = AddItem.getPageTitle(url);
-  Log.stop('AddItem_getPageTitle', [url]);
+function UrlFetcher_getTitleForUrl(url) {
+  Log.start('UrlFetcher_getTitleForUrl', [url]);
+  UrlFetcher.init();
+  var ret = UrlFetcher.getTitleForUrl(url);
+  Log.stop('UrlFetcher_getTitleForUrl', [url]);
   return ret;
 }
 
