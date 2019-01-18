@@ -90,7 +90,7 @@ class AddItemDialog {
   
   addItemAndUpdate() {
      var errors = this.getErrors(false);
-     if (isValid) {
+     if (errors) {
        throw new Error(errors);
      }
      var savePromise = this.save();
