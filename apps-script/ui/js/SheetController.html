@@ -136,6 +136,13 @@ class SheetController {
   static addGlobalListeners() {
     SheetController.getDoAllTheThingsElement().click(SheetController.updateAll);
     SheetController.getTidyAllElement().click(SheetController.tidyAll);
+    $(document).keydown((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 13 && event.metaKey) {
+        SheetController.updateAll();
+        event.stopPropagation();
+      }
+    });
   }
   
   static getAll() {
