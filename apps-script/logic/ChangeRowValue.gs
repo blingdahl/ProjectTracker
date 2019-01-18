@@ -17,6 +17,11 @@ ChangeRowValue.init = function() {
     return 'Set ' + columnName + ' to ' + newValue;
   }
   
+  ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, url) {
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(url, 'Link'));
+    return 'Set ' + columnName + ' URL';
+  }
+  
   ChangeRowValue.changeSheet = function(fromSheetId, toSheetId, uuid) {
     return Update.changeSheet(fromSheetId, toSheetId, uuid);
   }
