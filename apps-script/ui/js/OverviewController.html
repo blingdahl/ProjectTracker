@@ -419,6 +419,13 @@ class OverviewController {
     OverviewController.getUpdateOverviewElement().click(OverviewController.handleUpdateOverviewClick);
     OverviewController.getHideOverviewElement().click(OverviewController.handleHideOverviewClick);
     OverviewController.getSortOverviewElement().click(OverviewController.handleSortOverviewClick);
+    $(document).keydown((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 85 && event.metaKey) {
+        OverviewController.updateOverview();
+        event.stopPropagation();
+      }
+    });
   }
   
   static init() {
