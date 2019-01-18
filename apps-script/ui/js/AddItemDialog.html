@@ -47,7 +47,7 @@ class AddItemDialog {
     return this.getTitle() || this.getUrl() || this.getPriority();
   }
   
-  validate(dirtyOnly) {
+  getErrors(dirtyOnly) {
     let errors = [];
     if (!dirtyOnly || this.isDirty()) {
       if (!this.getTitle()) {
@@ -56,14 +56,17 @@ class AddItemDialog {
     }
     if (errors.length > 0) {
       this.getErrorElement().text(errors.join(', ')).show();
-      throw new Error(errors.join(', '));
+      return errors.join(', ');
     }
     this.getErrorElement().hide();
-    return Promise.resolve();
+    return null;
   }
   
   save() {
-    this.validate(false);
+    let errors = this.getErrors(false);
+    if (errors) {
+      throw new Error(errors);
+    }
     var title = this.getTitle();
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
@@ -77,20 +80,26 @@ class AddItemDialog {
   }
   
   addItem() {
-     var validatePromise = this.validate(false);
+     var errors = this.getErrors(false);
+     if (errors) {
+       throw new Error(errors);
+     }
      this.save();
-     validatePromise.then(this.clearForm());
+     this.clearForm();
   }
   
   addItemAndUpdate() {
-     var validatePromise = this.validate(false);
+     var errors = this.getErrors(false);
+     if (isValid) {
+       throw new Error(errors);
+     }
      var savePromise = this.save();
      savePromise.then(() => SheetController.forSheet(this.sheetId).update());
-     validatePromise.then(() => this.itemForm.dialog("close"));
+     this.itemForm.dialog('close');
   }
   
   show() {
-    this.getFieldElements().change(() => this.validate(true));
+    this.getFieldElements().change(() => this.getErrors(true)));
     this.getFieldElements().keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 13) {
@@ -105,20 +114,21 @@ class AddItemDialog {
     this.getUrlElement().change(() => {
       let title = this.getTitle();
       let url = this.getUrl();
+      console.log(title, url);
       if (!title && url) {
-        new RpcConfig('AddItem_getPageTitle', runner => runner.AddItem_getPageTitle(url)).
+        new RpcConfig('UrlFetcher_getTitleForUrl', runner => runner.UrlFetcher_getTitleForUrl(url)).
             retryOnTimeout().
             clearMessageOnSuccess().
             callRpc().
             then(successMsg => {
               if (!this.getTitle()) {
                 this.getTitleElement().val(successMsg);
-                this.validate(true);
+                this.getErrors(true);
               }
             });
       }
     });
-    let _this = this;
+    console.log('Set up change listener ', this.getUrlElement());
     this.itemForm.dialog({
       title: 'Add item to ' + this.sheetName,
       minWidth: 500,
@@ -133,9 +143,9 @@ class AddItemDialog {
            this.addItem();
          }
         },
-        {text: "Close",
+        {text: 'Close',
          click: () => {
-           this.itemForm.dialog("close");
+           this.itemForm.dialog('close');
          }
         }
       ]
