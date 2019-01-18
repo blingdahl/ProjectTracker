@@ -101,6 +101,11 @@ Spreadsheet.init = function() {
     return this.getRow(rowOffset, true);
   }
   
+  Spreadsheet.Sheet.prototype.addCopyOfRow = function(fromRow) {
+    var toRow = this.addRow();
+    toRow.copyFrom(fromRow);
+  }
+  
   Spreadsheet.Sheet.prototype.removeRow = function(row) {
     this.markDirty();
     this.nativeSheet.deleteRow(row.getRowNumber());
@@ -297,6 +302,12 @@ Spreadsheet.init = function() {
     return this;
   };
   
+  Spreadsheet.Columns.prototype.forEachColumn = function(callback) {
+    this.columnDefinitions.columnDefinitionsInOrder.forEach(function(columnDefinition) {
+      callback(columnDefinition.header);
+    });
+  };
+  
   Spreadsheet.Columns.prototype.refreshHeaders = function() {
     Log.info('refreshHeaders');
     this.sheet.markDirty();
@@ -348,6 +359,21 @@ Spreadsheet.init = function() {
     }
     this.getCell_(columnHeader).setValue(val);
     return this;
+  };
+  
+  Spreadsheet.Row.prototype.getRowOffset = function() {
+    return this.getRowNumber() - 1;
+  };
+  
+  Spreadsheet.Row.prototype.copyFrom = function(otherRow) {
+    this.columns.forEachColumn(function(columnHeader) {
+      var otherFormula = otherRow.getFormula(columnHeader);
+      if (otherFormula) {
+        this.setFormula(columnHeader, otherFormula);
+      } else {
+        this.setValue(columnHeader, otherRow.getValue(columnHeader));
+      }
+    }.bind(this));
   };
   
   Spreadsheet.Row.prototype.setFormula = function(columnHeader, formula) {
