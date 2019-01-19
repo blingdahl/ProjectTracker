@@ -185,6 +185,7 @@ class OverviewController {
   }
   
   addRow(rowData) {
+    this.getTbodyElement().find('[data-uuid="' + rowData['UUID'] + '"]').remove();
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
     rowJq.find('.sheet').append(this.changeSheetMaker.makeLink(rowData['SHEET_ID'], rowData['SHEET']));
     rowJq.find('.viewSheet').append(OverviewController.makeLink(rowData, 'SHEET', 'View'));
