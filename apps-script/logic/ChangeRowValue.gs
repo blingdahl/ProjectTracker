@@ -8,6 +8,7 @@ ChangeRowValue.init = function() {
   
   TrackingSheet.init();
   Update.init();
+  UrlFetcher.init();
   Log.info('ChangeRowValue.init()');
   
   ChangeRowValue.initialized = true;
@@ -18,7 +19,8 @@ ChangeRowValue.init = function() {
   }
   
   ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, url) {
-    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(url, 'Link'));
+    var linkText = UrlFetcher.getTitleForUrl(url);
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(url, linkText || 'Link'));
     return 'Set ' + columnName + ' URL';
   }
   
