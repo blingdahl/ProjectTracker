@@ -97,7 +97,8 @@ GmailLinkExtractor.UrlStrategy = function() {
       add('https://www.fablevisionlearning.com/', 'FableVision').
       add('https://photos.app.goo.gl/', 'Photos').
       add('https://app.smartsheet.com/b/home', 'SmartSheet').
-      add('https://drive.google.com/', 'Drive');
+      add('https://drive.google.com/', 'Drive').
+      add('https://critique.corp.google.com/', 'Critique');
 }
 
 GmailLinkExtractor.UrlStrategy.prototype = Object.create(GmailLinkExtractor.ExtractorStrategy.prototype);
