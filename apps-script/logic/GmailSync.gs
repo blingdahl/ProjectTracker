@@ -9,6 +9,7 @@ GmailSync.init = function() {
   Log.info('GmailSync.init()');
   
   GmailLabel.init();
+  GmailExtractor.init();
   GmailSync.initialized = true
   
   GmailSync.Result = function() {
