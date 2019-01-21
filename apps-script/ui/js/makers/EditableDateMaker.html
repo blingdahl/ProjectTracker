@@ -50,20 +50,13 @@ class EditableDateMaker {
         },
         closeText: 'Clear',
         beforeShow: input => {
-            setTimeout(function() {
-              var clearButton = $(input)
-                  .datepicker("widget")
-                  .find(".ui-datepicker-close");
-              clearButton.unbind("click").bind("click", () => $.datepicker._clearDate(input));
+            setTimeout(() => {
+              let widget = $(input).datepicker('widget');
+              widget.find(".ui-datepicker-close").unbind("click").bind("click", () => $.datepicker._clearDate(input));
+              console.log(widget.find('.ui-datepicker-current'));
+              widget.find('.ui-datepicker-current').hide();
             })},
         showButtonPanel: true
-    });
-    input.keyup(event => {
-      var keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode === 13) {
-        this.setValue(link, input, input.val());
-        event.stopPropagation();
-      }
     });
     return input;
   }
