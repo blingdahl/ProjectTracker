@@ -39,7 +39,7 @@ Docs.getName = function(url) {
   if (type === Docs.GENERIC) {
     var id = Docs.getId(url);
     if (id) {
-      return DriveApp.getFileById().getName();
+      return DriveApp.getFileById(id).getName();
     }
   }
   return null;
