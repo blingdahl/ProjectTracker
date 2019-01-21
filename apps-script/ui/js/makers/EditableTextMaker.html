@@ -36,6 +36,7 @@ class EditableTextMaker {
         let newValue = input.val();
         this.changeCallback(link, newValue);
         link.text(newValue).show();
+        link.attr('data-value', newValue);
         input.hide();
         event.stopPropagation();
       }

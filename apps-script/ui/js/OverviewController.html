@@ -290,10 +290,8 @@ class OverviewController {
   }
   
   initListeners() {
-    for (let field in this.pickers) {
-      console.log('For ' + field);
-      console.log(this.pickers[field]);
-      this.pickers[field].attachClickListener(this.jq);
+    for (let field in this.elementMakers) {
+      this.elementMakers[field].attachClickHandler(this.jq);
     }
   }
   
