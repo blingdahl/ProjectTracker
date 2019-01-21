@@ -1,20 +1,22 @@
 class EditableTextMaker {
-  constructor(linkClass, changeCallback) {
-    this.linkClass = linkClass;
+  constructor(cssClass, textCallback, valueCallback, changeCallback) {
+    this.cssClass = cssClass;
+    this.textCallback = textCallback;
+    this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
   }
   
   // Called once per table load
   attachClickHandler(ancestorJq) {
-    ancestorJq.on('click', '.' + this.linkClass, this.linkClicked.bind(this));
+    ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
   }
   
-  makeLink(currValue) {
+  makeElement(rowData) {
     let link = $('<a />');
-    link.text(currValue);
-    link.addClass(this.linkClass);
+    link.text(this.textCallback(rowData));
+    link.addClass(this.cssClass);
     link.addClass('editableField');
-    link.attr('data-value', currValue);
+    link.attr('data-value', this.valueCallback(rowData));
     return link;
   }
   

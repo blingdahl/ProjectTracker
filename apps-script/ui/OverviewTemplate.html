@@ -15,6 +15,7 @@
     <input type="checkbox" class="emailColumn showColumn" data-key="EMAIL"> Email
     <input type="checkbox" class="linkColumn showColumn" data-key="LINK"> Link
     <input type="checkbox" class="fromColumn showColumn" data-key="FROM"> From
+    <input type="checkbox" class="dateColumn showColumn" data-key="NEXT_ACTION_DATE"> Next Action
     <input type="checkbox" class="dateColumn showColumn" data-key="EMAIL_LAST_DATE"> Date
     <div class="displayCountWrapper"><span class="displayCount">#</span> items</div>
   </div>
@@ -28,19 +29,21 @@
       <th data-key="EMAIL">Email</th>
       <th data-key="LINK">Link</th>
       <th data-key="FROM">From</th>
+      <th data-key="NEXT_ACTION_DATE">Next Action</th>
       <th data-key="EMAIL_LAST_DATE">Last Date</th>
     </tr>
     <tbody>
       <tr class="overviewRowTemplate overviewRow">
-        <td class="sheet"></td>
-        <td class="viewSheet customFill" data-key="VIEW_SHEET"></td>
-        <td class="priority"></td>
-        <td class="status"></td>
-        <td class="item customFill" data-key="ITEM"></td>
-        <td class="email customFill" data-key="EMAIL"></td>
-        <td class="link customFill" data-key="LINK"></td>
-        <td class="from" data-key="FROM"></td>
-        <td class="emailLastDate dateField" data-key="EMAIL_LAST_DATE"></td>
+        <td data-key="SHEET" data-value-field="SHEET_ID" data-text-field="SHEET"></td>
+        <td data-key="VIEW_SHEET" data-text="View"></td>
+        <td data-key="PRIORITY"></td>
+        <td data-key="STATUS"></td>
+        <td data-key="ITEM"></td>
+        <td data-key="EMAIL"></td>
+        <td data-key="LINK" data-add-text="..."></td>
+        <td data-key="FROM"></td>
+        <td data-key="NEXT_ACTION_DATE"></td>
+        <td data-key="EMAIL_LAST_DATE"></td>
       </tr>
     </tbody>
   </table>

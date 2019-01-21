@@ -1,0 +1,24 @@
+class LinkMaker {
+  constructor(cssClass, textCallback, urlCallback, opt_emptyCallback) {
+    this.cssClass = cssClass;
+    this.textCallback = textCallback;
+    this.urlCallback = urlCallback;
+    this.opt_emptyCallback = opt_emptyCallback;
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    // No-op
+  }
+  
+  makeElement(rowData) {
+    let url = this.urlCallback(rowData);
+    if (!url) {
+      if (this.opt_emptyCallback) {
+        return this.opt_emptyCallback(rowData);
+      }
+      return null;
+    }
+    return $('<a />').attr('href', url).addClass(this.cssClass).attr('target', '_blank').text(this.textCallback(rowData));
+  }
+}

@@ -1,0 +1,19 @@
+class TextMaker {
+  constructor(cssClass, textCallback) {
+    this.cssClass = cssClass;
+    this.textCallback = textCallback;
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    // No-op
+  }
+  
+  makeElement(rowData) {
+    let text = this.textCallback(rowData);
+    if (!text) {
+      return null;
+    }
+    return $('<div />').text(text); 
+  }
+}

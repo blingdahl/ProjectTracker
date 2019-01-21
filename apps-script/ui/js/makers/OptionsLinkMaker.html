@@ -1,30 +1,31 @@
 class OptionsLinkMaker {
-  constructor(allValues, emptyText, linkClass, changeCallback) {
+  constructor(allValues, emptyText, cssClass, textCallback, valueCallback, changeCallback) {
     this.allValues = allValues;
     this.emptyText = emptyText;
-    this.linkClass = linkClass;
+    this.cssClass = cssClass;
+    this.textCallback = textCallback;
+    this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
   }
   
   // Called once per table load
   attachClickHandler(ancestorJq) {
-    ancestorJq.on('click', '.' + this.linkClass, this.linkClicked.bind(this));
+    ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
   }
   
-  makeLinkText(currText) {
-    return currText || this.emptyText;
+  makeLinkText(text) {
+    return text || this.emptyText;
   }
   
-  makeLink(currValue, opt_currText) {
+  makeElement(rowData) {
     let link = $('<a />');
-    if(!opt_currText) {
-      opt_currText = currValue;
-    }
-    link.text(this.makeLinkText(opt_currText));
-    link.addClass(this.linkClass);
+    let text = this.textCallback(rowData);
+    let value = this.valueCallback(rowData);
+    link.text(this.makeLinkText(text));
+    link.addClass(this.cssClass);
     link.addClass('editableField');
-    link.attr('data-value', currValue);
-    link.attr('data-text', opt_currText);
+    link.attr('data-value', value);
+    link.attr('data-text', text);
     return link;
   }
   
@@ -48,8 +49,6 @@ class OptionsLinkMaker {
         value = optionValue.value;
       }
       let option = $('<div />').attr('data-value', value).attr('data-text', text).text(text);
-      console.log('currValue', currValue);
-      console.log('value', value);
       if (currValue == value) {
         option.addClass('currValue');
       }
