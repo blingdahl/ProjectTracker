@@ -6,13 +6,14 @@ class OverviewController {
     this.elementMakers = {};
     this.elementMakers['PRIORITY'] = new OptionsLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', rowData => rowData['PRIORITY'], rowData => rowData['PRIORITY'], this.handlePriorityChange.bind(this));
     this.elementMakers['STATUS'] = new OptionsLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this));
-    this.elementMakers['ITEM'] = new EditableTextMaker('itemLink', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this));
+    this.elementMakers['ITEM'] = new EditableTextMaker('itemLink', rowData => rowData['ITEM'], this.handleItemChange.bind(this));
     this.elementMakers['SHEET'] = new OptionsLinkMaker(OverviewController.getSheetOptions(), 'Unexpected', 'changeSheetLink', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this));
     this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL']);
     this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL']);
     this.elementMakers['LINK'] = new LinkMaker('theLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], OverviewController.makeAddLink);
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('emailLastDate', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('fromDate', rowData => rowData['FROM']);
+    this.elementMakers['NEXT_ACTION_DATE'] = new EditableDateMaker('nextActionDate', rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), '...');
   }
 
   // SECTION:
@@ -120,6 +121,13 @@ class OverviewController {
     let uuid = tr.attr('data-uuid');
     tr.attr('data-item', newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'ITEM', newValue);
+  }
+  
+  handleNextActionDateChange(link, newValue) {
+    let tr = $(link).closest('tr[data-sheet-id]');
+    let sheetId = tr.attr('data-sheet-id');
+    let uuid = tr.attr('data-uuid');
+    SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'NEXT_ACTION_DATE', newValue);
   }
   
   handleSheetChange(link, newSheetId) {

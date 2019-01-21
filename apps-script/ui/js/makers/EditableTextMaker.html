@@ -1,7 +1,6 @@
 class EditableTextMaker {
-  constructor(cssClass, textCallback, valueCallback, changeCallback) {
+  constructor(cssClass, valueCallback, changeCallback) {
     this.cssClass = cssClass;
-    this.textCallback = textCallback;
     this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
   }
@@ -13,7 +12,7 @@ class EditableTextMaker {
   
   makeElement(rowData) {
     let link = $('<a />');
-    link.text(this.textCallback(rowData));
+    link.text(this.valueCallback(rowData));
     link.addClass(this.cssClass);
     link.addClass('editableField');
     link.attr('data-value', this.valueCallback(rowData));
