@@ -34,6 +34,7 @@ TrackingSheet.init = function() {
       .addColumn('TO_DO', 'To Do')
       .addColumn('INBOX', 'Inbox')
       .addColumn('EMAIL_LAST_DATE', 'Email Last Date')
+      .addColumn('NEXT_ACTION_DATE', 'Next Action Date')
       .addColumn('NOTES', 'Notes')
       .addColumn('FROM', 'From')
       .addColumn('SCRIPT_NOTES', 'Script Notes')
