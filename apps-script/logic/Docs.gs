@@ -3,6 +3,7 @@ var Docs = {};
 Docs.DOC = 'Doc';
 Docs.SHEET = 'Sheet';
 Docs.PRESENTATION = 'Presentation';
+Docs.FORM = 'Form';
 Docs.GENERIC = 'Drive File';
 
 Docs.getType = function(url) {
@@ -13,6 +14,8 @@ Docs.getType = function(url) {
       return Docs.SHEET;
     } else if (url.includes('/presentation')) {
       return Docs.PRESENTATION;
+    } else if (url.includes('/form')) {
+      return Docs.FORM;
     } else {
       return Docs.GENERIC;
     }
@@ -36,10 +39,18 @@ Docs.getName = function(url) {
   if (type === Docs.PRESENTATION) {
     return SlidesApp.openByUrl(url).getName();
   }
+  if (type === Docs.FORM) {
+    // TODO(lindahl) Form name
+    return 'Form';
+  }
   if (type === Docs.GENERIC) {
     var id = Docs.getId(url);
     if (id) {
-      return DriveApp.getFileById(id).getName();
+      try {
+        return DriveApp.getFileById(id).getName();
+      } catch(e) {
+        return 'Unknown Drive file';
+      }
     }
   }
   return null;
