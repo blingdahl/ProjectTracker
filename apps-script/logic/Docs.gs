@@ -14,7 +14,7 @@ Docs.getType = function(url) {
       return Docs.SHEET;
     } else if (url.includes('/presentation')) {
       return Docs.PRESENTATION;
-    } else if (url.includes('/form')) {
+    } else if (url.includes('/forms')) {
       return Docs.FORM;
     } else {
       return Docs.GENERIC;
@@ -39,9 +39,13 @@ Docs.getName = function(url) {
   if (type === Docs.PRESENTATION) {
     return SlidesApp.openByUrl(url).getName();
   }
+  Log.info(url);
   if (type === Docs.FORM) {
-    // TODO(lindahl) Form name
-    return 'Form';
+    try {
+      return FormApp.openByUrl(url).getTitle();
+    } catch (e) {
+      return 'Unknown Form';
+    }
   }
   if (type === Docs.GENERIC) {
     var id = Docs.getId(url);
