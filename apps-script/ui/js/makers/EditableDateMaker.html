@@ -41,10 +41,11 @@ class EditableDateMaker {
   makeInput(currValue, link) {
     let input = $('<input />').addClass('dateInput').val(currValue);
     input.datepicker({
+        dateFormat: 'yy/mm/dd',
         'onSelect': dateText => {
           this.setValue(link, input, dateText);
         },
-        'onClose': () => {
+        onClose: () => {
           link.show();
           input.remove();
         },
