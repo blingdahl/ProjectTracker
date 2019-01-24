@@ -1,0 +1,45 @@
+class OptionsLinkMaker {
+  constructor(allValues, emptyText, cssClass, textCallback, valueCallback, changeCallback) {
+    this.allValues = allValues;
+    this.emptyText = emptyText;
+    this.cssClass = cssClass;
+    this.textCallback = textCallback;
+    this.valueCallback = valueCallback;
+    this.changeCallback = changeCallback;
+    this.optionPicker = new OptionPicker(this.allValues, this.emptyText, this.onChange.bind(this));
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
+  }
+  
+  linkClicked(e) {
+    var link = $(e.currentTarget);
+    link.parent().append(this.optionPicker.makeElement(link.attr('data-value'), link));
+    link.hide();
+  }
+  
+  makeLinkText(text) {
+    return text || this.emptyText;
+  }
+  
+  makeElement(rowData) {
+    let link = $('<a />');
+    let text = this.textCallback(rowData);
+    let value = this.valueCallback(rowData);
+    link.text(this.makeLinkText(text));
+    link.addClass(this.cssClass);
+    link.addClass('editableField');
+    link.attr('data-value', value);
+    link.attr('data-text', text);
+    return link;
+  }
+  
+  onChange(newValue, newText, link) {
+    link.attr('data-text', newText);
+    link.attr('data-value', newValue);
+    link.text(this.makeLinkText(newText)).show();
+    this.changeCallback(link, newValue);
+  }
+}

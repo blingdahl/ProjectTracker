@@ -43,26 +43,6 @@ class OverviewController {
     return $('.overviewTemplate');
   }
   
-  getPriorityFilterElement() {
-    return this.jq.find('.priorityFilter');
-  }
-  
-  getStatusFilterElement() {
-    return this.jq.find('.statusFilter');
-  }
-  
-  getSheetFilterElement() {
-    return this.jq.find('.sheetFilter');
-  }
-  
-  getFilterElements() {
-    return this.jq.find('.filter');
-  }
-  
-  getShowColumnElements() {
-    return this.jq.find('.showColumn');
-  }
-  
   getLoadTimeElement() {
     return this.jq.find('.loadTime');
   }
@@ -93,6 +73,14 @@ class OverviewController {
   
   getColumnCells(columnKey) {
     return this.getTableElement().find('[data-key="' + columnKey + '"]');
+  }
+  
+  setColumnShown(columnKey, shown) {
+    if (shown) {
+      this.getColumnCells(columnKey).show();
+    } else {
+      this.getColumnCells(columnKey).hide();
+    }
   }
 
   // SECTION:
@@ -127,7 +115,7 @@ class OverviewController {
     let tr = $(link).closest('tr[data-sheet-id]');
     let sheetId = tr.attr('data-sheet-id');
     let uuid = tr.attr('data-uuid');
-    SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'NEXT_ACTION_DATE', newValue);
+    SheetController.forSheet(sheetId).setValue(uuid, 'Next Action Date', 'NEXT_ACTION_DATE', newValue);
   }
   
   handleSheetChange(link, newSheetId) {
@@ -211,6 +199,22 @@ class OverviewController {
     this.getTbodyElement().append(rowJq);
   }
   
+  applyFilters() {
+    let filters = this.filterBar.getFilters();
+    this.getDataRowElements().each((index, elt) => {
+      let rowJq = $(elt);
+      let showRow = filters.matches(
+          rowJq.attr('data-priority'),
+          rowJq.attr('data-status'),
+          rowJq.attr('data-sheet-id'));
+      if (showRow) {
+        rowJq.show();
+      } else {
+        rowJq.hide();
+      }
+    });
+  }
+  
   handleData(msg) {
     let rows = JSON.parse(msg);
     this.setTableShown(true);
@@ -218,83 +222,6 @@ class OverviewController {
     this.sortRows();
     this.applyFilters();
     this.getLoadingElement().hide();
-  }
-  
-  populateFilter(filterElement, values, emptyKey, emptyName) {
-    values.forEach(value => filterElement.append($('<option />').attr('value', value || emptyKey).text(value || emptyName)));
-  }
-  
-  populateSheetFilter(filterElement, sheetInfos) {
-    sheetInfos.sort((a, b) => a.sheetName > b.sheetName ? 1 : a.sheetName != b.sheetName ? -1 : 0);
-    sheetInfos.forEach(sheetInfo => filterElement.append($('<option />').attr('value', sheetInfo.sheetId).text(sheetInfo.sheetName)));
-  }
-  
-  applyFilterToRow(priority, status, sheetId, dataRowElt) {
-    var show = true;
-    if (priority && priority != dataRowElt.attr('data-priority')) {
-      show = false;
-    }
-    if (status && status != dataRowElt.attr('data-status')) {
-      show = false;
-    }
-    if (sheetId && sheetId != dataRowElt.attr('data-sheet-id')) {
-      show = false;
-    }
-    if (show) {
-      dataRowElt.show();
-    } else {
-      dataRowElt.hide();
-    }
-  }
-  
-  setColumnShown(showColumnJq) {
-    let columnKey = showColumnJq.attr('data-key');
-    let shown = showColumnJq.is(':checked');
-    if (shown) {
-      this.getColumnCells(columnKey).show();
-    } else {
-      this.getColumnCells(columnKey).hide();
-    }
-  }
-  
-  applyFilters() {
-    this.getDataRowElements().each((idx, elt) => this.applyFilterToRow(
-        this.getPriorityFilterElement().val(), this.getStatusFilterElement().val(), this.getSheetFilterElement().val(), $(elt)));
-    this.getShowColumnElements().each((idx, elt) => this.setColumnShown($(elt)));
-    this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
-    this.saveShowColumns();
-  }
-  
-  showColumnStorageKey(dataKey) {
-    return 'show_' + dataKey;
-  }
-  
-  saveShowColumns() {
-    this.getShowColumnElements().each((idx, elt) => {
-      let jq = $(elt);
-      var dataKey = jq.attr('data-key');
-      sessionStorage.setItem(this.showColumnStorageKey(dataKey), String(jq.is(':checked')));
-    });
-  }
-  
-  initShowColumns() {
-    this.getShowColumnElements().each((idx, elt) => {
-      let jq = $(elt);
-      var dataKey = jq.attr('data-key');
-      let checked = sessionStorage.getItem(this.showColumnStorageKey(dataKey)) === 'true';
-      if (checked) {
-        jq.attr('checked', true);
-      }
-    });
-    this.getShowColumnElements().change(() => this.applyFilters());
-  }
-  
-  initFilters() {
-    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_KEY, OverviewController.NO_PRIORITY_TEXT);
-    this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
-    this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
-    this.getFilterElements().change(() => this.applyFilters());
-    this.initShowColumns();
   }
   
   initListeners() {
@@ -320,7 +247,8 @@ class OverviewController {
     this.jq.find('.overviewRowTemplate').remove();
     this.setTableShown(false);
     this.getLoadTimeElement().text(new Date());
-    this.initFilters();
+    this.filterBar = new FilterBar(this.jq, this.setColumnShown.bind(this), this.applyFilters.bind(this));
+    this.filterBar.init();
     this.load();
     this.initListeners();
     return this;

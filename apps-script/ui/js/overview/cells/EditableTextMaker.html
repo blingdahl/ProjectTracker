@@ -10,12 +10,12 @@ class EditableTextMaker {
     ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
   }
   
-  makeElement(rowData) {
+  makeElement(data) {
     let link = $('<a />');
-    link.text(this.valueCallback(rowData));
+    link.text(this.valueCallback(data));
     link.addClass(this.cssClass);
     link.addClass('editableField');
-    link.attr('data-value', this.valueCallback(rowData));
+    link.attr('data-value', this.valueCallback(data));
     return link;
   }
   

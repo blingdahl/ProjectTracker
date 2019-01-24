@@ -1,0 +1,28 @@
+class DatePicker {
+  constructor(changeCallback) {
+    this.changeCallback = changeCallback;
+  }
+  
+  makeElement(currValue, callbackElement) {
+    let input = $('<input />').addClass('dateInput').val(currValue);
+    input.datepicker({
+        dateFormat: 'yy/mm/dd',
+        onSelect: dateText => {
+          this.changeCallback(input, dateText, callbackElement);
+        },
+        onClose: () => {
+          callbackElement.show();
+          input.remove();
+        },
+        closeText: 'Clear',
+        beforeShow: input => {
+            setTimeout(() => {
+              let widget = $(input).datepicker('widget');
+              widget.find(".ui-datepicker-close").unbind("click").bind("click", () => $.datepicker._clearDate(input));
+              widget.find('.ui-datepicker-current').hide();
+            })},
+        showButtonPanel: true
+    });
+    return input;
+  }
+}

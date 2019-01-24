@@ -1,0 +1,36 @@
+class OptionPicker {
+  constructor(allValues, emptyText, changeCallback) {
+    this.allValues = allValues;
+    this.emptyText = emptyText;
+    this.changeCallback = changeCallback;
+  }
+  
+  makeElement(currValue, callbackElement) {
+    let options = $('<div />').addClass('optionPicker');
+    for (var i = 0; i != this.allValues.length; i++) {
+      let optionValue = this.allValues[i];
+      let text;
+      let value = optionValue;
+      if (typeof optionValue === 'string') {
+        text = optionValue || this.emptyText;
+        value = optionValue;
+      } else {
+        text = optionValue.text;
+        value = optionValue.value;
+      }
+      let option = $('<div />').attr('data-value', value).attr('data-text', text).text(text);
+      if (currValue == value) {
+        option.addClass('currValue');
+      }
+      options.append(option);
+      option.click((event) => {
+        let jq = $(event.currentTarget);
+        let newValue = jq.attr('data-value');
+        let newText = jq.text();
+        options.remove();
+        this.changeCallback(newValue, newText, callbackElement);
+      });
+    }
+    return options;
+  }
+}

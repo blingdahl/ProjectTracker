@@ -1,0 +1,40 @@
+class EditableDateMaker {
+  constructor(cssClass, valueCallback, changeCallback, emptyText) {
+    this.cssClass = cssClass;
+    this.valueCallback = valueCallback;
+    this.changeCallback = changeCallback;
+    this.emptyText = emptyText;
+    this.datePicker = new DatePicker(this.setValue.bind(this));
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
+  }
+  
+  makeElement(data) {
+    let link = $('<a />');
+    link.text(this.valueCallback(data) || this.emptyText);
+    link.addClass(this.cssClass);
+    link.addClass('editableField');
+    link.attr('data-value', this.valueCallback(data));
+    return link;
+  }
+  
+  linkClicked(e) {
+    var link = $(e.currentTarget);
+    let input = this.datePicker.makeElement(link.attr('data-value'), link);
+    link.parent().append(input);
+    input.focus();
+    link.hide();
+  }
+  
+  setValue(input, newValue, link) {
+    this.changeCallback(link, newValue);
+    link.attr('data-value', newValue);
+    link.text(newValue || this.emptyText);
+    link.show();
+    input.datepicker('hide');
+    input.remove();
+  }
+}

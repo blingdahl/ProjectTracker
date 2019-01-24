@@ -1,0 +1,122 @@
+class Filters {
+  constructor(jq, priority, status, sheetId) {
+    this.jq = jq;
+    this.priority = priority;
+    this.status = status;
+    this.sheetId = sheetId;
+  }
+  
+  matchesPriority(rowPriority) {
+    return !this.priority || this.priority == rowPriority;
+  }
+  
+  matchesStatus(rowStatus) {
+    return !this.status || this.status == rowStatus;
+  }
+  
+  matchesSheetId(rowSheetId) {
+    return !this.sheetId || this.sheetId == rowSheetId;
+  }
+  
+  matches(rowPriority, rowStatus, rowSheetId) {
+    return this.matchesPriority(rowPriority) &&
+        this.matchesStatus(rowStatus) &&
+        this.matchesSheetId(rowSheetId);
+  }
+}
+
+class FilterBar {
+  constructor(setColumnShownCallback, applyFiltersCallback) {
+    this.setColumnShownCallback = setColumnShownCallback;
+    this.applyFiltersCallback = applyFiltersCallback;
+  }
+  
+  getPriorityFilterElement() {
+    return this.jq.find('.priorityFilter');
+  }
+  
+  getStatusFilterElement() {
+    return this.jq.find('.statusFilter');
+  }
+  
+  getSheetFilterElement() {
+    return this.jq.find('.sheetFilter');
+  }
+  
+  getFilterElements() {
+    return this.jq.find('.filter');
+  }
+  
+  getShowColumnElements() {
+    return this.jq.find('.showColumn');
+  }
+  
+  setColumnShown(showColumnJq) {
+    let columnKey = showColumnJq.attr('data-key');
+    let shown = showColumnJq.is(':checked');
+    this.setColumnShownCallback(columnKey, shown);
+  }
+  
+  populateFilter(filterElement, values, emptyKey, emptyName) {
+    values.forEach(value => filterElement.append($('<option />').attr('value', value || emptyKey).text(value || emptyName)));
+  }
+  
+  populateSheetFilter(filterElement, sheetInfos) {
+    sheetInfos.sort((a, b) => a.sheetName > b.sheetName ? 1 : a.sheetName != b.sheetName ? -1 : 0);
+    sheetInfos.forEach(sheetInfo => filterElement.append($('<option />').attr('value', sheetInfo.sheetId).text(sheetInfo.sheetName)));
+  }
+  
+  getFilters() {
+    return 
+  }
+  
+  applyFilterToRow(priority, status, sheetId, dataRowElt) {
+    var show = true;
+    if (priority && priority != dataRowElt.attr('data-priority')) {
+      show = false;
+    }
+    if (status && status != dataRowElt.attr('data-status')) {
+      show = false;
+    }
+    if (sheetId && sheetId != dataRowElt.attr('data-sheet-id')) {
+      show = false;
+    }
+    if (show) {
+      dataRowElt.show();
+    } else {
+      dataRowElt.hide();
+    }
+  }
+  
+  showColumnStorageKey(dataKey) {
+    return 'show_' + dataKey;
+  }
+  
+  saveShowColumns() {
+    this.getShowColumnElements().each((idx, elt) => {
+      let jq = $(elt);
+      var dataKey = jq.attr('data-key');
+      sessionStorage.setItem(this.showColumnStorageKey(dataKey), String(jq.is(':checked')));
+    });
+  }
+
+  init() {
+    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_KEY, OverviewController.NO_PRIORITY_TEXT);
+    this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
+    this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
+    this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));
+    this.initShowColumns();
+  }
+  
+  initShowColumns() {
+    this.getShowColumnElements().each((idx, elt) => {
+      let jq = $(elt);
+      var dataKey = jq.attr('data-key');
+      let checked = sessionStorage.getItem(this.showColumnStorageKey(dataKey)) === 'true';
+      if (checked) {
+        jq.attr('checked', true);
+      }
+    });
+    this.getShowColumnElements().change(() => this.applyFiltersCallback(this.getFilters()));
+  }
+}
