@@ -11,6 +11,15 @@
       data-search-query="<?= sheetInfo.searchQuery || '' ?>">
     <td><a href="<?= spreadsheetUrl ?>#gid=<?= sheetInfo.sheetId ?>" target="_new"><?= sheetInfo.sheetName ?></a></td>
     <td>
+      <button class="update">Update</button>
+    </td>
+    <td>
+      <button class="add">Add</button>
+    </td>
+    <td>
+      <button class="search labelOnly">Search</button>
+    </td>
+    <td>
       <div class="labelPicker">
         <div class="labelDisplayMode">
           <span class="labelName"></span>
@@ -24,15 +33,6 @@
           <a class="removeLabel">Remove</a>
         </div>
       </div>
-    </td>
-    <td>
-      <button class="update">Update</button>
-    </td>
-    <td>
-      <button class="add">Add</button>
-    </td>
-    <td>
-      <button class="search labelOnly">Search</button>
     </td>
   </tr>
   <?
