@@ -1,20 +1,20 @@
 class Filters {
-  constructor(priority, status, sheetId) {
-    this.priority = priority;
-    this.status = status;
-    this.sheetId = sheetId;
+  constructor(priorities, statuses, sheetIds) {
+    this.priorities = priorities;
+    this.statuses = statuses;
+    this.sheetIds = sheetIds;
   }
   
   matchesPriority(rowPriority) {
-    return !this.priority || this.priority == rowPriority;
+    return this.priorities.length === 0 || this.priorities.includes(rowPriority);
   }
   
   matchesStatus(rowStatus) {
-    return !this.status || this.status == rowStatus;
+    return this.statuses.length === 0 || this.statuses.includes(rowStatus);
   }
   
   matchesSheetId(rowSheetId) {
-    return !this.sheetId || this.sheetId == rowSheetId;
+    return this.sheetIds.length === 0 || this.sheetIds.includes(rowSheetId);
   }
   
   matches(rowPriority, rowStatus, rowSheetId) {
@@ -61,9 +61,12 @@ class FilterBar {
   }
   
   getFilters() {
-    return new Filters(this.getPriorityFilterElement().val(),
-                       this.getStatusFilterElement().val(),
-                       this.getSheetFilterElement().val());
+    var priority = this.getPriorityFilterElement().val();
+    var status = this.getStatusFilterElement().val();
+    var sheetId = this.getSheetFilterElement().val();
+    return new Filters(priority ? [priority] : [],
+                       status ? [status] : [],
+                       sheetId ? [sheetId] : []);
   }
   
   hideColumnStorageKey(columnKey) {
