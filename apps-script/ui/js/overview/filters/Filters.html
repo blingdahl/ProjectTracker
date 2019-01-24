@@ -72,24 +72,6 @@ class FilterBar {
                        this.getSheetFilterElement().val());
   }
   
-  applyFilterToRow(priority, status, sheetId, dataRowElt) {
-    var show = true;
-    if (priority && priority != dataRowElt.attr('data-priority')) {
-      show = false;
-    }
-    if (status && status != dataRowElt.attr('data-status')) {
-      show = false;
-    }
-    if (sheetId && sheetId != dataRowElt.attr('data-sheet-id')) {
-      show = false;
-    }
-    if (show) {
-      dataRowElt.show();
-    } else {
-      dataRowElt.hide();
-    }
-  }
-  
   showColumnStorageKey(dataKey) {
     return 'show_' + dataKey;
   }
