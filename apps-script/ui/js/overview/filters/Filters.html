@@ -1,6 +1,5 @@
 class Filters {
-  constructor(jq, priority, status, sheetId) {
-    this.jq = jq;
+  constructor(priority, status, sheetId) {
     this.priority = priority;
     this.status = status;
     this.sheetId = sheetId;
@@ -26,7 +25,8 @@ class Filters {
 }
 
 class FilterBar {
-  constructor(setColumnShownCallback, applyFiltersCallback) {
+  constructor(jq, setColumnShownCallback, applyFiltersCallback) {
+    this.jq = jq;
     this.setColumnShownCallback = setColumnShownCallback;
     this.applyFiltersCallback = applyFiltersCallback;
   }
@@ -67,7 +67,9 @@ class FilterBar {
   }
   
   getFilters() {
-    return 
+    return new Filters(this.getPriorityFilterElement().val(),
+                       this.getStatusFilterElement().val(),
+                       this.getSheetFilterElement().val());
   }
   
   applyFilterToRow(priority, status, sheetId, dataRowElt) {
