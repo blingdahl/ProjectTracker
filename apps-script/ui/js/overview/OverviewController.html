@@ -71,16 +71,30 @@ class OverviewController {
     return this.getTbodyElement().find('tr[data-sheet-id]');
   }
   
+  getHeaderCells() {
+    return this.getTableElement().find('th[data-key]');
+  }
+  
   getColumnCells(columnKey) {
     return this.getTableElement().find('[data-key="' + columnKey + '"]');
   }
   
-  setColumnShown(columnKey, shown) {
-    if (shown) {
-      this.getColumnCells(columnKey).show();
-    } else {
-      this.getColumnCells(columnKey).hide();
-    }
+  hideColumns(hiddenColumns) {
+    this.getHeaderCells().each((index, elt) => {
+      let jq = $(elt);
+      let columnKey = jq.attr('data-key');
+      if (columnKey) {
+        if (hiddenColumns.includes(columnKey)) {
+          this.getColumnCells(columnKey).hide();
+        } else {
+          this.getColumnCells(columnKey).show();
+        }
+      }
+    });
+  }
+  
+  applyHideColumns(hiddenColumns) {
+    this.filterBar.applyHideColumns();
   }
 
   // SECTION:
@@ -213,6 +227,7 @@ class OverviewController {
         rowJq.hide();
       }
     });
+    this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
   }
   
   handleData(msg) {
@@ -221,6 +236,7 @@ class OverviewController {
     rows.forEach(rowData => this.addRow(rowData));
     this.sortRows();
     this.applyFilters();
+    this.applyHideColumns();
     this.getLoadingElement().hide();
   }
   
@@ -247,7 +263,7 @@ class OverviewController {
     this.jq.find('.overviewRowTemplate').remove();
     this.setTableShown(false);
     this.getLoadTimeElement().text(new Date());
-    this.filterBar = new FilterBar(this.jq, this.setColumnShown.bind(this), this.applyFilters.bind(this));
+    this.filterBar = new FilterBar(this.jq, this.hideColumns.bind(this), this.applyFilters.bind(this));
     this.filterBar.init();
     this.load();
     this.initListeners();

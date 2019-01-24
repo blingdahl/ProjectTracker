@@ -25,9 +25,9 @@ class Filters {
 }
 
 class FilterBar {
-  constructor(jq, setColumnShownCallback, applyFiltersCallback) {
+  constructor(jq, hideColumnsCallback, applyFiltersCallback) {
     this.jq = jq;
-    this.setColumnShownCallback = setColumnShownCallback;
+    this.hideColumnsCallback = hideColumnsCallback;
     this.applyFiltersCallback = applyFiltersCallback;
   }
   
@@ -51,12 +51,6 @@ class FilterBar {
     return this.jq.find('.showColumn');
   }
   
-  setColumnShown(showColumnJq) {
-    let columnKey = showColumnJq.attr('data-key');
-    let shown = showColumnJq.is(':checked');
-    this.setColumnShownCallback(columnKey, shown);
-  }
-  
   populateFilter(filterElement, values, emptyKey, emptyName) {
     values.forEach(value => filterElement.append($('<option />').attr('value', value || emptyKey).text(value || emptyName)));
   }
@@ -72,16 +66,32 @@ class FilterBar {
                        this.getSheetFilterElement().val());
   }
   
-  showColumnStorageKey(dataKey) {
-    return 'show_' + dataKey;
+  hideColumnStorageKey(columnKey) {
+    return 'hide_' + columnKey;
   }
   
-  saveShowColumns() {
+  saveHiddenColumns() {
     this.getShowColumnElements().each((idx, elt) => {
       let jq = $(elt);
-      var dataKey = jq.attr('data-key');
-      sessionStorage.setItem(this.showColumnStorageKey(dataKey), String(jq.is(':checked')));
+      var columnKey = jq.attr('data-key');
+      sessionStorage.setItem(this.hideColumnStorageKey(columnKey), String(!jq.is(':checked')));
     });
+  }
+  
+  getHiddenColumns() {
+    let hiddenColumns = [];
+    this.getShowColumnElements().each((index, elt) => {
+      let jq = $(elt);
+      if (!jq.is(':checked')) {
+        hiddenColumns.push(jq.attr('data-key'));
+      }
+    });
+    return hiddenColumns;
+  }
+  
+  applyHideColumns() {
+    this.hideColumnsCallback(this.getHiddenColumns());
+    this.saveHiddenColumns();
   }
 
   init() {
@@ -89,18 +99,18 @@ class FilterBar {
     this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
     this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
     this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));
-    this.initShowColumns();
+    this.initHiddenColumns();
   }
   
-  initShowColumns() {
+  initHiddenColumns() {
     this.getShowColumnElements().each((idx, elt) => {
       let jq = $(elt);
       var dataKey = jq.attr('data-key');
-      let checked = sessionStorage.getItem(this.showColumnStorageKey(dataKey)) === 'true';
+      let checked = sessionStorage.getItem(this.hideColumnStorageKey(dataKey)) === 'false';
       if (checked) {
         jq.attr('checked', true);
       }
     });
-    this.getShowColumnElements().change(() => this.applyFiltersCallback(this.getFilters()));
+    this.getShowColumnElements().change(this.applyHideColumns.bind(this));
   }
 }
