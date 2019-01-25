@@ -1,6 +1,6 @@
 class TextMaker {
-  constructor(cssClass, textCallback) {
-    this.cssClass = cssClass;
+  constructor(emptyText, textCallback) {
+    this.emptyText = emptyText;
     this.textCallback = textCallback;
   }
   
@@ -9,11 +9,7 @@ class TextMaker {
     // No-op
   }
   
-  makeElement(rowData) {
-    let text = this.textCallback(rowData);
-    if (!text) {
-      return null;
-    }
-    return $('<div />').text(text); 
+  makeElement(data) {
+    return $('<span />').text(this.textCallback(data) || this.emptyText); 
   }
 }

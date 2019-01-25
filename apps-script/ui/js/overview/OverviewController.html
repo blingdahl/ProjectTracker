@@ -11,8 +11,8 @@ class OverviewController {
     this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL']);
     this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL']);
     this.elementMakers['LINK'] = new LinkMaker('theLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], OverviewController.makeAddLink);
-    this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('emailLastDate', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
-    this.elementMakers['FROM'] = new TextMaker('fromDate', rowData => rowData['FROM']);
+    this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
+    this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker('nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
   }
 
