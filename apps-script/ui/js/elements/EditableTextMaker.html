@@ -1,53 +1,35 @@
 class EditableTextMaker {
-  constructor(cssClass, valueCallback, changeCallback) {
-    this.cssClass = cssClass;
+  constructor(textCssClass, textCallback, valueCallback, changeCallback, inputMaker) {
+    this.textCssClass = textCssClass;
+    this.textCallback = textCallback;
     this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
+    this.inputMaker = inputMaker;
   }
   
   // Called once per table load
   attachClickHandler(ancestorJq) {
-    ancestorJq.on('click', '.' + this.cssClass, this.linkClicked.bind(this));
+    ancestorJq.on('click', '.' + this.textCssClass, this.textClicked.bind(this));
+  }
+  
+  textClicked(e) {
+    var textJq = $(e.currentTarget);
+    let input = this.inputMaker.makeElement(textJq.attr('data-value'),
+        (newValue, newText) => {
+          this.changeCallback(textJq, newValue);
+          textJq.attr('data-value', newValue).text(newText).show();
+        },
+        () => textJq.show());
+    textJq.parent().append(input);
+    input.focus();
+    textJq.hide();
   }
   
   makeElement(data) {
-    let link = $('<a />');
-    link.text(this.valueCallback(data));
-    link.addClass(this.cssClass);
-    link.addClass('editableField');
-    link.attr('data-value', this.valueCallback(data));
-    return link;
-  }
-  
-  linkClicked(e) {
-    var link = $(e.currentTarget);
-    let input = this.makeInput(link.attr('data-value'), link);
-    link.parent().append(input);
-    input.focus();
-    link.hide();
-  }
-  
-  makeInput(currValue, link) {
-    let input = $('<input />').addClass('textInput').val(currValue);
-    input.keypress((event) => {
-      var keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode === 13) {
-        let newValue = input.val();
-        this.changeCallback(link, newValue);
-        link.text(newValue).show();
-        link.attr('data-value', newValue);
-        input.hide();
-        event.stopPropagation();
-      }
-    });
-    input.keydown((event) => {
-      var keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode === 27) {
-        link.show();
-        input.hide();
-        event.stopPropagation();
-      }
-    });
-    return input;
+    return $('<span />').
+        addClass(this.textCssClass).
+        addClass('editableText').
+        text(this.textCallback(data)).
+        attr('data-value', this.valueCallback(data));
   }
 }
