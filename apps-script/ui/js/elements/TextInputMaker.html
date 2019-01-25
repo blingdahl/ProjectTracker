@@ -1,0 +1,31 @@
+class TextInputMaker {
+  constructor(cssClass, valueCallback, changeCallback) {
+    this.cssClass = cssClass;
+    this.valueCallback = valueCallback;
+    this.changeCallback = changeCallback;
+  }
+
+  makeElement(currValue, link) {
+    let input = $('<input />').addClass('textInput').val(currValue);
+    input.keypress((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 13) {
+        let newValue = input.val();
+        this.changeCallback(link, newValue);
+        link.text(newValue).show();
+        link.attr('data-value', newValue);
+        input.hide();
+        event.stopPropagation();
+      }
+    });
+    input.keydown((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 27) {
+        link.show();
+        input.hide();
+        event.stopPropagation();
+      }
+    });
+    return input;
+  }
+}
