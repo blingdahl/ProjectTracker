@@ -19,6 +19,10 @@ class LinkMaker {
       }
       return null;
     }
-    return $('<a />').attr('href', url).addClass(this.cssClass).attr('target', '_blank').text(this.textCallback(data));
+    return $('<a />').
+        attr('href', url).
+        addClass(this.cssClass).
+        attr('target', '_blank').
+        text(this.textCallback(data));
   }
 }
