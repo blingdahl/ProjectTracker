@@ -3,16 +3,17 @@ class DateInputMaker {
     this.changeCallback = changeCallback;
   }
   
-  makeElement(currValue, callbackElement) {
+  makeElement(currValue, changeCallback, cancelCallback) {
     let input = $('<input />').addClass('dateInput').val(currValue);
     input.datepicker({
         dateFormat: 'yy/mm/dd',
         onSelect: dateText => {
-          this.changeCallback(input, dateText, callbackElement);
+          input.remove();
+          changeCallback(dateText, dateText);
         },
         onClose: () => {
-          callbackElement.show();
           input.remove();
+          cancelCallback();
         },
         closeText: 'Clear',
         beforeShow: input => {

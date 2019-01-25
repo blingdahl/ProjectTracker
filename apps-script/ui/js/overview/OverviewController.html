@@ -13,7 +13,7 @@ class OverviewController {
     this.elementMakers['LINK'] = new LinkMaker('theLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], OverviewController.makeAddLink);
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('emailLastDate', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('fromDate', rowData => rowData['FROM']);
-    this.elementMakers['NEXT_ACTION_DATE'] = new EditableDateMaker('nextActionDate', rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), '...');
+    this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker('nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
   }
 
   // SECTION:

@@ -30,7 +30,7 @@ class EditableTextMaker {
     return $('<span />').
         addClass(this.textCssClass).
         addClass('editableText').
-        text(this.textCallback(data)).
+        text(this.textCallback(data) || this.emptyText).
         attr('data-value', this.valueCallback(data));
   }
 }
