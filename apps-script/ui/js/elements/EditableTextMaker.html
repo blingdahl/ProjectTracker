@@ -1,6 +1,7 @@
 class EditableTextMaker {
-  constructor(textCssClass, textCallback, valueCallback, changeCallback, inputMaker) {
+  constructor(textCssClass, emptyText, textCallback, valueCallback, changeCallback, inputMaker) {
     this.textCssClass = textCssClass;
+    this.emptyText = emptyText;
     this.textCallback = textCallback;
     this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
@@ -17,7 +18,7 @@ class EditableTextMaker {
     let input = this.inputMaker.makeElement(textJq.attr('data-value'),
         (newValue, newText) => {
           this.changeCallback(textJq, newValue);
-          textJq.attr('data-value', newValue).text(newText).show();
+          textJq.attr('data-value', newValue).text(newText || this.emptyText).show();
         },
         () => textJq.show());
     textJq.parent().append(input);

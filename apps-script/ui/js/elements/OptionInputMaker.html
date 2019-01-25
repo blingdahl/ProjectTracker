@@ -1,11 +1,10 @@
-class OptionPicker {
-  constructor(allValues, emptyText, changeCallback) {
+class OptionInputMaker {
+  constructor(allValues, emptyText) {
     this.allValues = allValues;
     this.emptyText = emptyText;
-    this.changeCallback = changeCallback;
   }
   
-  makeElement(currValue, callbackElement) {
+  makeElement(currValue, changeCallback, cancelCallback) {
     let options = $('<div />').addClass('optionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
@@ -28,7 +27,7 @@ class OptionPicker {
         let newValue = jq.attr('data-value');
         let newText = jq.text();
         options.remove();
-        this.changeCallback(newValue, newText, callbackElement);
+        changeCallback(newValue, newText);
       });
     }
     return options;

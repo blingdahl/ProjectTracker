@@ -4,10 +4,10 @@ class OverviewController {
     this.jq = null;
     this.rowTemplateJq = null;
     this.elementMakers = {};
-    this.elementMakers['PRIORITY'] = new OptionsLinkMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT, 'priorityLink', rowData => rowData['PRIORITY'], rowData => rowData['PRIORITY'], this.handlePriorityChange.bind(this));
-    this.elementMakers['STATUS'] = new OptionsLinkMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT, 'statusLink', rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this));
-    this.elementMakers['ITEM'] = new EditableTextMaker('itemLink', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this), new TextInputMaker());
-    this.elementMakers['SHEET'] = new OptionsLinkMaker(OverviewController.getSheetOptions(), 'Unexpected', 'changeSheetLink', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this));
+    this.elementMakers['PRIORITY'] = new EditableTextMaker('priorityLink', OverviewController.NO_PRIORITY_TEXT, rowData => rowData['PRIORITY'], rowData => rowData['PRIORITY'], this.handlePriorityChange.bind(this), new OptionInputMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT));
+    this.elementMakers['STATUS'] = new EditableTextMaker('statusLink', OverviewController.NO_STATUS_TEXT, rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this), new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
+    this.elementMakers['ITEM'] = new EditableTextMaker('itemLink', 'Unknown item', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this), new TextInputMaker());
+    this.elementMakers['SHEET'] = new EditableTextMaker('changeSheetLink', 'Unknown Sheet', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this), new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
     this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL']);
     this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL']);
     this.elementMakers['LINK'] = new LinkMaker('theLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], OverviewController.makeAddLink);
