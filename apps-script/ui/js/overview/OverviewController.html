@@ -4,16 +4,16 @@ class OverviewController {
     this.jq = null;
     this.rowTemplateJq = null;
     this.elementMakers = {};
-    this.elementMakers['PRIORITY'] = new EditableTextMaker('priorityLink', OverviewController.NO_PRIORITY_TEXT, rowData => rowData['PRIORITY'], rowData => rowData['PRIORITY'], this.handlePriorityChange.bind(this), new OptionInputMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT));
-    this.elementMakers['STATUS'] = new EditableTextMaker('statusLink', OverviewController.NO_STATUS_TEXT, rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this), new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
-    this.elementMakers['ITEM'] = new EditableTextMaker('itemLink', 'Unknown item', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this), new TextInputMaker());
-    this.elementMakers['SHEET'] = new EditableTextMaker('changeSheetLink', 'Unknown Sheet', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this), new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
+    this.elementMakers['PRIORITY'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'priorityLink', OverviewController.NO_PRIORITY_TEXT, rowData => rowData['PRIORITY'], rowData => rowData['PRIORITY'], this.handlePriorityChange.bind(this), new OptionInputMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT));
+    this.elementMakers['STATUS'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'statusLink', OverviewController.NO_STATUS_TEXT, rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this), new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
+    this.elementMakers['ITEM'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'itemLink', 'Unknown item', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this), new TextInputMaker());
+    this.elementMakers['SHEET'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'changeSheetLink', 'Unknown Sheet', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this), new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
     this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL']);
     this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL']);
     this.elementMakers['LINK'] = new LinkMaker('theLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], OverviewController.makeAddLink);
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
-    this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker('nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
+    this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
   }
 
   // SECTION:
@@ -71,6 +71,10 @@ class OverviewController {
     return this.getTbodyElement().find('tr[data-sheet-id]');
   }
   
+  getDataRowElement(sheetId, uuid) {
+    return this.getTbodyElement().find('tr[data-sheet-id="' + sheetId + '"][data-uuid="' + uuid + '"]');
+  }
+  
   getHeaderCells() {
     return this.getTableElement().find('th[data-key]');
   }
@@ -97,48 +101,43 @@ class OverviewController {
     this.filterBar.applyHideColumns();
   }
 
-  // SECTION:
-  // Click handlers
+  static getSheetId(link) {
+    return $(link).closest('tr[data-sheet-id]').attr('data-sheet-id');
+  }
+
+  static getUuid(link) {
+    return $(link).closest('tr[data-uuid]').attr('data-uuid');
+  }
   
-  handleStatusChange(link, newStatus) {
-    let tr = $(link).closest('tr[data-sheet-id]');
-    let sheetId = tr.attr('data-sheet-id');
-    let uuid = tr.attr('data-uuid');
+  handleStatusChange(sheetId, uuid, newStatus) {
+    let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-status', newStatus);
     tr.attr('data-status-index', String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
     SheetController.forSheet(sheetId).setValue(uuid, 'Status', 'STATUS', newStatus);
   }
   
-  handlePriorityChange(link, newPriority) {
-    let tr = $(link).closest('tr[data-sheet-id]');
-    let sheetId = tr.attr('data-sheet-id');
-    let uuid = tr.attr('data-uuid');
+  handlePriorityChange(sheetId, uuid, newPriority) {
+    let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-priority', newPriority);
     SheetController.forSheet(sheetId).setValue(uuid, 'Priority', 'PRIORITY', newPriority);
   }
   
-  handleItemChange(link, newValue) {
-    let tr = $(link).closest('tr[data-sheet-id]');
-    let sheetId = tr.attr('data-sheet-id');
-    let uuid = tr.attr('data-uuid');
+  handleItemChange(sheetId, uuid, newValue) {
+    let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-item', newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'ITEM', newValue);
   }
   
-  handleNextActionDateChange(link, newValue) {
-    let tr = $(link).closest('tr[data-sheet-id]');
-    let sheetId = tr.attr('data-sheet-id');
-    let uuid = tr.attr('data-uuid');
+  handleNextActionDateChange(sheetId, uuid, newValue) {
+    let tr = this.getDataRowElement(sheetId, uuid);
     SheetController.forSheet(sheetId).setValue(uuid, 'Next Action Date', 'NEXT_ACTION_DATE', newValue);
   }
   
-  handleSheetChange(link, newSheetId) {
-    let tr = $(link).closest('tr[data-sheet-id]');
-    let sheetId = tr.attr('data-sheet-id');
+  handleSheetChange(sheetId, uuid, newSheetId) {
     if (sheetId == newSheetId) {
       return;
     }
-    let uuid = tr.attr('data-uuid');
+    let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-sheet-id', newSheetId);
     SheetController.forSheet(sheetId).changeSheet(uuid, newSheetId);
   }
