@@ -80,6 +80,12 @@ class SheetController {
 				callRpc();
   }
   
+  clearLink(uuid, text, href) {
+		new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_clearLink(this.getSheetId(), uuid, 'Link', 'LINK')).
+				output('Clearing link...').
+				callRpc();
+  }
+  
   changeSheet(uuid, toSheetId) {
     return new RpcConfig('ChangeRowValue_changeSheet', runner => runner.ChangeRowValue_changeSheet(this.getSheetId(), toSheetId, uuid)).
         output('Moving to ' + SheetController.forSheet(toSheetId).getSheetName() + '...').
