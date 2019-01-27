@@ -151,22 +151,6 @@ class OverviewController {
     }
   }
   
-  static makeAddLink(rowData) {
-    return $('<a />').text('...').addClass('addLink').click(() => {
-      let url = window.prompt('URL');
-      if (url) {
-        let sheetId = rowData['SHEET_ID'];
-        let uuid = rowData['UUID'];
-        new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(sheetId, uuid, 'Link', 'LINK', url)).
-            output('Add URL ' + url + '...').
-            callRpc().
-            then(() => {
-              OverviewController.updateOverviewForSheet(sheetId);
-            });
-      }
-    });
-  }
-  
   static getSheetOptions() {
     let ret = [];
     SheetController.getSheetInfos().forEach(sheetInfo => ret.push({text: sheetInfo.sheetName, value: sheetInfo.sheetId}));
