@@ -21,7 +21,13 @@ class EditableLinkMaker {
   
   makeHandleChange(dataJq) {
     return function(sheetId, uuid, text, href) {
-      dataJq.attr('data-href', href).attr('data-text', text);
+      dataJq.attr('data-href', href).attr('data-text', text)
+      let linkJq = dataJq.find('a');
+      if (href) {
+        linkJq.attr('href', href).text(text).show();
+      } else {
+        linkJq.hide();
+      }
       this.changeCallback(sheetId, uuid, text, href);
     }.bind(this);
   }
@@ -29,13 +35,16 @@ class EditableLinkMaker {
   makeElement(data) {
     let text = this.textCallback(data);
     let href = this.hrefCallback(data);
-    let linkJq = $('<a />').
-        attr('href', href).
-        text(text);
+    let linkJq = $('<a />');
+    if (href) {
+      linkJq.attr('href', href).text(text);
+    } else {
+      linkJq.hide();
+    }
     let editLink = $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass(this.editLinkCssClass);
     return $('<span />').
-        attr('data-href', href).
-        attr('data-text', text).
+        attr('data-href', href || '').
+        attr('data-text', text || '').
         append(linkJq).
         append(editLink);
   }

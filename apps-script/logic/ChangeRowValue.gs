@@ -20,12 +20,12 @@ ChangeRowValue.init = function() {
   
   ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, text, href) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(href, text));
-    return 'Set ' + columnName + ' link';
+    return 'Set ' + columnName;
   }
   
   ChangeRowValue.clearLink = function(sheetId, uuid, columnName, columnKey) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], '');
-    return 'Cleared ' + columnName + ' link';
+    return 'Cleared ' + columnName;
   }
   
   ChangeRowValue.changeSheet = function(fromSheetId, toSheetId, uuid) {
