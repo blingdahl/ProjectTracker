@@ -20,7 +20,7 @@ class EditableTextMaker {
     let input = this.inputMaker.makeElement(textJq.attr('data-value'),
         (newValue, newText) => {
           this.changeCallback(this.sheetIdCallback(textJq), this.uuidCallback(textJq), newValue);
-          textJq.attr('data-value', newValue).text(newText || this.emptyText).show();
+          textJq.attr('data-value', newValue || '').text(newText || this.emptyText).show();
         },
         () => textJq.show());
     textJq.parent().append(input);
