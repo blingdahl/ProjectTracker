@@ -1,0 +1,55 @@
+class MultiOptionInputMaker {
+  constructor(allValues, emptyText) {
+    this.allValues = allValues;
+    this.emptyText = emptyText;
+  }
+  
+  makeElement(currValues, changeCallback, cancelCallback) {
+    let optionsJq = $('<div />').addClass('multiOptionPicker');
+    for (var i = 0; i != this.allValues.length; i++) {
+      let optionValue = this.allValues[i];
+      let text;
+      let value;
+      if (typeof optionValue === 'string') {
+        text = optionValue || this.emptyText;
+        value = optionValue;
+      } else {
+        text = optionValue.text;
+        value = optionValue.value;
+      }
+      let optionJq = $('<div />').
+          attr('data-value', value).
+          attr('data-text', text);
+      let textJq = $('<span />').text(text);
+      let checkJq = $('<span>&check;</span>').addClass('check');
+      optionJq.append(checkJq);
+      optionJq.append(textJq);
+      if (currValues.length === 0 || currValues.includes(value)) {
+        optionJq.attr('data-selected', 'true');
+      }
+      optionJq.addClass('option');
+      optionsJq.append(optionJq);
+      optionJq.click((event) => {
+        let optionJq = $(event.currentTarget);
+        if (optionJq.attr('data-selected') == 'true') {
+          optionJq.attr('data-selected', 'false');
+        } else {
+          optionJq.attr('data-selected', 'true');
+        }
+      });
+    }
+    let applyJq = $('<div />').text('Apply').addClass('apply');
+    applyJq.click((event) => {
+      let applyJq = $(event.currentTarget);
+      let newValues = [];
+      optionsJq.find('[data-selected="true"]').each((index, elt) => {
+        let optionJq = $(elt);
+        newValues.push(optionJq.attr('data-value'));
+      });
+      optionsJq.remove();
+      changeCallback(newValues);
+    });
+    optionsJq.append(applyJq);
+    return optionsJq;
+  }
+}

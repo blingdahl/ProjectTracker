@@ -61,10 +61,9 @@ class FilterBar {
   }
   
   getFilters() {
-    var priority = this.getPriorityFilterElement().val();
     var status = this.getStatusFilterElement().val();
     var sheetId = this.getSheetFilterElement().val();
-    return new Filters(priority ? [priority] : [],
+    return new Filters(this.prioritiesFilter.values,
                        status ? [status] : [],
                        sheetId ? [sheetId] : []);
   }
@@ -96,9 +95,26 @@ class FilterBar {
     this.hideColumnsCallback(this.getHiddenColumns());
     this.saveHiddenColumns();
   }
+  
+  static saved(storageKey, defaultValue) {
+    let str = sessionStorage.getItem(storageKey);
+    if (!str) {
+      return defaultValue;
+    }
+    return str.split(',');
+  }
+  
+  static save(storageKey, values) {
+    sessionStorage.setItem(storageKey, values.join(','));
+  }
+  
+  static saveFn(storageKey) {
+    return values => FilterBar.save(storageKey, values);
+  }
 
   init() {
-    this.populateFilter(this.getPriorityFilterElement(), GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_KEY, OverviewController.NO_PRIORITY_TEXT);
+    this.prioritiesFilter = new FilterElement('priorityFilter', OverviewController.NO_PRIORITY_TEXT, 'All Priorities', FilterBar.saved('priorities', []), GlobalController.PRIORITIES, FilterBar.saveFn('priorities'));
+    this.prioritiesFilter.appendTo(this.getPriorityFilterElement());
     this.populateFilter(this.getStatusFilterElement(), GlobalController.STATUSES, OverviewController.NO_STATUS_KEY, OverviewController.NO_STATUS_TEXT);
     this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
     this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));

@@ -1,0 +1,57 @@
+class FilterElement {
+  constructor(textCssClass, emptyValueText, allValuesText, values, allValues, changeCallback) {
+    this.textCssClass = textCssClass;
+    this.emptyValueText = emptyValueText;
+    this.allValuesText = allValuesText;
+    this.values = values;
+    this.changeCallback = changeCallback;
+    this.allValues = allValues;
+    this.textJq = $('<span />').
+        addClass(this.textCssClass).
+        addClass('editableText');
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.textCssClass, this.textClicked.bind(this));
+  }
+  
+  valuesToText() {
+    if (this.values.length == 0) {
+      return this.allValuesText;
+    }
+    let textParts = [];
+    this.values.forEach(value => textParts.push(value || this.emptyValueText));
+    return textParts.join(', ');
+  }
+  
+  updateTextJq() {
+    let text;
+    if (this.values.length == 0 || this.values.length === this.allValues.length) {
+      text = this.allValuesText;
+    } else {
+      let textParts = [];
+      this.values.forEach(value => textParts.push(value || this.emptyValueText));
+      text = textParts.join(', ');
+    }
+    this.textJq.text(text).show();
+  }
+  
+  textClicked(e) {
+    let input = new MultiOptionInputMaker(this.allValues, this.emptyValueText).makeElement(this.values,
+        (newValues) => {
+          this.values = newValues;
+          this.updateTextJq();
+          this.changeCallback(newValues);
+        },
+        () => this.textJq.show());
+    this.textJq.parent().append(input);
+    this.textJq.hide();
+  }
+  
+  appendTo(parentJq) {
+    this.updateTextJq();
+    parentJq.append(this.textJq);
+    this.attachClickHandler(parentJq);
+  }
+}
