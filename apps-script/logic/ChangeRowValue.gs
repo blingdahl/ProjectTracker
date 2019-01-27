@@ -18,10 +18,14 @@ ChangeRowValue.init = function() {
     return 'Set ' + columnName + ' to ' + newValue;
   }
   
-  ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, url) {
-    var linkText = UrlFetcher.getTitleForUrl(url);
-    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(url, linkText || 'Link'));
-    return 'Set ' + columnName + ' URL';
+  ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, text, href) {
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(href, text));
+    return 'Set ' + columnName + ' link';
+  }
+  
+  ChangeRowValue.clearLink = function(sheetId, uuid, columnName, columnKey) {
+    TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], '');
+    return 'Cleared ' + columnName + ' link';
   }
   
   ChangeRowValue.changeSheet = function(fromSheetId, toSheetId, uuid) {

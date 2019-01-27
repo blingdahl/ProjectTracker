@@ -12,6 +12,7 @@
   <button class="sortOverview" style="display: none">Sort Overview</button>
   <?!= include("ui/OverviewTemplate"); ?>
   <?!= include("ui/AddItemTemplate"); ?>
+  <?!= include("ui/EditLinkTemplate"); ?>
   <script>
     <?!= include("ui/js/RpcConfig"); ?>
     <?!= include("ui/js/elements/DateInputMaker"); ?>
@@ -19,11 +20,13 @@
     <?!= include("ui/js/elements/OptionInputMaker"); ?>
     <?!= include("ui/js/elements/TextMaker"); ?>
     <?!= include("ui/js/elements/TextInputMaker"); ?>
+    <?!= include("ui/js/elements/EditableLinkMaker"); ?>
     <?!= include("ui/js/elements/EditableTextMaker"); ?>
     <?!= include("ui/js/elements/LinkMaker"); ?>
     <?!= include("ui/js/overview/filters/Filters"); ?>
     <?!= include("ui/js/overview/OverviewController"); ?>
     <?!= include("ui/js/AddItemDialog"); ?>
+    <?!= include("ui/js/EditLinkDialog"); ?>
     <?!= include("ui/js/Compare"); ?>
     <?!= include("ui/js/SheetController"); ?>
     <?!= include("ui/js/GlobalController"); ?>

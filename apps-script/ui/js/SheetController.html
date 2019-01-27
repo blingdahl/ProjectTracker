@@ -74,6 +74,12 @@ class SheetController {
         callRpc();
   }
   
+  setLink(uuid, text, href) {
+		new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'Link', 'LINK', text, href)).
+				output('Saving new link...').
+				callRpc();
+  }
+  
   changeSheet(uuid, toSheetId) {
     return new RpcConfig('ChangeRowValue_changeSheet', runner => runner.ChangeRowValue_changeSheet(this.getSheetId(), toSheetId, uuid)).
         output('Moving to ' + SheetController.forSheet(toSheetId).getSheetName() + '...').

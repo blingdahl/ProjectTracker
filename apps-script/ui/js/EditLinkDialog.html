@@ -1,0 +1,130 @@
+class EditLinkDialog {
+  constructor(sheetId, uuid, text, href, saveCallback) {
+    this.editLinkForm = $('.editLinkTemplate').first().clone().removeClass('editLinkTemplate');
+    console.log(this.editLinkForm);
+    this.sheetId = sheetId;
+    this.uuid = uuid;
+    this.href = href;
+    this.saveCallback = saveCallback;
+  }
+  
+  getTextElement() {
+    return this.editLinkForm.find('.text');
+  }
+  
+  getText() {
+    return this.getTextElement().val();
+  }
+  
+  getHrefElement() {
+    return this.editLinkForm.find('.href');
+  }
+  
+  getHref() {
+    return this.getHrefElement().val();
+  }
+  
+  getSubmitElement() {
+    return this.editLinkForm.find('.editLink');
+  }
+  
+  getFieldElements() {
+    return this.editLinkForm.find('.field');
+  }
+  
+  getErrorElement() {
+    return this.editLinkForm.find('.error');
+  }
+  
+  isDirty() {
+    return this.getText() || this.getHref();
+  }
+  
+  getErrors(dirtyOnly) {
+    let errors = [];
+    if (!dirtyOnly || this.isDirty()) {
+      if (!this.getText()) {
+        errors.push('Text is a required field');
+      }
+      if (!this.getHref()) {
+        errors.push('HREF is a required field');
+      }
+    }
+    if (errors.length > 0) {
+      this.getErrorElement().text(errors.join(', ')).show();
+      return errors.join(', ');
+    }
+    this.getErrorElement().hide();
+    return null;
+  }
+  
+  save() {
+    let errors = this.getErrors(false);
+    if (errors) {
+      throw new Error(errors);
+    }
+    this.saveCallback(this.sheetId, this.uuid, this.getText(), this.getHref());
+    this.editLinkForm.dialog('close');
+  }
+  
+  removeLink() {
+    this.saveCallback(this.sheetId, this.uuid, null, null);
+  }
+  
+  show() {
+    if (this.href) {
+      this.getHrefElement().val(this.href);
+      this.getTextElement().val(this.text);
+    }
+    this.getFieldElements().change(() => this.getErrors(true));
+    this.getFieldElements().keydown((event) => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (keycode === 13) {
+        this.save();
+        event.stopPropagation();
+      }
+    });
+    this.getHrefElement().change(() => {
+      let title = this.getText();
+      let url = this.getHref();
+      console.log(text, href);
+      if (!text && href) {
+        new RpcConfig('UrlFetcher_getTitleForUrl', runner => runner.UrlFetcher_getTitleForUrl(href)).
+            retryOnTimeout().
+            clearMessageOnSuccess().
+            callRpc().
+            then(successMsg => {
+              if (!this.getText()) {
+                this.getTextElement().val(successMsg);
+                this.getErrors(true);
+              }
+            });
+      }
+    });
+  let buttons = [
+    {
+      text: 'Save',
+      click: () => {
+        this.save();
+      }
+    }
+  ];
+  if (this.href) {
+    buttons.push({text: 'Remove',
+      click: () => {
+        this.removeLink();
+      }
+    });
+  }
+  buttons.push({text: 'Cancel',
+    click: () => {
+      this.editLinkForm.dialog('close');
+    }
+  });
+  this.editLinkForm.dialog({
+      title: 'Update link',
+      minWidth: 500,
+      buttons: buttons
+    });
+  }
+}

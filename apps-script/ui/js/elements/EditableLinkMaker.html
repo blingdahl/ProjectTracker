@@ -1,0 +1,42 @@
+class EditableLinkMaker {
+  constructor(sheetIdCallback, uuidCallback, editLinkCssClass, textCallback, hrefCallback, changeCallback) {
+    this.sheetIdCallback = sheetIdCallback;
+    this.uuidCallback = uuidCallback;
+    this.editLinkCssClass = editLinkCssClass;
+    this.textCallback = textCallback;
+    this.hrefCallback = hrefCallback;
+    this.changeCallback = changeCallback;
+  }
+  
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    ancestorJq.on('click', '.' + this.editLinkCssClass, this.editClicked.bind(this));
+  }
+  
+  editClicked(e) {
+    var editLinkJq = $(e.currentTarget);
+    let dataJq = editLinkJq.closest('[data-href]');
+    new EditLinkDialog(this.sheetIdCallback(dataJq), this.uuidCallback(dataJq), dataJq.attr('data-text'), dataJq.attr('data-href'), this.makeHandleChange(dataJq)).show();
+  }
+  
+  makeHandleChange(dataJq) {
+    return function(sheetId, uuid, text, href) {
+      dataJq.attr('data-href', href).attr('data-text', text);
+      this.changeCallback(sheetId, uuid, text, href);
+    }.bind(this);
+  }
+  
+  makeElement(data) {
+    let text = this.textCallback(data);
+    let href = this.hrefCallback(data);
+    let linkJq = $('<a />').
+        attr('href', href).
+        text(text);
+    let editLink = $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass(this.editLinkCssClass);
+    return $('<span />').
+        attr('data-href', href).
+        attr('data-text', text).
+        append(linkJq).
+        append(editLink);
+  }
+}

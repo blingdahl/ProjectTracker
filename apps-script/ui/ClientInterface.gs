@@ -31,12 +31,21 @@ function ChangeRowValue_setValue(sheetId, uuid, columnName, columnKey, newValue)
   return ret;
 }
 
-function ChangeRowValue_setLink(sheetId, uuid, columnName, columnKey, url) {
-  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, url]);
+function ChangeRowValue_setLink(sheetId, uuid, columnName, columnKey, text, href) {
+  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, text, href]);
   ChangeRowValue.init();
   TrackingSheet.init();
-  var ret = ChangeRowValue.setLink(sheetId, uuid, columnName, columnKey, url);
-  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, url]);
+  var ret = ChangeRowValue.setLink(sheetId, uuid, columnName, columnKey, text, href);
+  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, text, href]);
+  return ret;
+}
+
+function ChangeRowValue_clearLink(sheetId, uuid, columnName, columnKey) {
+  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey]);
+  ChangeRowValue.init();
+  TrackingSheet.init();
+  var ret = ChangeRowValue.clearLink(sheetId, uuid, columnName, columnKey);
+  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey]);
   return ret;
 }
 
