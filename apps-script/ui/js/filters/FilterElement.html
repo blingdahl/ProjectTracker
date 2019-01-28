@@ -6,9 +6,11 @@ class FilterElement {
     this.values = values;
     this.changeCallback = changeCallback;
     this.allValues = allValues;
+    this.jq = $('<span />').addClass('filterElement');
     this.textJq = $('<span />').
         addClass(this.textCssClass).
-        addClass('editableText');
+        addClass('filterText');
+    this.jq.append(this.textJq).append($('<span>&#9660;</span>').addClass('arrow'));
   }
   
   // Called once per table load
@@ -34,7 +36,8 @@ class FilterElement {
       this.values.forEach(value => textParts.push(value || this.emptyValueText));
       text = textParts.join(', ');
     }
-    this.textJq.text(text).show();
+    this.textJq.text(text);
+    this.jq.show();
   }
   
   textClicked(e) {
@@ -45,13 +48,13 @@ class FilterElement {
           this.changeCallback(newValues);
         },
         () => this.textJq.show());
-    this.textJq.parent().append(input);
-    this.textJq.hide();
+    this.jq.parent().append(input);
+    this.jq.hide();
   }
   
   appendTo(parentJq) {
     this.updateTextJq();
-    parentJq.append(this.textJq);
+    parentJq.append(this.jq);
     this.attachClickHandler(parentJq);
   }
 }
