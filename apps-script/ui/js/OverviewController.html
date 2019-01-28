@@ -19,16 +19,8 @@ class OverviewController {
   // SECTION:
   // Elements
   
-  static getShowOverviewElement() {
-    return $('.showOverview');
-  }
-  
   static getUpdateOverviewElement() {
     return $('.updateOverview');
-  }
-  
-  static getHideOverviewElement() {
-    return $('.hideOverview');
   }
   
   static getSortOverviewElement() {
@@ -264,14 +256,10 @@ class OverviewController {
   
   static updateButtons(showingOverview) {
     if (showingOverview) {
-      OverviewController.getShowOverviewElement().hide();
       OverviewController.getUpdateOverviewElement().show();
-      OverviewController.getHideOverviewElement().show();
       OverviewController.getSortOverviewElement().show();
     } else {
-      OverviewController.getShowOverviewElement().show();
       OverviewController.getUpdateOverviewElement().hide();
-      OverviewController.getHideOverviewElement().hide();
       OverviewController.getSortOverviewElement().hide();
     }
   }
@@ -296,7 +284,7 @@ class OverviewController {
   }
   
   static updateOverview() {
-    OverviewController.hideOverview(false);
+    OverviewController.hideOverview();
     OverviewController.showOverview();
   }
   
@@ -315,23 +303,19 @@ class OverviewController {
   }
   
   static showOverview() {
-    OverviewController.hideOverview(false);
-    google.script.history.push(null, null, 'overview');
+    OverviewController.hideOverview();
     OverviewController.updateButtons(true);
     OverviewController.current = new OverviewController().show();
   }
   
-  hide(opt_changeHistory) {
-    if (opt_changeHistory === undefined || opt_changeHistory === true) {
-      google.script.history.push(null, null, '');
-    }
+  hide() {
     this.jq.remove();
     OverviewController.updateButtons(false);
   }
   
-  static hideOverview(opt_changeHistory) {
+  static hideOverview() {
     if (OverviewController.current) {
-      OverviewController.current.hide(opt_changeHistory);
+      OverviewController.current.hide();
       OverviewController.current = null;
     }
   }
@@ -350,18 +334,12 @@ class OverviewController {
     OverviewController.updateOverview();
   }
   
-  static handleHideOverviewClick() {
-    OverviewController.hideOverview();
-  }
-  
   static handleSortOverviewClick() {
     OverviewController.current.sortRows();
   }
 
   static addListeners() {
-    OverviewController.getShowOverviewElement().click(OverviewController.handleShowOverviewClick);
     OverviewController.getUpdateOverviewElement().click(OverviewController.handleUpdateOverviewClick);
-    OverviewController.getHideOverviewElement().click(OverviewController.handleHideOverviewClick);
     OverviewController.getSortOverviewElement().click(OverviewController.handleSortOverviewClick);
     $(document).keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
@@ -374,11 +352,7 @@ class OverviewController {
   
   static init() {
     OverviewController.addListeners();
-    google.script.url.getLocation(function(location) {
-      if (location.hash === 'overview') {
-        OverviewController.showOverview();
-      }
-    });
+    window.setTimeout(OverviewController.showOverview, 1);
   }
 }
 

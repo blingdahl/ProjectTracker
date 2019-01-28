@@ -1,0 +1,83 @@
+class Hash {
+  constructor(params) {
+    this.params = params;
+  }
+  
+  setParam(paramName, paramValue) {
+    let param = this.getParam(paramName);
+    if (param) {
+      param.value = paramValue;
+    } else {
+      this.params.push(new HashParam(paramName, paramValue));
+    }
+  }
+  
+  getParam(paramName) {
+    for (let i = 0; i != this.params.length; i++) {
+      let param = this.params[i];
+      if (param.name === paramName) {
+        return param;
+      }
+    }
+    return null;
+  }
+  
+  toString() {
+    let parts = [];
+    this.params.forEach(param => {
+      let paramStr = param.toString();
+      if (paramStr !== '') {
+        parts.push(param.toString());
+      }
+    });
+    return parts.join('&');
+  }
+  
+  static fromString(s) {
+    let params = [];
+    s.split('&').forEach(part => params.push(HashParam.fromString(part)));
+    return new Hash(params);
+  }
+  
+  static setParam(paramName, paramValue) {
+    google.script.url.getLocation(function(location) {
+      let hash = Hash.fromString(location.hash);
+      hash.setParam(paramName, paramValue);
+      google.script.history.push(null, null, hash.toString());
+    });
+  }
+  
+  static withParam(paramName, callback) {
+    google.script.url.getLocation(function(location) {
+      let param = Hash.fromString(location.hash).getParam(paramName);
+      if (param) {
+        callback(Hash.fromString(location.hash).getParam(paramName).value);
+      }
+    });
+  }
+}
+
+class HashParam {
+  constructor(name, value) {
+    this.name = name;
+    this.value = value;
+  }
+  
+  toString() {
+    if (this.value === false) {
+      return '';
+    }
+    if (this.value === true) {
+      return this.name;
+    }
+    return this.name + '=' + this.value;
+  }
+  
+  static fromString(s) {
+    let equalsIndex = s.indexOf('=');
+    if (equalsIndex === -1) {
+      return new HashParam(s, true);
+    }
+    return new HashParam(s.substring(0, equalsIndex), s.substring(equalsIndex + 1));
+  }
+}
