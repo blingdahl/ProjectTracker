@@ -217,7 +217,7 @@ class OverviewController {
       if (rowStatus === OverviewController.NO_STATUS_KEY) {
         rowStatus = '';
       }
-      let showRow = filters.matches(
+      let showRow = filters.rowMatches(
           rowPriority,
           rowStatus,
           rowJq.attr('data-sheet-id'));

@@ -17,7 +17,7 @@ class Filters {
     return this.sheetIds.length === 0 || this.sheetIds.includes(rowSheetId);
   }
   
-  matches(rowPriority, rowStatus, rowSheetId) {
+  rowMatches(rowPriority, rowStatus, rowSheetId) {
     return this.matchesPriority(rowPriority) &&
         this.matchesStatus(rowStatus) &&
         this.matchesSheetId(rowSheetId);
