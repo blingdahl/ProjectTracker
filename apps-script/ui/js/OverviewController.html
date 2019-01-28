@@ -209,9 +209,17 @@ class OverviewController {
     let filters = this.filterBar.getFilters();
     this.getDataRowElements().each((index, elt) => {
       let rowJq = $(elt);
+      let rowPriority = rowJq.attr('data-priority');
+      if (rowPriority === OverviewController.NO_PRIORITY_KEY) {
+        rowPriority = '';
+      }
+      let rowStatus = rowJq.attr('data-status');
+      if (rowStatus === OverviewController.NO_STATUS_KEY) {
+        rowStatus = '';
+      }
       let showRow = filters.matches(
-          rowJq.attr('data-priority'),
-          rowJq.attr('data-status'),
+          rowPriority,
+          rowStatus,
           rowJq.attr('data-sheet-id'));
       if (showRow) {
         rowJq.show();
