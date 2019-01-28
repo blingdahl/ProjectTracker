@@ -11,15 +11,14 @@ class MultiOptionInputMaker {
       let text = this.textCallback(value);
       let optionJq = $('<div />').
           attr('data-value', value).
-          attr('data-text', text);
+          attr('data-text', text).
+          addClass('option');
       let textJq = $('<span />').text(text);
       let checkJq = $('<span>&check;</span>').addClass('check');
-      optionJq.append(checkJq);
-      optionJq.append(textJq);
+      optionJq.append(checkJq).append(textJq);
       if (currValues.length === 0 || currValues.includes(String(value))) {
         optionJq.attr('data-selected', 'true');
       }
-      optionJq.addClass('option');
       optionsJq.append(optionJq);
       optionJq.click((event) => {
         let optionJq = $(event.currentTarget);
@@ -31,7 +30,7 @@ class MultiOptionInputMaker {
       });
     }
     let buttonsJq = $('<div />').addClass('buttons');
-    let applyJq = $('<span />').text('Apply').addClass('apply');
+    let applyJq = $('<span />').text('Apply').addClass('apply').addClass('button');
     applyJq.click((event) => {
       let applyJq = $(event.currentTarget);
       let newValues = [];
@@ -42,11 +41,15 @@ class MultiOptionInputMaker {
       optionsJq.remove();
       changeCallback(newValues);
     });
-    let clearJq = $('<span />').text('Clear').addClass('clear');
+    let clearJq = $('<span />').text('Clear').addClass('clear').addClass('button');
     clearJq.click((event) => {
-      optionsJq.find('[data-selected="true"]').attr('data-selected', 'false');
+      optionsJq.find('.option').attr('data-selected', 'false');
     });
-    let cancelJq = $('<span />').text('Cancel').addClass('cancel');
+    let allJq = $('<span />').text('All').addClass('all').addClass('button');
+    allJq.click((event) => {
+      optionsJq.find('.option').attr('data-selected', 'true');
+    });
+    let cancelJq = $('<span />').text('Cancel').addClass('cancel').addClass('button');
     cancelJq.click((event) => {
       optionsJq.remove();
       cancelCallback();
@@ -54,6 +57,8 @@ class MultiOptionInputMaker {
     buttonsJq.append(applyJq);
     buttonsJq.append($('<span />').addClass('betweenButtons'));
     buttonsJq.append(clearJq);
+    buttonsJq.append($('<span />').addClass('betweenButtons'));
+    buttonsJq.append(allJq);
     buttonsJq.append($('<span />').addClass('betweenButtons'));
     buttonsJq.append(cancelJq);
     optionsJq.append(buttonsJq);
