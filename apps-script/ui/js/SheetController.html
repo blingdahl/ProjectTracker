@@ -171,6 +171,16 @@ class SheetController {
     return SheetController.SHEET_INFOS;
   }
   
+  static getSheetIds() {
+    let sheetIds = [];
+    this.getSheetInfos().forEach(sheetInfo => sheetIds.push(sheetInfo.sheetId));
+    return sheetIds;
+  }
+  
+  static getSheetName(sheetId) {
+    return SheetController.forSheet(sheetId).getSheetName();
+  }
+  
   static forSheet(sheetId) {
     let ret = null;
     SheetController.ALL.forEach(sheetController => {

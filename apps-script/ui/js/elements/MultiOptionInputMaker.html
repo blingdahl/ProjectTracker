@@ -30,7 +30,8 @@ class MultiOptionInputMaker {
         }
       });
     }
-    let applyJq = $('<div />').text('Apply').addClass('apply');
+    let buttonsJq = $('<div />').addClass('buttons');
+    let applyJq = $('<span />').text('Apply').addClass('apply');
     applyJq.click((event) => {
       let applyJq = $(event.currentTarget);
       let newValues = [];
@@ -41,7 +42,21 @@ class MultiOptionInputMaker {
       optionsJq.remove();
       changeCallback(newValues);
     });
-    optionsJq.append(applyJq);
+    let clearJq = $('<span />').text('Clear').addClass('clear');
+    clearJq.click((event) => {
+      optionsJq.find('[data-selected="true"]').attr('data-selected', 'false');
+    });
+    let cancelJq = $('<span />').text('Cancel').addClass('cancel');
+    cancelJq.click((event) => {
+      optionsJq.remove();
+      cancelCallback();
+    });
+    buttonsJq.append(applyJq);
+    buttonsJq.append($('<span />').addClass('betweenButtons'));
+    buttonsJq.append(clearJq);
+    buttonsJq.append($('<span />').addClass('betweenButtons'));
+    buttonsJq.append(cancelJq);
+    optionsJq.append(buttonsJq);
     return optionsJq;
   }
 }

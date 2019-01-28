@@ -65,7 +65,7 @@ class FilterBar {
     var sheetId = this.getSheetFilterElement().val();
     return new Filters(this.priorityFilter.getValues(),
                        this.statusFilter.getValues(),
-                       sheetId ? [sheetId] : []);
+                       this.sheetFilter.getValues());
   }
   
   hideColumnStorageKey(columnKey) {
@@ -117,7 +117,8 @@ class FilterBar {
     this.priorityFilter.appendTo(this.getPriorityFilterElement());
     this.statusFilter = new FilterElement('statusFilter', Common.textFn(OverviewController.NO_STATUS_TEXT), 'All Statuses', FilterBar.saved('statuses', []), GlobalController.STATUSES, FilterBar.saveFn('statuses'));
     this.statusFilter.appendTo(this.getStatusFilterElement());
-    this.populateSheetFilter(this.getSheetFilterElement(), SheetController.getSheetInfos());
+    this.sheetFilter = new FilterElement('sheetFilter', SheetController.getSheetName, 'All Sheets', FilterBar.saved('sheets', []), SheetController.getSheetIds(), FilterBar.saveFn('sheets'));
+    this.sheetFilter.appendTo(this.getSheetFilterElement());
     this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));
     this.initHiddenColumns();
   }
