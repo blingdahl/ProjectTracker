@@ -37,7 +37,7 @@ class EditableLinkMaker {
     let href = this.hrefCallback(data);
     let linkJq = $('<a />');
     if (href) {
-      linkJq.attr('href', href).text(text);
+      linkJq.attr('href', href).text(text).attr('target', '_blank');
     } else {
       linkJq.hide();
     }
