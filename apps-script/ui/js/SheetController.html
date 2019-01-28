@@ -52,6 +52,18 @@ class SheetController {
   getSearchQuery() {
     return this.jq.attr('data-search-query');
   }
+   
+  isDirty() {
+    return this.jq.attr('data-dirty') === 'true';
+  }
+   
+  markDirty() {
+    this.jq.attr('data-dirty', 'true');
+  }
+   
+  markNotDirty() {
+    this.jq.attr('data-dirty', null);
+  }
   
   hide() {
     this.jq.hide();
@@ -68,6 +80,7 @@ class SheetController {
   }
   
   setValue(uuid, columnName, columnKey, newValue) {
+    this.markDirty();
     return new RpcConfig('ChangeRowValue_setValue', runner => runner.ChangeRowValue_setValue(this.getSheetId(), uuid, columnName, columnKey, newValue)).
         output('Setting ' + columnName + ' to ' + newValue + '...').
         retryOnTimeout().
@@ -75,18 +88,21 @@ class SheetController {
   }
   
   setLink(uuid, text, href) {
-		new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'Link', 'LINK', text, href)).
-				output('Saving new link...').
-				callRpc();
+    this.markDirty();
+    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'Link', 'LINK', text, href)).
+            output('Saving new link...').
+            callRpc();
   }
   
   clearLink(uuid, text, href) {
-		new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_clearLink(this.getSheetId(), uuid, 'Link', 'LINK')).
-				output('Clearing link...').
-				callRpc();
+    this.markDirty();
+    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_clearLink(this.getSheetId(), uuid, 'Link', 'LINK')).
+            output('Clearing link...').
+            callRpc();
   }
   
   changeSheet(uuid, toSheetId) {
+    this.markDirty();
     return new RpcConfig('ChangeRowValue_changeSheet', runner => runner.ChangeRowValue_changeSheet(this.getSheetId(), toSheetId, uuid)).
         output('Moving to ' + SheetController.forSheet(toSheetId).getSheetName() + '...').
         retryOnTimeout().
@@ -97,15 +113,20 @@ class SheetController {
   // Click handlers
 
   update() {
+    this.markNotDirty();
     return new RpcConfig('Update_update', runner => runner.Update_update(this.getSheetId())).
         output('Updating ' + this.getSheetName() + ' sheet...').
         retryOnTimeout().
         callRpc().
         then(() => OverviewController.updateOverviewForSheet(this.getSheetId()));
   }
+  
+  addItemCallback() {
+    this.markDirty();
+  }
 
   add() {
-    new AddItemDialog(this.getSheetId(), this.getSheetName(), GlobalController.PRIORITIES).show();
+    new AddItemDialog(this.getSheetId(), this.getSheetName(), this.addItemCallback.bind(this)).show();
   }
 
   tidyUpColumns() {

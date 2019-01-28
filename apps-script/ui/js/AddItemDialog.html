@@ -1,8 +1,9 @@
 class AddItemDialog {
-  constructor(sheetId, sheetName) {
+  constructor(sheetId, sheetName, addItemCallback) {
     this.itemForm = $('.itemFormTemplate').first().clone().removeClass('itemFormTemplate');
     this.sheetName = sheetName;
     this.sheetId = sheetId;
+    this.addItemCallback = addItemCallback;
     this.getPriorityElement().append($('<option />').attr('value', '').text('No Priority'));
     GlobalController.PRIORITIES.forEach(priority => this.getPriorityElement().append($('<option />').attr('value', priority).text(priority)));
   }
@@ -68,6 +69,7 @@ class AddItemDialog {
       throw new Error(errors);
     }
     var title = this.getTitle();
+    this.addItemCallback();
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         retryOnTimeout().
