@@ -1,26 +1,27 @@
 class FilterElement {
-  constructor(textCssClass, textCallback, allValuesText, values, allValues, changeCallback) {
-    this.textCssClass = textCssClass;
+  constructor(cssClass, textCallback, allValuesText, emptyValues, emptyText, values, allValues, changeCallback) {
+    this.cssClass = cssClass;
     this.textCallback = textCallback;
     this.allValuesText = allValuesText;
+    this.emptyValues = emptyValues;
+    this.emptyText = emptyText;
     this.values = values;
     this.changeCallback = changeCallback;
     this.allValues = allValues;
-    this.jq = $('<span />').addClass('filterElement');
+    this.jq = $('<span />').addClass('filterElement').addClass(cssClass);
     this.textJq = $('<span />').
-        addClass(this.textCssClass).
         addClass('filterText');
     this.jq.append(this.textJq).append($('<span>&#9660;</span>').addClass('arrow'));
   }
   
   // Called once per table load
   attachClickHandler(ancestorJq) {
-    ancestorJq.on('click', '.' + this.textCssClass, this.textClicked.bind(this));
+    ancestorJq.on('click', '.' + this.cssClass, this.textClicked.bind(this));
   }
   
   valuesToText() {
     if (this.values.length == 0) {
-      return this.allValuesText;
+      return this.emptyText;
     }
     let textParts = [];
     this.values.forEach(value => textParts.push(this.textCallback(value)));
@@ -29,7 +30,9 @@ class FilterElement {
   
   updateTextJq() {
     let text;
-    if (this.values.length == 0 || this.values.length === this.allValues.length) {
+    if (this.values.length == 0) {
+      text = this.emptyText;
+    } else if (this.values.length === this.allValues.length) {
       text = this.allValuesText;
     } else {
       let textParts = [];
@@ -41,8 +44,9 @@ class FilterElement {
   }
   
   textClicked(e) {
-    let input = new MultiOptionInputMaker(this.allValues, this.textCallback).makeElement(this.values,
-        (newValues) => {
+    console.log('clicked');
+    let input = new MultiOptionInputMaker(this.allValues, this.textCallback).makeElement(this.getValues(),
+        newValues => {
           this.values = newValues;
           this.updateTextJq();
           this.changeCallback(newValues);
@@ -59,6 +63,6 @@ class FilterElement {
   }
   
   getValues() {
-    return this.values || this.allValues;
+    return this.values || this.emptyValues;
   }
 }

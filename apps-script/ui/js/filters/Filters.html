@@ -104,13 +104,13 @@ class FilterBar {
   }
 
   init() {
-    this.priorityFilter = new FilterElement('priorityFilter', Common.textFn(OverviewController.NO_PRIORITY_TEXT), 'All Priorities', FilterBar.saved('priorities', []), GlobalController.PRIORITIES, FilterBar.saveFn('priorities'));
+    this.priorityFilter = new FilterElement('priorityFilter', Common.textFn(OverviewController.NO_PRIORITY_TEXT), 'All Priorities', GlobalController.PRIORITIES, 'All Priorities', FilterBar.saved('priorities', []), GlobalController.PRIORITIES, FilterBar.saveFn('priorities'));
     this.priorityFilter.appendTo(this.getPriorityFilterElement());
-    this.statusFilter = new FilterElement('statusFilter', Common.textFn(OverviewController.NO_STATUS_TEXT), 'All Statuses', FilterBar.saved('statuses', []), GlobalController.STATUSES, FilterBar.saveFn('statuses'));
+    this.statusFilter = new FilterElement('statusFilter', Common.textFn(OverviewController.NO_STATUS_TEXT), 'All Statuses', GlobalController.STATUSES, 'All Statuses', FilterBar.saved('statuses', []), GlobalController.STATUSES, FilterBar.saveFn('statuses'));
     this.statusFilter.appendTo(this.getStatusFilterElement());
-    this.sheetFilter = new FilterElement('sheetFilter', SheetController.getSheetName, 'All Sheets', FilterBar.saved('sheets', []), SheetController.getSheetIds(), FilterBar.saveFn('sheets'));
+    this.sheetFilter = new FilterElement('sheetFilter', SheetController.getSheetName, 'All Sheets', SheetController.getSheetIds(), 'All Sheets', FilterBar.saved('sheets', []), SheetController.getSheetIds(), FilterBar.saveFn('sheets'));
     this.sheetFilter.appendTo(this.getSheetFilterElement());
-    this.columnFilter = new FilterElement('columnFilter', FilterBar.getColumnName, 'All Columns', FilterBar.saved('columns', []), Filters.FILTER_COLUMNS, FilterBar.saveFn('columns'));
+    this.columnFilter = new FilterElement('columnFilter', FilterBar.getColumnName, 'All Columns', [], '-', FilterBar.saved('columns', []), Filters.FILTER_COLUMNS, FilterBar.saveFn('columns'));
     this.columnFilter.appendTo(this.getColumnFilterElement());
     this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));
   }
