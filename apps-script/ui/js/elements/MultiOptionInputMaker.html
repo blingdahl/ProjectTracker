@@ -16,7 +16,7 @@ class MultiOptionInputMaker {
       let textJq = $('<span />').text(text);
       let checkJq = $('<span>&check;</span>').addClass('check');
       optionJq.append(checkJq).append(textJq);
-      if (currValues.includes(String(value))) {
+      if (currValues.some(currValue => value == currValue)) {
         optionJq.attr('data-selected', 'true');
       }
       optionsJq.append(optionJq);
