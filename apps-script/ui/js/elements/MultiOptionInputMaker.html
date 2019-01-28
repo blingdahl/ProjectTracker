@@ -1,22 +1,14 @@
 class MultiOptionInputMaker {
-  constructor(allValues, emptyText) {
+  constructor(allValues, textCallback) {
     this.allValues = allValues;
-    this.emptyText = emptyText;
+    this.textCallback = textCallback;
   }
   
   makeElement(currValues, changeCallback, cancelCallback) {
     let optionsJq = $('<div />').addClass('multiOptionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
-      let optionValue = this.allValues[i];
-      let text;
-      let value;
-      if (typeof optionValue === 'string') {
-        text = optionValue || this.emptyText;
-        value = optionValue;
-      } else {
-        text = optionValue.text;
-        value = optionValue.value;
-      }
+      let value = this.allValues[i];
+      let text = this.textCallback(value);
       let optionJq = $('<div />').
           attr('data-value', value).
           attr('data-text', text);

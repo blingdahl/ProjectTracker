@@ -1,7 +1,7 @@
 class FilterElement {
-  constructor(textCssClass, emptyValueText, allValuesText, values, allValues, changeCallback) {
+  constructor(textCssClass, textCallback, allValuesText, values, allValues, changeCallback) {
     this.textCssClass = textCssClass;
-    this.emptyValueText = emptyValueText;
+    this.textCallback = textCallback;
     this.allValuesText = allValuesText;
     this.values = values;
     this.changeCallback = changeCallback;
@@ -23,7 +23,7 @@ class FilterElement {
       return this.allValuesText;
     }
     let textParts = [];
-    this.values.forEach(value => textParts.push(value || this.emptyValueText));
+    this.values.forEach(value => textParts.push(this.textCallback(value)));
     return textParts.join(', ');
   }
   
@@ -33,7 +33,7 @@ class FilterElement {
       text = this.allValuesText;
     } else {
       let textParts = [];
-      this.values.forEach(value => textParts.push(value || this.emptyValueText));
+      this.values.forEach(value => textParts.push(this.textCallback(value)));
       text = textParts.join(', ');
     }
     this.textJq.text(text);
@@ -41,7 +41,7 @@ class FilterElement {
   }
   
   textClicked(e) {
-    let input = new MultiOptionInputMaker(this.allValues, this.emptyValueText).makeElement(this.values,
+    let input = new MultiOptionInputMaker(this.allValues, this.textCallback).makeElement(this.values,
         (newValues) => {
           this.values = newValues;
           this.updateTextJq();
@@ -56,5 +56,9 @@ class FilterElement {
     this.updateTextJq();
     parentJq.append(this.jq);
     this.attachClickHandler(parentJq);
+  }
+  
+  getValues() {
+    return this.values || this.allValues;
   }
 }
