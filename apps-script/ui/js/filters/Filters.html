@@ -92,6 +92,14 @@ class FilterBar {
   }
   
   static getColumnName(columnKey) {
+    switch (columnKey) {
+      case 'VIEW_SHEET': return 'View Sheet';
+      case 'EMAIL': return 'Email';
+      case 'LINK': return 'Link';
+      case 'FROM': return 'From';
+      case 'NEXT_ACTION_DATE': return 'Next Action';
+      case 'EMAIL_LAST_DATE': return 'Last Email';
+    }
     return columnKey;
   }
 
