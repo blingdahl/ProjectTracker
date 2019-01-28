@@ -25,7 +25,7 @@ class Filters {
   }
   
   columnMatches(columnKey) {
-    return this.columnKeys.length === 0 || this.columnKeys.includes(columnKey);
+    return this.columnKeys.includes(columnKey);
   }
 }
 
@@ -75,22 +75,6 @@ class FilterBar {
                        this.columnFilter.getValues());
   }
   
-  static saved(storageKey, defaultValue) {
-    let str = sessionStorage.getItem(storageKey);
-    if (!str) {
-      return defaultValue;
-    }
-    return str.split(',');
-  }
-  
-  static save(storageKey, values) {
-    sessionStorage.setItem(storageKey, values.join(','));
-  }
-  
-  static saveFn(storageKey) {
-    return values => FilterBar.save(storageKey, values);
-  }
-  
   static getColumnName(columnKey) {
     switch (columnKey) {
       case 'VIEW_SHEET': return 'View Sheet';
@@ -102,15 +86,19 @@ class FilterBar {
     }
     return columnKey;
   }
+  
+  applyFilters() {
+    this.applyFiltersCallback(this.getFilters());
+  }
 
   init() {
-    this.priorityFilter = new FilterElement('priorityFilter', Common.textFn(OverviewController.NO_PRIORITY_TEXT), 'All Priorities', GlobalController.PRIORITIES, 'All Priorities', FilterBar.saved('priorities', []), GlobalController.PRIORITIES, FilterBar.saveFn('priorities'));
+    this.priorityFilter = new FilterElement('priorityFilter', Common.textFn(OverviewController.NO_PRIORITY_TEXT), 'All Priorities', GlobalController.PRIORITIES, 'All Priorities', 'priorities', GlobalController.PRIORITIES, this.applyFilters.bind(this));
     this.priorityFilter.appendTo(this.getPriorityFilterElement());
-    this.statusFilter = new FilterElement('statusFilter', Common.textFn(OverviewController.NO_STATUS_TEXT), 'All Statuses', GlobalController.STATUSES, 'All Statuses', FilterBar.saved('statuses', []), GlobalController.STATUSES, FilterBar.saveFn('statuses'));
+    this.statusFilter = new FilterElement('statusFilter', Common.textFn(OverviewController.NO_STATUS_TEXT), 'All Statuses', GlobalController.STATUSES, 'All Statuses', 'statuses', GlobalController.STATUSES, this.applyFilters.bind(this));
     this.statusFilter.appendTo(this.getStatusFilterElement());
-    this.sheetFilter = new FilterElement('sheetFilter', SheetController.getSheetName, 'All Sheets', SheetController.getSheetIds(), 'All Sheets', FilterBar.saved('sheets', []), SheetController.getSheetIds(), FilterBar.saveFn('sheets'));
+    this.sheetFilter = new FilterElement('sheetFilter', SheetController.getSheetName, 'All Sheets', SheetController.getSheetIds(), 'All Sheets', 'sheets', SheetController.getSheetIds(), this.applyFilters.bind(this));
     this.sheetFilter.appendTo(this.getSheetFilterElement());
-    this.columnFilter = new FilterElement('columnFilter', FilterBar.getColumnName, 'All Columns', [], '-', FilterBar.saved('columns', []), Filters.FILTER_COLUMNS, FilterBar.saveFn('columns'));
+    this.columnFilter = new FilterElement('columnFilter', FilterBar.getColumnName, 'All Columns', [], '-', 'columns', Filters.FILTER_COLUMNS, this.applyFilters.bind(this));
     this.columnFilter.appendTo(this.getColumnFilterElement());
     this.getFilterElements().change(() => this.applyFiltersCallback(this.getFilters()));
   }
