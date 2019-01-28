@@ -15,7 +15,7 @@ class Filters {
   }
   
   matchesSheetId(rowSheetId) {
-    return this.sheetIds.length === 0 || this.sheetIds.includes(rowSheetId);
+    return this.sheetIds.length === 0 || this.sheetIds.some(filterSheetId => filterSheetId == rowSheetId);
   }
   
   rowMatches(rowPriority, rowStatus, rowSheetId) {
@@ -69,6 +69,7 @@ class FilterBar {
   }
   
   getFilters() {
+    console.log(this.sheetFilter.getValues());
     return new Filters(this.priorityFilter.getValues(),
                        this.statusFilter.getValues(),
                        this.sheetFilter.getValues(),
