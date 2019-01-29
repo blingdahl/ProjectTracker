@@ -83,6 +83,24 @@ class OverviewController {
     return $(link).closest('tr[data-uuid]').attr('data-uuid');
   }
   
+  updateNextActionDate(tr, newNextActionDate) {
+    tr.attr('data-next-action-date', newNextActionDate);
+    let nextActionCategory;
+    if (newNextActionDate === '') {
+      nextActionCategory = null;
+    } else {
+      let currDateStr = OverviewController.currDateStr();
+      if (newNextActionDate > currDateStr) {
+        nextActionCategory = 'future';
+      } else if (newNextActionDate == currDateStr) {
+        nextActionCategory = 'today';
+      } else {
+        nextActionCategory = 'past';
+      }
+    }
+    tr.attr('data-next-action-category', nextActionCategory);
+  }
+  
   handleStatusChange(sheetId, uuid, newStatus) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-status', newStatus);
@@ -104,7 +122,7 @@ class OverviewController {
   
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
-    tr.attr('data-next-action-date', newValue);
+    this.updateNextActionDate(tr, newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'Next Action Date', 'NEXT_ACTION_DATE', newValue);
   }
   
@@ -217,7 +235,7 @@ class OverviewController {
     rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
-    rowJq.attr('data-next-action-date', rowData['NEXT_ACTION_DATE']);
+    this.updateNextActionDate(rowJq, rowData['NEXT_ACTION_DATE']);
     
     this.getTbodyElement().append(rowJq);
   }
