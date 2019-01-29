@@ -315,16 +315,6 @@ class OverviewController {
     return this;
   }
   
-  static updateButtons(showingOverview) {
-    if (showingOverview) {
-      OverviewController.getUpdateOverviewElement().show();
-      OverviewController.getSortOverviewElement().show();
-    } else {
-      OverviewController.getUpdateOverviewElement().hide();
-      OverviewController.getSortOverviewElement().hide();
-    }
-  }
-  
   updateOverviewForSheet(sheetId) {
     this.getDataRowElements().filter('[data-sheet-id="' + sheetId + '"]').remove();
     $('.overviewPlaceholder').find('.overviewLoading').show();
@@ -365,13 +355,11 @@ class OverviewController {
   
   static showOverview() {
     OverviewController.hideOverview();
-    OverviewController.updateButtons(true);
     OverviewController.current = new OverviewController().show();
   }
   
   hide() {
     this.jq.remove();
-    OverviewController.updateButtons(false);
   }
   
   static hideOverview() {
