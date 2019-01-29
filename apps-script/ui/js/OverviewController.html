@@ -323,7 +323,7 @@ class OverviewController {
   updateOverviewForSheet(sheetId) {
     this.getDataRowElements().filter('[data-sheet-id="' + sheetId + '"]').remove();
     $('.overviewPlaceholder').find('.overviewLoading').show();
-    new RpcConfig('Overview_getRowsForSheetId', runner => runner.Overview_getRowsForSheetId(sheetId)).
+    return new RpcConfig('Overview_getRowsForSheetId', runner => runner.Overview_getRowsForSheetId(sheetId)).
         output('Loading overview for ' + SheetController.forSheet(sheetId).getSheetName() + '...').
         clearMessageOnSuccess().
         callRpc().

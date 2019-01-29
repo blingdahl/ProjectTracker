@@ -110,12 +110,27 @@ class SheetController {
   // SECTION:
   // Click handlers
 
+  afterUpdate() {
+    this.updateOutstanding = false;
+    if (this.updateQueued) {
+      this.updateQueued = false;
+      return this.update();
+    } else {
+      return OverviewController.updateOverviewForSheet(this.getSheetId());
+    }
+  }
+
   update() {
+    if (this.updateOutstanding) {
+      this.updateQueued = true;
+      return;
+    }
+    this.updateOutstanding = true;
     this.markNotDirty();
     return new RpcConfig('Update_update', runner => runner.Update_update(this.getSheetId())).
         output('Updating ' + this.getSheetName() + ' sheet...').
         callRpc().
-        then(() => OverviewController.updateOverviewForSheet(this.getSheetId()));
+        then(this.afterUpdate.bind(this));
   }
   
   addItemCallback() {
