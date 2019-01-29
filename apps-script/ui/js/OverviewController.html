@@ -135,15 +135,56 @@ class OverviewController {
     return a.attr('data-priority').compare(b.attr(attrName))
   }
   
-  static compareAttributeFn(attrName) {
+  static compareAttributeFn(attrName, opt_customCompare) {
     return function(a, b) {
-      return compare($(a).attr(attrName), $(b).attr(attrName));
+      let aAttr = $(a).attr(attrName);
+      let bAttr = $(b).attr(attrName);
+      if (opt_customCompare) {
+        let result = opt_customCompare(aAttr, bAttr);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return compare(aAttr, bAttr);
     };
+  }
+  
+  static currDateStr() {
+    if (!OverviewController.CURR_DATE_STR) {
+      let d = new Date();
+      let monthStr = String(d.getMonth() + 1);
+      if (monthStr.length === 1) {
+        monthStr = '0' + monthStr;
+      }
+      let dayStr = String(d.getDate());
+      if (dayStr.length === 1) {
+        dayStr = '0' + dayStr;
+      }
+      OverviewController.CURR_DATE_STR = (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
+      console.log(OverviewController.CURR_DATE_STR);
+    }
+    return OverviewController.CURR_DATE_STR;
+  }
+  
+  static compareNextActionDate(aNextActionDate, bNextActionDate) {
+    let currDateStr = OverviewController.currDateStr();
+    let aEmpty = aNextActionDate == '';
+    let bEmpty = bNextActionDate == '';
+    let aAfterToday = !aEmpty && aNextActionDate > currDateStr;
+    let bAfterToday = !bEmpty && bNextActionDate > currDateStr;
+    if (aAfterToday != bAfterToday) {
+      return aAfterToday ? 1 : -1;
+    }
+    if (aEmpty != bEmpty) {
+      return aEmpty ? 1 : -1;
+    }
+    return 0;
   }
   
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.compareAttributeFn('data-priority'),
+      compare.fn.chain(OverviewController.compareAttributeFn('data-next-action-date', OverviewController.compareNextActionDate),
+                       OverviewController.compareAttributeFn('data-priority'),
                        OverviewController.compareAttributeFn('data-status-index'),
                        OverviewController.compareAttributeFn('data-sheet-id'),
                        OverviewController.compareAttributeFn('data-uuid'))
@@ -175,6 +216,7 @@ class OverviewController {
     rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
+    rowJq.attr('data-next-action-date', rowData['NEXT_ACTION_DATE']);
     
     this.getTbodyElement().append(rowJq);
   }
