@@ -125,7 +125,6 @@ class AddItemDialog {
     this.getUrlElement().change(() => {
       let title = this.getTitle();
       let url = this.getUrl();
-      console.log(title, url);
       if (!title && url) {
         new RpcConfig('UrlFetcher_getTitleForUrl', runner => runner.UrlFetcher_getTitleForUrl(url)).
             clearMessageOnSuccess().
