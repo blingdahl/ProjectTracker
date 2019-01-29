@@ -93,7 +93,6 @@ class LabelPicker {
     this.clearSelectOptions('Populating...');
     this.getMaxThreadsElement().val(this.getMaxThreads());
     new RpcConfig('Label_getAllLabels', runner => runner.Label_getAllLabels()).
-        retryOnTimeout().
         logAll().
         callRpc().
         then(successMsg => this.populateSelect(JSON.parse(successMsg)));
@@ -123,7 +122,6 @@ class LabelPicker {
   clearLabel() {
     this.setLabelName(null);
     new RpcConfig('Preferences_clearLabelNameForSheet', runner => runner.Preferences_clearLabelNameForSheet(this.sheetId)).
-        retryOnTimeout().
         callRpc();
   }
   
@@ -140,7 +138,6 @@ class LabelPicker {
     new RpcConfig('Preferences_setLabelNameForSheet', runner => runner.Preferences_setLabelNameForSheet(this.sheetId,
                                                         this.updateLabelFromSelect(),
                                                         this.updateMaxThreadsFromInput())).
-        retryOnTimeout().
         callRpc();
     this.setMode(LabelPicker.MODE.DISPLAY);
   }

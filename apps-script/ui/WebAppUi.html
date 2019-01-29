@@ -29,7 +29,6 @@
         function updatePreferences() {
           new RpcConfig('Preferences_updateScriptPreferences', runner => runner.Preferences_updateScriptPreferences($('.spreadsheetUrl').val(), $('.appTitle').val(), $('.scriptUrl').val())).
               output('Updating Preferences...').
-              retryOnTimeout().
               callRpc();
           $('.changePreferences').show();
           $('.preferencesInput').hide();
@@ -51,7 +50,6 @@
           console.log($('.spreadsheetUrl').val());
           new RpcConfig('setSpreadsheetUrl', runner => runner.setSpreadsheetUrl($('.spreadsheetUrl').val())).
               output('Setting spreadsheet url...').
-              retryOnTimeout().
               callRpc();
         }
         $('.setSpreadsheetUrl').click(setSpreadsheetUrl);

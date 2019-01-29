@@ -82,7 +82,6 @@ class AddItemDialog {
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(
             this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
-        retryOnTimeout().
         callRpc();
   }
   
@@ -129,7 +128,6 @@ class AddItemDialog {
       console.log(title, url);
       if (!title && url) {
         new RpcConfig('UrlFetcher_getTitleForUrl', runner => runner.UrlFetcher_getTitleForUrl(url)).
-            retryOnTimeout().
             clearMessageOnSuccess().
             callRpc().
             then(successMsg => {

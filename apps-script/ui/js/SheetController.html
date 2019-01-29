@@ -83,7 +83,6 @@ class SheetController {
     this.markDirty();
     return new RpcConfig('ChangeRowValue_setValue', runner => runner.ChangeRowValue_setValue(this.getSheetId(), uuid, columnName, columnKey, newValue)).
         output('Setting ' + columnName + ' to ' + newValue + '...').
-        retryOnTimeout().
         callRpc();
   }
   
@@ -105,7 +104,6 @@ class SheetController {
     this.markDirty();
     return new RpcConfig('ChangeRowValue_changeSheet', runner => runner.ChangeRowValue_changeSheet(this.getSheetId(), toSheetId, uuid)).
         output('Moving to ' + SheetController.forSheet(toSheetId).getSheetName() + '...').
-        retryOnTimeout().
         callRpc();
   }
   
@@ -116,7 +114,6 @@ class SheetController {
     this.markNotDirty();
     return new RpcConfig('Update_update', runner => runner.Update_update(this.getSheetId())).
         output('Updating ' + this.getSheetName() + ' sheet...').
-        retryOnTimeout().
         callRpc().
         then(() => OverviewController.updateOverviewForSheet(this.getSheetId()));
   }
@@ -132,14 +129,12 @@ class SheetController {
   tidyUpColumns() {
     new RpcConfig('TidyUpColumns_tidyUpColumns', runner => runner.TidyUpColumns_tidyUpColumns(this.getSheetId())).
         output('Tidying up ' + this.getSheetName() + '...').
-        retryOnTimeout().
         callRpc();
   }
   
   addTracking() {
     new RpcConfig('Preferences_setTrackedForSheet', runner => runner.Preferences_setTrackedForSheet(this.getSheetId(), true)).
         output('Adding tracking for ' + this.getSheetName() + ' sheet...').
-        retryOnTimeout().
         callRpc();
   }
   

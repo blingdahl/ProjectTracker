@@ -6,19 +6,6 @@ class RpcConfig {
     this.failureOut_ = this.append.bind(this);
   }
   
-  retryOnTimeout() {
-    if (!RpcConfig.ALLOW_RETRIES) {
-      return this;
-    }
-    return this.logAll().withFailureFn(function(errorMsg) {
-          if (errorMsg === 'ScriptError: Exceeded maximum execution time') {
-            console.log(errorMsg);
-            this.callRpc();
-          }
-          return errorMsg;
-        }.bind(this));
-  }
-  
   logSuccess() {
     this.successOut_ = Log.log;
     return this;
