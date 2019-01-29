@@ -178,27 +178,30 @@
     background: #eeeeee;
   }
   
-  .multiOptionPicker div.option {
-    font-size: 14px;
-    text-decoration: underline;
+  .multiOptionPicker .option {
+    font-size: 12px;
     cursor: pointer;
     padding: 2px;
-    margin-top: 1px;
     margin-right: 3px;
     margin-left: 3px;
     border-top: 1px solid #333333;
   }
   
-  .multiOptionPicker div.option[data-selected="true"] {
+  .multiOptionPicker .option .text {
+    font-size: 16px;
+    text-decoration: underline;
+  }
+  
+  .multiOptionPicker .option[data-selected="true"] {
     background: #cccccc;
   }
   
-  .multiOptionPicker div.option:first-child {
+  .multiOptionPicker .option:first-child {
     margin-top: 0;
     border-top: none;
   }
   
-  .multiOptionPicker div.option:hover {
+  .multiOptionPicker .option:hover {
     background: #aaaaaa;
   }
   
@@ -224,6 +227,12 @@
     display: inline-block;
     visibility: hidden;
     width: 12px;
+    font-size: 16px;
+  }
+  
+  .multiOptionPicker .option .only {
+    text-decoration: underline;
+    font-size: 10px;
   }
   
   .multiOptionPicker [data-selected="true"] .check {
