@@ -104,6 +104,7 @@ class OverviewController {
   
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
+    tr.attr('data-next-action-date', newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'Next Action Date', 'NEXT_ACTION_DATE', newValue);
   }
   
