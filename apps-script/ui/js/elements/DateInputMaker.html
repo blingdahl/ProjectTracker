@@ -1,18 +1,21 @@
 class DateInputMaker {
-  constructor(changeCallback) {
-    this.changeCallback = changeCallback;
+  constructor() {
   }
   
-  makeElement(currValue, changeCallback, cancelCallback) {
-    let input = $('<input />').addClass('dateInput').val(currValue);
+  attachToInput(currValue, changeCallback, cancelCallback, input, opt_closeCallback) {
+    input.addClass('dateInput').val(currValue);
     input.datepicker({
         dateFormat: 'yy/mm/dd',
         onSelect: dateText => {
-          input.remove();
+          if (opt_closeCallback) {
+            opt_closeCallback();
+          }
           changeCallback(dateText, dateText);
         },
         onClose: () => {
-          input.remove();
+          if (opt_closeCallback) {
+            opt_closeCallback();
+          }
           cancelCallback();
         },
         closeText: 'Clear',
@@ -24,6 +27,11 @@ class DateInputMaker {
             })},
         showButtonPanel: true
     });
+  }
+  
+  makeElement(currValue, changeCallback, cancelCallback) {
+    let input = $('<input />');
+    this.attachToInput(currValue, changeCallback, cancelCallback, input, () => input.remove());
     return input;
   }
 }

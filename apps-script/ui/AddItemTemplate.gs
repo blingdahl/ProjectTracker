@@ -12,4 +12,8 @@
 <div class="promptText">Priority</div>
 <select class="priority field"></select>
 </div>
+<div class="nextActionDateField">
+<div class="promptText">Next Action Date</div>
+<input type="text" class="nextActionDate field">
+</div>
 </div>

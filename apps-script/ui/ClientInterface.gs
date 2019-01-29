@@ -58,12 +58,12 @@ function ChangeRowValue_changeSheet(fromSheetId, toSheetId, uuid) {
   return ret;
 }
 
-function AddItem_addItem(sheetId, title, url, priority) {
-  Log.start('AddItem_addItem', [sheetId, title, url, priority]);
+function AddItem_addItem(sheetId, title, url, priority, nextActionDate) {
+  Log.start('AddItem_addItem', [sheetId, title, url, priority, nextActionDate]);
   AddItem.init();
   TrackingSheet.init();
-  var ret = AddItem.addItem(sheetId, title, url, priority);
-  Log.stop('AddItem_addItem', [sheetId, title, url, priority]);
+  var ret = AddItem.addItem(sheetId, title, url, priority, nextActionDate);
+  Log.stop('AddItem_addItem', [sheetId, title, url, priority, nextActionDate]);
   return ret;
 }
 

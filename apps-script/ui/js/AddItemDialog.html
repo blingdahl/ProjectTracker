@@ -6,6 +6,7 @@ class AddItemDialog {
     this.addItemCallback = addItemCallback;
     this.getPriorityElement().append($('<option />').attr('value', '').text('No Priority'));
     GlobalController.PRIORITIES.forEach(priority => this.getPriorityElement().append($('<option />').attr('value', priority).text(priority)));
+    this.dateInputMaker = new DateInputMaker();
   }
   
   getTitleElement() {
@@ -32,6 +33,14 @@ class AddItemDialog {
     return this.getPriorityElement().val();
   }
   
+  getNextActionDateElement() {
+    return this.itemForm.find('.nextActionDate');
+  }
+  
+  getNextActionDate() {
+    return this.getNextActionDateElement().val();
+  }
+  
   getSubmitElement() {
     return this.itemForm.find('.addItem');
   }
@@ -45,7 +54,7 @@ class AddItemDialog {
   }
   
   isDirty() {
-    return this.getTitle() || this.getUrl() || this.getPriority();
+    return this.getTitle() || this.getUrl() || this.getPriority() || this.getNextActionDate();
   }
   
   getErrors(dirtyOnly) {
@@ -70,7 +79,8 @@ class AddItemDialog {
     }
     var title = this.getTitle();
     this.addItemCallback();
-    return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(this.sheetId, title, this.getUrl(), this.getPriority())).
+    return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(
+            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         retryOnTimeout().
         callRpc();
@@ -130,6 +140,7 @@ class AddItemDialog {
             });
       }
     });
+    this.dateInputMaker.attachToInput('', () => null, () => null, this.getNextActionDateElement())
     this.itemForm.dialog({
       title: 'Add item to ' + this.sheetName,
       minWidth: 500,
