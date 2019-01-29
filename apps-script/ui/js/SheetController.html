@@ -142,6 +142,14 @@ class SheetController {
     window.open('https://mail.google.com/mail/u/0/#search/' + this.getSearchQuery());
   }
   
+  static updateAllDirty() {
+    SheetController.getAll().forEach(sheetController => {
+      if (sheetController.isDirty()) {
+        sheetController.update();
+      }
+    });
+  }
+  
   static updateAll() {
     SheetController.getAll().forEach(sheetController => sheetController.update());
   }
@@ -169,6 +177,12 @@ class SheetController {
       if (keycode === 13 && event.metaKey) {
         SheetController.updateAll();
         event.stopPropagation();
+        event.preventDefault();
+      }
+      if (keycode === 68 && event.metaKey) {
+        SheetController.updateAllDirty();
+        event.stopPropagation();
+        event.preventDefault();
       }
     });
   }
