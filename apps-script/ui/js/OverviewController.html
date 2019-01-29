@@ -230,12 +230,17 @@ class OverviewController {
     
     rowJq.find('td[data-key]').each((index, elt) => this.fillText($(elt), rowData));
     
-    rowJq.attr('data-sheet-id', rowData['SHEET_ID']);
+    let sheetId = rowData['SHEET_ID'];
+    rowJq.attr('data-sheet-id', sheetId);
     rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
-    rowJq.attr('data-status', rowData['STATUS'] || OverviewController.NO_STATUS_KEY);
+    let rowStatus = rowData['STATUS'];
+    rowJq.attr('data-status', rowStatus || OverviewController.NO_STATUS_KEY);
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
     this.updateNextActionDate(rowJq, rowData['NEXT_ACTION_DATE']);
+    if (rowStatus === 'Outdated' || rowStatus === 'Completed') {
+      SheetController.forSheet(sheetId).markDirty();
+    }
     
     this.getTbodyElement().append(rowJq);
   }
