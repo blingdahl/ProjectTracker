@@ -38,6 +38,10 @@ class SheetController {
   static getTidyAllElement() {
     return $('.tidyAll');
   }
+  
+  static getUpdateDirtyElement() {
+    return $('.updateDirty');
+  }
 
   // SECTION:
   // Attributes
@@ -187,6 +191,7 @@ class SheetController {
   static addGlobalListeners() {
     SheetController.getDoAllTheThingsElement().click(SheetController.updateAll);
     SheetController.getTidyAllElement().click(SheetController.tidyAll);
+    SheetController.getUpdateDirtyElement().click(SheetController.updateAllDirty);
     $(document).keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 13 && event.metaKey) {
