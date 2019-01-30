@@ -397,6 +397,10 @@ class OverviewController {
         OverviewController.updateOverview();
         event.stopPropagation();
       }
+      if (keycode === 83 && event.metaKey) {
+        OverviewController.sortOverview();
+        event.stopPropagation();
+      }
     });
   }
   
