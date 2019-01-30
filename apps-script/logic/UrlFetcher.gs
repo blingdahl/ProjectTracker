@@ -17,6 +17,10 @@ UrlFetcher.init = function() {
     if (url.startsWith('http://go/')) {
       return url.substring('http://'.length);
     }
+    // TODO(lindahl) Generalize
+    if (url.startsWith('https://goto.google.com/')) {
+      return 'go/' + url.substring('https://goto.google.com/'.length);
+    }
     return null;
   }
   
