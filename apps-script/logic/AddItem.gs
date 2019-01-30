@@ -6,6 +6,7 @@ AddItem.init = function() {
     return;
   }
   
+  UrlFetcher.init();
   TrackingSheet.init();
   AddItem.initialized = true;
   
@@ -16,24 +17,14 @@ AddItem.init = function() {
     var newRow = trackingSheet.addRow();
     newRow.setValue(TrackingSheet.COLUMNS.ITEM, title);
     if (url) {
-      newRow.setFormula(TrackingSheet.COLUMNS.LINK, Spreadsheet.hyperlinkFormula(url, 'Link'));
+      newRow.setFormula(TrackingSheet.COLUMNS.LINK, Spreadsheet.hyperlinkFormula(url, UrlFetcher.getTitleForUrl(url)));
     }
     if (priority) {
       newRow.setValue(TrackingSheet.COLUMNS.PRIORITY, priority);
     }
     if (nextActionDate) {
-      newRow.setValue(TrackingSheet.COLUMNS.NEXT_ACTOIN_DATE, nextActionDate);
+      newRow.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE, nextActionDate);
     }
     return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
-  }
-  
-  AddItem.getPageTitle = function(url) {
-    var docName = Docs.getName(url);
-    if (docName) {
-      return docName;
-    }
-    var content = UrlFetchApp.fetch(url).getContentText();
-    var xmldoc = Xml.parse(content, true);
-    return xmldoc.html.head.getElements("title")[0].getText().replace(/\s+/g, ' ');
   }
 }

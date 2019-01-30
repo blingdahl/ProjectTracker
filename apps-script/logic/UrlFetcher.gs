@@ -15,8 +15,13 @@ UrlFetcher.init = function() {
     if (docName) {
       return docName;
     }
-    var content = UrlFetchApp.fetch(url).getContentText();
-    var xmldoc = Xml.parse(content, true);
-    return xmldoc.html.head.getElements("title")[0].getText().replace(/\s+/g, ' ');
+    try {
+      var content = UrlFetchApp.fetch(url).getContentText();
+      var xmldoc = Xml.parse(content, true);
+      return xmldoc.html.head.getElements("title")[0].getText().replace(/\s+/g, ' ');
+    } catch (e) {
+      Log.warning(e);
+      return 'Link';
+    }
   }
 }
