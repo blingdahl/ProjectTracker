@@ -396,10 +396,12 @@ class OverviewController {
       if (keycode === 85 && event.metaKey) {
         OverviewController.updateOverview();
         event.stopPropagation();
+        event.preventDefault();
       }
       if (keycode === 83 && event.metaKey) {
         OverviewController.sortOverview();
         event.stopPropagation();
+        event.preventDefault();
       }
     });
   }
