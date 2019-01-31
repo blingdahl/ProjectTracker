@@ -12,7 +12,7 @@ AddItem.init = function() {
   
   Log.info('AddUrl.init()');
   
-  AddItem.addItem = function(sheetId, title, url, priority, nextActionDate) {
+  AddItem.addItem = function(sheetId, title, url, priority, nextActionDate, nextActionDateUpdated) {
     var trackingSheet = TrackingSheet.forSheetId(sheetId);
     var newRow = trackingSheet.addRow();
     newRow.setValue(TrackingSheet.COLUMNS.ITEM, title);
@@ -24,6 +24,7 @@ AddItem.init = function() {
     }
     if (nextActionDate) {
       newRow.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE, nextActionDate);
+      newRow.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE_UPDATED, nextActionDateUpdated);
     }
     return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
   }

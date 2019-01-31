@@ -80,7 +80,7 @@ class AddItemDialog {
     var title = this.getTitle();
     this.addItemCallback();
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(
-            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate())).
+            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate(), Common.getCurrDateStr())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         callRpc();
   }
