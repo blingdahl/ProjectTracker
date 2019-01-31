@@ -104,7 +104,7 @@ class OverviewController {
   
   updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
     tr.attr('data-next-action-updated-date', newNextActionUpdatedDate);
-    tr.find('[data-key="NEXT_ACTION_UPDATED_DATE"]').text(newNextActionUpdatedDate);
+    tr.find('[data-key="NEXT_ACTION_DATE_UPDATED"]').text(newNextActionUpdatedDate);
   }
   
   handleStatusChange(sheetId, uuid, newStatus) {
@@ -131,6 +131,7 @@ class OverviewController {
     this.updateNextActionDate(tr, newValue);
     let dateUpdated =  Common.getCurrDateStr();
     this.updateNextActionUpdatedDate(tr, dateUpdated);
+    tr.attr('data-next-action-date-outdated', 'false');
     SheetController.forSheet(sheetId).setValues(uuid, 'Next Action Date', {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
   }
   
@@ -237,10 +238,12 @@ class OverviewController {
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
     this.updateNextActionDate(rowJq, rowData['NEXT_ACTION_DATE']);
-    if (rowStatus === 'Outdated' || rowStatus === 'Completed') {
+    if (rowStatus === 'Obsolete' || rowStatus === 'Completed') {
       SheetController.forSheet(sheetId).markDirty();
     }
-    
+    if (rowData['NEXT_ACTION_DATE_UPDATED'] && rowData['EMAIL_LAST_DATE_FORMATTED'] && rowData['EMAIL_LAST_DATE_FORMATTED'] > rowData['NEXT_ACTION_DATE_UPDATED']) {
+      rowJq.attr('data-next-action-date-outdated', 'true');
+    }
     this.getTbodyElement().append(rowJq);
   }
   
