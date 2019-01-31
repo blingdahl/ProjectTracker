@@ -31,6 +31,15 @@ function ChangeRowValue_setValue(sheetId, uuid, columnName, columnKey, newValue)
   return ret;
 }
 
+function ChangeRowValue_setValues(sheetId, uuid, valueMap) {
+  Log.start('ChangeRowValue_setValues', [sheetId, uuid, valueMap]);
+  ChangeRowValue.init();
+  TrackingSheet.init();
+  var ret = ChangeRowValue.setValues(sheetId, uuid, valueMap);
+  Log.stop('ChangeRowValue_setValues', [sheetId, uuid, valueMap]);
+  return ret;
+}
+
 function ChangeRowValue_setLink(sheetId, uuid, columnName, columnKey, text, href) {
   Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, text, href]);
   ChangeRowValue.init();

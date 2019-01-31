@@ -18,6 +18,16 @@ ChangeRowValue.init = function() {
     return 'Set ' + columnName + ' to ' + newValue;
   }
   
+  ChangeRowValue.setValues = function(sheetId, uuid, valueMap) {
+    var setValueStrings = [];
+    var row = TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid);
+    for (var columnKey in valueMap) {
+      row.setValue(TrackingSheet.COLUMNS[columnKey], valueMap[columnKey]);
+      setValueStrings.push(columnKey.toLowerCase() + ' to ' + valueMap[columnKey]);
+    }
+    return 'Set ' + setValueStrings.join(', ');
+  }
+  
   ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, text, href) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(href, text));
     return 'Set ' + columnName;

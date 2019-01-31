@@ -123,7 +123,7 @@ class OverviewController {
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateNextActionDate(tr, newValue);
-    SheetController.forSheet(sheetId).setValue(uuid, 'Next Action Date', 'NEXT_ACTION_DATE', newValue);
+    SheetController.forSheet(sheetId).setValues(uuid, 'Next Action Date', {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': Common.getCurrDateStr()});
   }
   
   handleSheetChange(sheetId, uuid, newSheetId) {
@@ -170,16 +170,7 @@ class OverviewController {
   
   static currDateStr() {
     if (!OverviewController.CURR_DATE_STR) {
-      let d = new Date();
-      let monthStr = String(d.getMonth() + 1);
-      if (monthStr.length === 1) {
-        monthStr = '0' + monthStr;
-      }
-      let dayStr = String(d.getDate());
-      if (dayStr.length === 1) {
-        dayStr = '0' + dayStr;
-      }
-      OverviewController.CURR_DATE_STR = (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
+      OverviewController.CURR_DATE_STR = Common.getCurrDateStr();
       console.log(OverviewController.CURR_DATE_STR);
     }
     return OverviewController.CURR_DATE_STR;

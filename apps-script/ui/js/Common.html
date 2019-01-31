@@ -2,4 +2,17 @@ class Common {
   static textFn(emptyText) {
     return text => text || emptyText;
   }
+  
+  static getCurrDateStr() {
+    let d = new Date();
+    let monthStr = String(d.getMonth() + 1);
+    if (monthStr.length === 1) {
+      monthStr = '0' + monthStr;
+    }
+    let dayStr = String(d.getDate());
+    if (dayStr.length === 1) {
+      dayStr = '0' + dayStr;
+    }
+    return (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
+  }
 }
