@@ -90,6 +90,13 @@ class SheetController {
         callRpc();
   }
   
+  setValues(uuid, columnName, valueMap) {
+    this.markDirty();
+    return new RpcConfig('ChangeRowValue_setValues', runner => runner.ChangeRowValue_setValues(this.getSheetId(), uuid, valueMap)).
+        output('Setting values...').
+        callRpc();
+  }
+  
   setLink(uuid, text, href) {
     this.markDirty();
     new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'Link', 'LINK', text, href)).

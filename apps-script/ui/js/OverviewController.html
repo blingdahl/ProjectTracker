@@ -14,6 +14,7 @@ class OverviewController {
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
+    this.elementMakers['NEXT_ACTION_DATE_UPDATED'] = new TextMaker('', rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
   }
 
   // SECTION:
@@ -101,6 +102,11 @@ class OverviewController {
     tr.attr('data-next-action-category', nextActionCategory);
   }
   
+  updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
+    tr.attr('data-next-action-updated-date', newNextActionUpdatedDate);
+    tr.find('[data-key="NEXT_ACTION_UPDATED_DATE"]').text(newNextActionUpdatedDate);
+  }
+  
   handleStatusChange(sheetId, uuid, newStatus) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-status', newStatus);
@@ -123,7 +129,9 @@ class OverviewController {
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateNextActionDate(tr, newValue);
-    SheetController.forSheet(sheetId).setValues(uuid, 'Next Action Date', {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': Common.getCurrDateStr()});
+    let dateUpdated =  Common.getCurrDateStr();
+    this.updateNextActionUpdatedDate(tr, dateUpdated);
+    SheetController.forSheet(sheetId).setValues(uuid, 'Next Action Date', {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
   }
   
   handleSheetChange(sheetId, uuid, newSheetId) {
