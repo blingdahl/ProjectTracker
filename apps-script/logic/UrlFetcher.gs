@@ -37,14 +37,19 @@ UrlFetcher.init = function() {
     if (!bugId) {
       return null;
     }
-    var bugShortLink = 'b/' + bugId;
-    if (BuganizerApp) {
-      var bug = BuganizerApp.getBug(bugId);
-      if (bug) {
-        return bugShortLink + ': ' + bug.getSummary();
+    try {
+      var bugShortLink = 'b/' + bugId;
+      if (BuganizerApp !== undefined) {
+        var bug = BuganizerApp.getBug(bugId);
+        if (bug) {
+          return bugShortLink + ': ' + bug.getSummary();
+        }
       }
+      return bugShortLink;
+    } catch (e) {
+      Log.info(e);
+      return null;
     }
-    return bugShortLink;
   }
   
   UrlFetcher.getTitleForUrl = function(url) {
