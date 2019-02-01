@@ -5,10 +5,10 @@ function renderControls() {
   return template.evaluate().getContent();
 }
 
-function renderSheetsTable() {
+function renderSheetList() {
   SheetInfo.init();
   TrackingSheet.init();
-  var template = HtmlService.createTemplateFromFile('ui/SheetsTable');
+  var template = HtmlService.createTemplateFromFile('ui/SheetList');
   template.spreadsheetUrl = Preferences.Properties.get(Preferences.Names.spreadsheetUrl());
   template.trackedSheets = [];
   template.untrackedSheets = [];

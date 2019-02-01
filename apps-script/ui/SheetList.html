@@ -1,4 +1,16 @@
-<table>
+<div class="sheetList">
+
+<div class="sheetListCollapsed">
+
+<span class="collapsedList"></span> <span class="expandSheetList">Show sheet list</span>
+
+</div>
+
+<div class="sheetListExpanded">
+
+<span class="collapseSheetList">Hide sheet list</span>
+
+<table class="sheetListTable">
   <?
     for (var i = 0; i < trackedSheets.length; i++) {
       var sheetInfo = trackedSheets[i];
@@ -58,3 +70,7 @@
     }
   ?>
 </table>
+
+</div>
+
+</div>

@@ -2,7 +2,7 @@
 <button class="clearCompleted">Clear completed</button>
 <div class="rpcMessages"></div>
 <div class="controls">
-  <?!= renderSheetsTable() ?>
+  <?!= renderSheetList() ?>
   <h1>All Sheets</h1>
   <button class="doAllTheThings">Do all the things!</button>
   <button class="tidyAll">Tidy all</button>
@@ -28,6 +28,7 @@
     <?!= include("ui/js/filters/Filters"); ?>
     <?!= include("ui/js/filters/FilterElement"); ?>
     <?!= include("ui/js/OverviewController"); ?>
+    <?!= include("ui/js/SheetListController"); ?>
     <?!= include("ui/js/AddItemDialog"); ?>
     <?!= include("ui/js/EditLinkDialog"); ?>
     <?!= include("ui/js/Compare"); ?>

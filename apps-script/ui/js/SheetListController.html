@@ -1,0 +1,65 @@
+class SheetListController {
+
+  constructor(jq) {
+    this.jq = jq;
+  }
+
+  // SECTION:
+  // Elements
+  
+  static getSheetListElement() {
+    return $('.sheetList');
+  }
+  
+  getCollapsedElement() {
+    return this.jq.find('.sheetListCollapsed');
+  }
+  
+  getExpandedElement() {
+    return this.jq.find('.sheetListExpanded');
+  }
+  
+  getExpandElement() {
+    return this.jq.find('.expandSheetList');
+  }
+  
+  getCollapseElement() {
+    return this.jq.find('.collapseSheetList');
+  }
+  
+  setExpanded(expanded) {
+    if (expanded) {
+      this.getCollapsedElement().hide();
+      this.getExpandedElement().show();
+    } else {
+      this.getCollapsedElement().show();
+      this.getExpandedElement().hide();
+    }
+    return this;
+  }
+  
+  expand() {
+    return this.setExpanded(true);
+  }
+  
+  collapse() {
+    return this.setExpanded(false);
+  }
+  
+  init() {
+    this.addListeners();
+    this.collapse();
+  }
+  
+  addListeners() {
+    this.getExpandElement().click(this.expand.bind(this));
+    this.getCollapseElement().click(this.collapse.bind(this));
+  }
+  
+  static init() {
+    SheetListController.current = new SheetListController(SheetListController.getSheetListElement());
+    SheetListController.current.init();
+  }
+}
+
+SheetListController.current = null;
