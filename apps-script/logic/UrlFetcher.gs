@@ -10,24 +10,28 @@ UrlFetcher.init = function() {
   
   Log.info('UrlFetcher.init()');
   
-  UrlFetcher.extractGoLinkName = function(url) {
-    if (url.startsWith('go/')) {
-      return url;
-    }
-    if (url.startsWith('http://go/')) {
-      return url.substring('http://'.length);
-    }
-    // TODO(lindahl) Generalize
-    if (url.startsWith('https://goto.google.com/')) {
-      return 'go/' + url.substring('https://goto.google.com/'.length);
+  UrlFetcher.replacePrefix = function(url, replacementPrefix, prefixes) {
+    for (var i = 0; i < prefixes.length; i++) {
+      var prefix = prefixes[i];
+      if (url.startsWith(prefix)) {
+        return replacementPrefix + url.substring(prefix.length);
+      }
     }
     return null;
   }
   
+  UrlFetcher.extractGoLinkName = function(url) {
+    return UrlFetcher.replacePrefix(url, 'go/', ['go/', 'http://go/', 'https://goto.google.com/']);
+  }
+  
+  UrlFetcher.extractBugLinkName = function(url) {
+    return UrlFetcher.replacePrefix(url, 'b/', ['b/', 'http://b/', 'https://b.corp.google.com/issues/']);
+  }
+  
   UrlFetcher.getTitleForUrl = function(url) {
-    var goLinkName = UrlFetcher.extractGoLinkName(url);
-    if (goLinkName) {
-      return goLinkName;
+    var linkName = UrlFetcher.extractGoLinkName(url) || UrlFetcher.extractBugLinkName(url);
+    if (linkName) {
+      return linkName;
     }
     var docName = Docs.getName(url);
     if (docName) {
