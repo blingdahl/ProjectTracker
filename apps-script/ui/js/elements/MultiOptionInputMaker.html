@@ -5,70 +5,95 @@ class MultiOptionInputMaker {
   }
   
   makeElement(currValues, changeCallback, cancelCallback) {
-    let buttonsJq = $('<div />').addClass('buttons');
-    let applyJq = $('<span />').text('Apply').addClass('apply').addClass('button');
-    applyJq.click((event) => {
-      let applyJq = $(event.currentTarget);
-      let newValues = [];
-      optionsJq.find('[data-selected="true"]').each((index, elt) => {
-        let optionJq = $(elt);
-        newValues.push(optionJq.attr('data-value'));
-      });
-      optionsJq.remove();
-      changeCallback(newValues);
+    let input = new MultiOptionInput(this.allValues,
+                                this.textCallback,
+                                currValues,
+                                changeCallback,
+                                cancelCallback);
+    return input.makeElement();
+  }
+}
+
+class MultiOptionInput {
+  constructor(allValues, textCallback, currValues, changeCallback, cancelCallback) {
+    this.allValues = allValues;
+    this.textCallback = textCallback;
+    this.currValues = currValues;
+    this.changeCallback = changeCallback;
+    this.cancelCallback = cancelCallback;
+  }
+  
+  apply() {
+    let newValues = [];
+    this.optionsJq.find('[data-selected="true"]').each((index, elt) => {
+      let optionJq = $(elt);
+      newValues.push(optionJq.attr('data-value'));
     });
-    let clearJq = $('<span />').text('Clear').addClass('clear').addClass('button');
-    clearJq.click((event) => {
-      optionsJq.find('.option').attr('data-selected', 'false');
-    });
-    let allJq = $('<span />').text('All').addClass('all').addClass('button');
-    allJq.click((event) => {
-      optionsJq.find('.option').attr('data-selected', 'true');
-    });
-    let cancelJq = $('<span />').text('Cancel').addClass('cancel').addClass('button');
-    cancelJq.click((event) => {
-      optionsJq.remove();
-      cancelCallback();
-    });
-    buttonsJq.append(applyJq);
-    buttonsJq.append($('<span />').addClass('betweenButtons'));
-    buttonsJq.append(clearJq);
-    buttonsJq.append($('<span />').addClass('betweenButtons'));
-    buttonsJq.append(allJq);
-    buttonsJq.append($('<span />').addClass('betweenButtons'));
-    buttonsJq.append(cancelJq);
-    let optionsJq = $('<div />').addClass('multiOptionPicker');
+    this.optionsJq.remove();
+    this.changeCallback(newValues);
+  }
+  
+  clear() {
+    this.optionsJq.find('.option').attr('data-selected', 'false');
+  }
+  
+  selectAll() {
+    this.optionsJq.find('.option').attr('data-selected', 'true');
+  }
+  
+  cancel() {
+    this.optionsJq.remove();
+    this.cancelCallback();
+  }
+  
+  selectOnly(optionJq) {
+    this.optionsJq.find('.option').attr('data-selected', 'false');
+    optionJq.attr('data-selected', 'true');
+    this.apply();
+  }
+  
+  toggleOption(optionJq) {
+    if (optionJq.attr('data-selected') == 'true') {
+      optionJq.attr('data-selected', 'false');
+    } else {
+      optionJq.attr('data-selected', 'true');
+    }
+  }
+  
+  makeElement() {
+    this.optionsJq = $('<div />').addClass('multiOptionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
       let value = this.allValues[i];
       let text = this.textCallback(value);
+      let onlyJq = MultiOptionInput.ONLY_JQ.clone();
       let optionJq = $('<div />').
           attr('data-value', value).
           attr('data-text', text).
-          addClass('option');
-      let checkJq = $('<span>&check;</span>').addClass('check');
-      let textJq = $('<span />').text(text).addClass('text');
-      let onlyJq = $('<span />').text('Only').addClass('only');
-      optionJq.append(checkJq).append(textJq).append(' (').append(onlyJq).append(')');
-      if (currValues.some(currValue => value == currValue)) {
+          addClass('option').
+          append(MultiOptionInput.CHECK_JQ.clone()).
+          append($('<span />').text(text).addClass('text')).
+          append(' (').append(onlyJq).append(')');
+      optionJq.click((event) => this.toggleOption(optionJq));
+      onlyJq.click((event) => {
+						this.selectOnly(optionJq);
+						event.stopPropagation();
+					});
+      if (this.currValues.some(currValue => value == currValue)) {
         optionJq.attr('data-selected', 'true');
       }
-      optionsJq.append(optionJq);
-      onlyJq.click((event) => {
-        optionsJq.find('.option').attr('data-selected', 'false');
-        optionJq.attr('data-selected', 'true');
-        applyJq.click();
-        event.stopPropagation();
-      });
-      optionJq.click((event) => {
-        let optionJq = $(event.currentTarget);
-        if (optionJq.attr('data-selected') == 'true') {
-          optionJq.attr('data-selected', 'false');
-        } else {
-          optionJq.attr('data-selected', 'true');
-        }
-      });
+      this.optionsJq.append(optionJq);
     }
-    optionsJq.append(buttonsJq);
-    return optionsJq;
+    return this.optionsJq.append(
+        $('<div />').addClass('buttons').
+            append($('<span />').text('Apply').addClass('apply').addClass('button').click(this.apply.bind(this))).
+            append($('<span />').addClass('betweenButtons')).
+            append($('<span />').text('Clear').addClass('clear').addClass('button').click(this.clear.bind(this))).
+            append($('<span />').addClass('betweenButtons')).
+            append($('<span />').text('All').addClass('all').addClass('button').click(this.selectAll.bind(this))).
+            append($('<span />').addClass('betweenButtons')).
+            append($('<span />').text('Cancel').addClass('cancel').addClass('button').click(this.cancel.bind(this))));
   }
 }
+
+MultiOptionInput.CHECK_JQ = $('<span>&check;</span>').addClass('check');
+MultiOptionInput.ONLY_JQ = $('<span />').text('Only').addClass('only');
