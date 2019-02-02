@@ -83,7 +83,7 @@ class MultiOptionInput {
       }
       this.optionsJq.append(optionJq);
     }
-    return this.optionsJq.append(
+    this.optionsJq.append(
         $('<div />').addClass('buttons').
             append($('<span />').text('Apply').addClass('button').click(this.apply.bind(this))).
             append($('<span />').addClass('betweenButtons')).
@@ -92,6 +92,7 @@ class MultiOptionInput {
             append($('<span />').text('All').addClass('button').click(this.selectAll.bind(this))).
             append($('<span />').addClass('betweenButtons')).
             append($('<span />').text('Cancel').addClass('button').click(this.cancel.bind(this))));
+    return this.optionsJq;
   }
 }
 
