@@ -17,15 +17,11 @@ class EditableTextMaker {
   
   updateTextJq(textJq, newText, newValue) {
     if (newText) {
-      console.log('new text', newText);
       textJq.text(newText);
     } else {
-      console.log('else');
       if (this.emptyContent instanceof jQuery) {
-        console.log(this.emptyContent);
         textJq.append(this.emptyContent.clone());
       } else {
-        console.log(this.emptyContent);
         textJq.text(this.emptyContent);
       }
     }
