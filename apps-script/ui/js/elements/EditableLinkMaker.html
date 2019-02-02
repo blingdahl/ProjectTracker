@@ -24,7 +24,7 @@ class EditableLinkMaker {
       dataJq.attr('data-href', href).attr('data-text', text)
       let linkJq = dataJq.find('a');
       if (href) {
-        linkJq.attr('href', href).text(text).show();
+        linkJq.attr('href', href).attr('target', '_blank').text(text).show();
       } else {
         linkJq.hide();
       }
