@@ -85,7 +85,7 @@ class EditLinkDialog {
         event.stopPropagation();
       }
     });
-    this.getHrefElement().change(() => {
+    this.getFieldElements().change(() => {
       let text = this.getText();
       let href = this.getHref();
       if (!text && href) {
