@@ -1,9 +1,9 @@
 class EditableTextMaker {
-  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyText, textCallback, valueCallback, changeCallback, inputMaker) {
+  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, textCallback, valueCallback, changeCallback, inputMaker) {
     this.sheetIdCallback = sheetIdCallback;
     this.uuidCallback = uuidCallback;
     this.textCssClass = textCssClass;
-    this.emptyText = emptyText;
+    this.emptyContent = emptyContent;
     this.textCallback = textCallback;
     this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
@@ -15,12 +15,30 @@ class EditableTextMaker {
     ancestorJq.on('click', '.' + this.textCssClass, this.textClicked.bind(this));
   }
   
+  updateTextJq(textJq, newText, newValue) {
+    if (newText) {
+      console.log('new text', newText);
+      textJq.text(newText);
+    } else {
+      console.log('else');
+      if (this.emptyContent instanceof jQuery) {
+        console.log(this.emptyContent);
+        textJq.append(this.emptyContent.clone());
+      } else {
+        console.log(this.emptyContent);
+        textJq.text(this.emptyContent);
+      }
+    }
+    textJq.attr('data-value', newValue || '');
+  }
+  
   textClicked(e) {
     var textJq = $(e.currentTarget);
     let input = this.inputMaker.makeElement(textJq.attr('data-value'),
         (newValue, newText) => {
           this.changeCallback(this.sheetIdCallback(textJq), this.uuidCallback(textJq), newValue);
-          textJq.attr('data-value', newValue || '').text(newText || this.emptyText).show();
+          this.updateTextJq(textJq, newText, newValue);
+          textJq.show();
         },
         () => textJq.show());
     textJq.parent().append(input);
@@ -29,10 +47,10 @@ class EditableTextMaker {
   }
   
   makeElement(data) {
-    return $('<span />').
+    let textJq = $('<span />').
         addClass(this.textCssClass).
-        addClass('editableText').
-        text(this.textCallback(data) || this.emptyText).
-        attr('data-value', this.valueCallback(data));
+        addClass('editableText');
+    this.updateTextJq(textJq, this.textCallback(data), this.valueCallback(data));
+    return textJq;
   }
 }

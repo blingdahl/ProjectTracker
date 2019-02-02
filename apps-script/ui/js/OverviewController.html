@@ -13,7 +13,7 @@ class OverviewController {
     this.elementMakers['LINK'] = new EditableLinkMaker(OverviewController.getSheetId, OverviewController.getUuid, 'editLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], this.handleLinkChange.bind(this));
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
-    this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', '...', rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
+    this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass('editPencil'), rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] = new TextMaker('', rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
   }
 
