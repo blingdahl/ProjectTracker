@@ -20,10 +20,6 @@ class OverviewController {
   // SECTION:
   // Elements
   
-  static getUpdateOverviewElement() {
-    return $('.updateOverview');
-  }
-  
   static getSortOverviewElement() {
     return $('.sortOverview');
   }
@@ -341,16 +337,11 @@ class OverviewController {
         then(msg => this.handleData(msg));
   }
   
-  static updateOverview() {
-    OverviewController.hideOverview();
-    OverviewController.showOverview();
-  }
-  
   static updateOverviewForSheet(sheetId) {
     if (OverviewController.current) {
       OverviewController.current.updateOverviewForSheet(sheetId);
     } else {
-      OverviewController.updateOverview();
+      OverviewController.showOverview();
     }
   }
   
@@ -382,24 +373,14 @@ class OverviewController {
     }
   }
   
-  static handleUpdateOverviewClick() {
-    OverviewController.updateOverview();
-  }
-  
   static handleSortOverviewClick() {
     OverviewController.current.sortRows();
   }
 
   static addListeners() {
-    OverviewController.getUpdateOverviewElement().click(OverviewController.handleUpdateOverviewClick);
     OverviewController.getSortOverviewElement().click(OverviewController.handleSortOverviewClick);
     $(document).keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode === 85 && event.metaKey) {
-        OverviewController.updateOverview();
-        event.stopPropagation();
-        event.preventDefault();
-      }
       if (keycode === 83 && event.metaKey) {
         OverviewController.sortOverview();
         event.stopPropagation();
