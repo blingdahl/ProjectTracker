@@ -10,6 +10,22 @@ if (typeof String.prototype.includes != 'function') {
   };
 };
 
+if (typeof String.prototype.toInitCaps != 'function') {
+  String.prototype.toInitCaps = function() {
+    var parts = this.split(' ');
+    for (var i = 0; i < parts.length; i++) {
+      parts[i] = parts[i].charAt(0).toUpperCase() + parts[i].substring(1);
+    }
+    return parts.join(' ');
+  };
+};
+
+if (typeof String.prototype.underscoreToCapsString != 'function') {
+  String.prototype.underscoreToCapsString = function() {
+    return this.toLowerCase().replace(/_/g, ' ').toInitCaps();
+  };
+};
+
 if (typeof String.prototype.compare != 'function') {
   String.prototype.compare = function(str) {
     return this > str ? 1 : this === str ? 0 : -1;

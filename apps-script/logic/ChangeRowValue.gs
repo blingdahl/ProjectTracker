@@ -23,7 +23,7 @@ ChangeRowValue.init = function() {
     var row = TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid);
     for (var columnKey in valueMap) {
       row.setValue(TrackingSheet.COLUMNS[columnKey], valueMap[columnKey]);
-      setValueStrings.push(columnKey.toLowerCase() + ' to ' + valueMap[columnKey]);
+      setValueStrings.push('"' + columnKey.underscoreToCapsString() + '" to "' + valueMap[columnKey] + '"');
     }
     return 'Set ' + setValueStrings.join(', ');
   }
