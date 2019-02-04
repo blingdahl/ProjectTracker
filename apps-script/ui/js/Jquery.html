@@ -1,0 +1,13 @@
+/**
+ * @fileoverview Jquery functions.
+ */
+
+jQuery.fn.extend({
+  onClick: function(callback) {
+    return this.click(event => {
+      callback(event);
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  }
+});

@@ -73,26 +73,37 @@ class MultiOptionInput {
           append(MultiOptionInput.CHECK_JQ.clone()).
           append($('<span />').text(text).addClass('text')).
           append(' (').append(onlyJq).append(')');
-      optionJq.click((event) => this.toggleOption(optionJq));
-      onlyJq.click((event) => {
-						this.selectOnly(optionJq);
-						event.stopPropagation();
-					});
+      optionJq.onClick(event => this.toggleOption(optionJq));
+      onlyJq.onClick(event => this.selectOnly(optionJq));
       if (this.currValues.some(currValue => value == currValue)) {
         optionJq.attr('data-selected', 'true');
       }
       this.optionsJq.append(optionJq);
     }
-    this.optionsJq.append(
-        $('<div />').addClass('buttons').
-            append($('<span />').text('Apply').addClass('button').click(this.apply.bind(this))).
-            append($('<span />').addClass('betweenButtons')).
-            append($('<span />').text('Clear').addClass('button').click(this.clear.bind(this))).
-            append($('<span />').addClass('betweenButtons')).
-            append($('<span />').text('All').addClass('button').click(this.selectAll.bind(this))).
-            append($('<span />').addClass('betweenButtons')).
-            append($('<span />').text('Cancel').addClass('button').click(this.cancel.bind(this))));
+    this.optionsJq.append(new MultiOptionInputButtonBar([
+       {text: 'Apply', callback: this.apply.bind(this)},
+       {text: 'Clear', callback: this.clear.bind(this)},
+       {text: 'All', callback: this.selectAll.bind(this)},
+       {text: 'Cancel', callback: this.cancel.bind(this)}]).makeElement());
     return this.optionsJq;
+  }
+}
+
+class MultiOptionInputButtonBar {
+  constructor(buttons) {
+    this.buttons = buttons;
+  }
+  
+  makeElement() {
+    let buttonsJq = $('<div />').addClass('buttons');
+    for (let i = 0; i != this.buttons.length; i++) {
+      if (i != 0) {
+        buttonsJq.append($('<span />').addClass('betweenButtons'));
+      }
+      let button = this.buttons[i];
+      buttonsJq.append($('<span />').text(button.text).addClass('button').onClick(button.callback));
+    }
+    return buttonsJq;
   }
 }
 
