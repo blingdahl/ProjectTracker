@@ -83,14 +83,14 @@ class SheetController {
     this.jq.show();
   }
   
-  setValue(uuid, columnName, columnKey, newValue) {
+  setValue(uuid, columnKey, newValue) {
     this.markDirty();
-    return new RpcConfig('ChangeRowValue_setValue', runner => runner.ChangeRowValue_setValue(this.getSheetId(), uuid, columnName, columnKey, newValue)).
-        output('Setting ' + columnName + ' to ' + newValue + '...').
+    return new RpcConfig('ChangeRowValue_setValue', runner => runner.ChangeRowValue_setValue(this.getSheetId(), uuid, columnKey, newValue)).
+        output('Setting value...').
         callRpc();
   }
   
-  setValues(uuid, columnName, valueMap) {
+  setValues(uuid, valueMap) {
     this.markDirty();
     return new RpcConfig('ChangeRowValue_setValues', runner => runner.ChangeRowValue_setValues(this.getSheetId(), uuid, valueMap)).
         output('Setting values...').
@@ -99,14 +99,14 @@ class SheetController {
   
   setLink(uuid, text, href) {
     this.markDirty();
-    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'Link', 'LINK', text, href)).
+    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_setLink(this.getSheetId(), uuid, 'LINK', text, href)).
             output('Saving new link...').
             callRpc();
   }
   
   clearLink(uuid, text, href) {
     this.markDirty();
-    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_clearLink(this.getSheetId(), uuid, 'Link', 'LINK')).
+    new RpcConfig('ChangeRowValue_setLink', runner => runner.ChangeRowValue_clearLink(this.getSheetId(), uuid, 'LINK')).
             output('Clearing link...').
             callRpc();
   }

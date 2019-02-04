@@ -13,9 +13,9 @@ ChangeRowValue.init = function() {
   
   ChangeRowValue.initialized = true;
   
-  ChangeRowValue.setValue = function(sheetId, uuid, columnName, columnKey, newValue) {
+  ChangeRowValue.setValue = function(sheetId, uuid, columnKey, newValue) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setValue(TrackingSheet.COLUMNS[columnKey], newValue);
-    return 'Set ' + columnName + ' to ' + newValue;
+    return 'Set "' + columnKey.underscoreToCapsString() + '" to "' + newValue + '"';
   }
   
   ChangeRowValue.setValues = function(sheetId, uuid, valueMap) {
@@ -28,14 +28,14 @@ ChangeRowValue.init = function() {
     return 'Set ' + setValueStrings.join(', ');
   }
   
-  ChangeRowValue.setLink = function(sheetId, uuid, columnName, columnKey, text, href) {
+  ChangeRowValue.setLink = function(sheetId, uuid, columnKey, text, href) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], Spreadsheet.hyperlinkFormula(href, text));
-    return 'Set ' + columnName;
+    return 'Set "' + columnKey.underscoreToCapsString() + '"';
   }
   
-  ChangeRowValue.clearLink = function(sheetId, uuid, columnName, columnKey) {
+  ChangeRowValue.clearLink = function(sheetId, uuid, columnKey) {
     TrackingSheet.forSheetId(sheetId).getRowForUuid(uuid).setFormula(TrackingSheet.COLUMNS[columnKey], '');
-    return 'Cleared ' + columnName;
+    return 'Cleared "' + columnKey.underscoreToCapsString() + '"';
   }
   
   ChangeRowValue.changeSheet = function(fromSheetId, toSheetId, uuid) {

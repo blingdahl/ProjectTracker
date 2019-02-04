@@ -107,19 +107,19 @@ class OverviewController {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-status', newStatus);
     tr.attr('data-status-index', String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
-    SheetController.forSheet(sheetId).setValue(uuid, 'Status', 'STATUS', newStatus);
+    SheetController.forSheet(sheetId).setValue(uuid, 'STATUS', newStatus);
   }
   
   handlePriorityChange(sheetId, uuid, newPriority) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-priority', newPriority);
-    SheetController.forSheet(sheetId).setValue(uuid, 'Priority', 'PRIORITY', newPriority);
+    SheetController.forSheet(sheetId).setValue(uuid, 'PRIORITY', newPriority);
   }
   
   handleItemChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-item', newValue);
-    SheetController.forSheet(sheetId).setValue(uuid, 'Item', 'ITEM', newValue);
+    SheetController.forSheet(sheetId).setValue(uuid, 'ITEM', newValue);
   }
   
   handleNextActionDateChange(sheetId, uuid, newValue) {
@@ -128,7 +128,7 @@ class OverviewController {
     let dateUpdated =  Common.getCurrDateStr();
     this.updateNextActionUpdatedDate(tr, dateUpdated);
     tr.attr('data-next-action-date-outdated', 'false');
-    SheetController.forSheet(sheetId).setValues(uuid, 'Next Action Date', {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
+    SheetController.forSheet(sheetId).setValues(uuid, {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
   }
   
   handleSheetChange(sheetId, uuid, newSheetId) {

@@ -22,12 +22,12 @@ function Preferences_setTrackedForSheet(sheetId, tracked) {
   return tracked ? 'Added tracking' : 'Removed tracking';
 }
 
-function ChangeRowValue_setValue(sheetId, uuid, columnName, columnKey, newValue) {
-  Log.start('ChangeRowValue_setValue', [sheetId, uuid, columnName, columnKey, newValue]);
+function ChangeRowValue_setValue(sheetId, uuid, columnKey, newValue) {
+  Log.start('ChangeRowValue_setValue', [sheetId, uuid, columnKey, newValue]);
   ChangeRowValue.init();
   TrackingSheet.init();
-  var ret = ChangeRowValue.setValue(sheetId, uuid, columnName, columnKey, newValue);
-  Log.stop('ChangeRowValue_setValue', [sheetId, uuid, columnName, columnKey, newValue]);
+  var ret = ChangeRowValue.setValue(sheetId, uuid, columnKey, newValue);
+  Log.stop('ChangeRowValue_setValue', [sheetId, uuid, columnKey, newValue]);
   return ret;
 }
 
@@ -40,21 +40,21 @@ function ChangeRowValue_setValues(sheetId, uuid, valueMap) {
   return ret;
 }
 
-function ChangeRowValue_setLink(sheetId, uuid, columnName, columnKey, text, href) {
-  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, text, href]);
+function ChangeRowValue_setLink(sheetId, uuid, columnKey, text, href) {
+  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnKey, text, href]);
   ChangeRowValue.init();
   TrackingSheet.init();
-  var ret = ChangeRowValue.setLink(sheetId, uuid, columnName, columnKey, text, href);
-  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey, text, href]);
+  var ret = ChangeRowValue.setLink(sheetId, uuid, columnKey, text, href);
+  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnKey, text, href]);
   return ret;
 }
 
-function ChangeRowValue_clearLink(sheetId, uuid, columnName, columnKey) {
-  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey]);
+function ChangeRowValue_clearLink(sheetId, uuid, columnKey) {
+  Log.start('ChangeRowValue_setLink', [sheetId, uuid, columnKey]);
   ChangeRowValue.init();
   TrackingSheet.init();
-  var ret = ChangeRowValue.clearLink(sheetId, uuid, columnName, columnKey);
-  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnName, columnKey]);
+  var ret = ChangeRowValue.clearLink(sheetId, uuid, columnKey);
+  Log.stop('ChangeRowValue_setLink', [sheetId, uuid, columnKey]);
   return ret;
 }
 
