@@ -30,18 +30,6 @@ class SheetController {
   getSearchElement() {
     return this.jq.find('.search');
   }
-  
-  static getDoAllTheThingsElement() {
-    return $('.doAllTheThings');
-  }
-  
-  static getTidyAllElement() {
-    return $('.tidyAll');
-  }
-  
-  static getUpdateDirtyElement() {
-    return $('.updateDirty');
-  }
 
   // SECTION:
   // Attributes
@@ -195,22 +183,6 @@ class SheetController {
     this.getSearchElement().click(this.search.bind(this));
   }
   
-  static addGlobalListeners() {
-    SheetController.getDoAllTheThingsElement().click(SheetController.updateAll);
-    SheetController.getTidyAllElement().click(SheetController.tidyAll);
-    SheetController.getUpdateDirtyElement().click(SheetController.updateAllDirty);
-    $(document).onKeydown((event, keycode) => {
-      if (keycode === 13 && event.metaKey) {
-        SheetController.updateAll();
-        return true;
-      }
-      if (keycode === 68 && event.metaKey) {
-        SheetController.updateAllDirty();
-        return true;
-      }
-    });
-  }
-  
   static getAll() {
     return SheetController.ALL;
   }
@@ -252,7 +224,6 @@ class SheetController {
       sheetController.show();
       SheetController.ALL.push(sheetController);
     });
-    SheetController.addGlobalListeners();
   }
 }
 

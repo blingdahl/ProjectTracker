@@ -27,6 +27,18 @@ class SheetListController {
     return this.jq.find('.collapseSheetList');
   }
   
+  getDoAllTheThingsElement() {
+    return this.jq.find('.doAllTheThings');
+  }
+  
+  getTidyAllElement() {
+    return this.jq.find('.tidyAll');
+  }
+  
+  getUpdateDirtyElement() {
+    return this.jq.find('.updateDirty');
+  }
+  
   setExpanded(expanded) {
     if (expanded) {
       this.getCollapsedElement().hide();
@@ -62,7 +74,18 @@ class SheetListController {
   addListeners() {
     this.getExpandElement().click(this.expand.bind(this));
     this.getCollapseElement().click(this.collapse.bind(this));
+    this.getDoAllTheThingsElement().click(SheetController.updateAll);
+    this.getTidyAllElement().click(SheetController.tidyAll);
+    this.getUpdateDirtyElement().click(SheetController.updateAllDirty);
     $(document).onKeydown((event, keycode) => {
+      if (keycode === 13 && event.metaKey) {
+        SheetController.updateAll();
+        return true;
+      }
+      if (keycode === 68 && event.metaKey) {
+        SheetController.updateAllDirty();
+        return true;
+      }
       if (keycode === 76 && event.metaKey) {
         this.toggle();
         return true;
