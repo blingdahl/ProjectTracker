@@ -46,6 +46,14 @@ class SheetListController {
     return this.setExpanded(false);
   }
   
+  isExpanded() {
+    return this.getExpandedElement().is(':visible');
+  }
+  
+  toggle() {
+    return this.setExpanded(!this.isExpanded());
+  }
+  
   init() {
     this.addListeners();
     this.collapse();
@@ -54,6 +62,12 @@ class SheetListController {
   addListeners() {
     this.getExpandElement().click(this.expand.bind(this));
     this.getCollapseElement().click(this.collapse.bind(this));
+    $(document).onKeydown((event, keycode) => {
+      if (keycode === 76 && event.metaKey) {
+        this.toggle();
+        return true;
+      }
+    });
   }
   
   static init() {
