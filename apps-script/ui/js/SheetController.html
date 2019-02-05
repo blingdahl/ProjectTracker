@@ -199,17 +199,14 @@ class SheetController {
     SheetController.getDoAllTheThingsElement().click(SheetController.updateAll);
     SheetController.getTidyAllElement().click(SheetController.tidyAll);
     SheetController.getUpdateDirtyElement().click(SheetController.updateAllDirty);
-    $(document).keydown((event) => {
-      var keycode = (event.keyCode ? event.keyCode : event.which);
+    $(document).onKeydown((event, keycode) => {
       if (keycode === 13 && event.metaKey) {
         SheetController.updateAll();
-        event.stopPropagation();
-        event.preventDefault();
+        return true;
       }
       if (keycode === 68 && event.metaKey) {
         SheetController.updateAllDirty();
-        event.stopPropagation();
-        event.preventDefault();
+        return true;
       }
     });
   }

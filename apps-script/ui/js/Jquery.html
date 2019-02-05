@@ -9,5 +9,15 @@ jQuery.fn.extend({
       event.preventDefault();
       event.stopPropagation();
     });
+  },
+  onKeydown: function(callback) {
+    this.keydown(event => {
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if (callback(event, keycode)) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    });
   }
+
 });
