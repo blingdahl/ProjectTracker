@@ -216,15 +216,6 @@ class SheetController {
     });
     return ret;
   }
-  
-  static init() {
-    $('.sheetController').each(function() {
-      let sheetController = new SheetController($(this));
-      sheetController.addListeners();
-      sheetController.show();
-      SheetController.ALL.push(sheetController);
-    });
-  }
 }
 
 SheetController.ALL = [];

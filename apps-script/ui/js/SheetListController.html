@@ -62,13 +62,24 @@ class SheetListController {
     return this.getExpandedElement().is(':visible');
   }
   
-  toggle() {
+  toggleExpanded() {
     return this.setExpanded(!this.isExpanded());
   }
   
-  init() {
-    this.addListeners();
-    this.collapse();
+  setAnyDirty(dirty) {
+    if (dirty) {
+      this.getUpdateDirtyElement().addClass('dirty');
+    } else {
+      this.getUpdateDirtyElement().removeClass('dirty');
+    }
+  }
+  
+  checkAnyDirty() {
+    if (SheetController.ALL.some(sheetController => sheetController.isDirty())) {
+      this.setAnyDirty(true);
+    } else {
+      this.setAnyDirty(false);
+    }
   }
   
   addListeners() {
@@ -87,10 +98,22 @@ class SheetListController {
         return true;
       }
       if (keycode === 76 && event.metaKey) {
-        this.toggle();
+        this.toggleExpanded();
         return true;
       }
     });
+  }
+  
+  init() {
+    $('.sheetController').each(function() {
+      let sheetController = new SheetController($(this));
+      sheetController.addListeners();
+      sheetController.show();
+      SheetController.ALL.push(sheetController);
+    });
+    this.addListeners();
+    this.collapse();
+    window.setInterval(this.checkAnyDirty.bind(this), 5 * 1000);
   }
   
   static init() {
