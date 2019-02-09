@@ -10,6 +10,7 @@ class TextMaker {
   }
   
   makeElement(data) {
-    return $('<span />').text(this.textCallback(data) || this.emptyText); 
+    let text = this.textCallback(data) || this.emptyText;
+    return $('<span />').text(text).attr('title', text); 
   }
 }

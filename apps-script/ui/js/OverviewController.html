@@ -52,6 +52,10 @@ class OverviewController {
     return this.jq.find('table');
   }
   
+  isVisible() {
+    return this.getTableElement().is(':visible');
+  }
+  
   getTbodyElement() {
     return this.jq.find('tbody').first();
   }
@@ -66,6 +70,18 @@ class OverviewController {
   
   getHeaderCells() {
     return this.getTableElement().find('th[data-key]');
+  }
+  
+  getVisibleDataKeys() {
+    let headerCells = this.getHeaderCells();
+    let ret = [];
+    headerCells.each((idx, elt) => {
+      let headerCell = $(elt);
+      if (headerCell.is(':visible')) {
+        ret.push(headerCell.attr('data-key'));
+      }
+    });
+    return ret;
   }
   
   getColumnCells(columnKey) {
@@ -277,14 +293,20 @@ class OverviewController {
       }
     });
     this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
+    this.resizeColumns();
+  }
+  
+  addRows(rows) {
+    rows.forEach(rowData => this.addRow(rowData));
+    this.sortRows();
+    this.applyFilters();
+    this.resizeColumns();
   }
   
   handleData(msg) {
     let rows = JSON.parse(msg);
     this.setTableShown(true);
-    rows.forEach(rowData => this.addRow(rowData));
-    this.sortRows();
-    this.applyFilters();
+    this.addRows(rows);
     this.getLoadingElement().hide();
   }
   
@@ -301,6 +323,44 @@ class OverviewController {
     } else {
       this.getTableElement().hide();
       this.getDisplayCountWrapperElement().hide();
+    }
+  }
+  
+  makeStyleClause(selector, width) {
+    return selector + '{width: ' + width + 'px;max-width: ' + width + 'px;}';
+  }
+  
+  resizeColumns() {
+    if (!this.isVisible()) {
+      return;
+    }
+    let styleJq = $('style#dynamic');
+    if (styleJq.length === 0) {
+      styleJq = $('<style />').attr('id', 'dynamic');
+      $('head').append(styleJq);
+    }
+    let totalWidth = $('body').width() - OverviewController.WIDTH_PADDING;
+    let remainingWidth = totalWidth;
+    let styles = [];
+    styles.push(this.makeStyleClause('.overviewPlaceholder table', totalWidth));
+    let visibleDataKeys = this.getVisibleDataKeys();
+    let numOtherColumns = visibleDataKeys.length - 1 - (visibleDataKeys.includes('LINK') ? 1 : 0);
+    let itemWidth = totalWidth - numOtherColumns * OverviewController.MIN_WIDTH_PER_COLUMN;
+    if (itemWidth > OverviewController.ITEM_MAX_WIDTH) {
+      itemWidth = OverviewController.ITEM_MAX_WIDTH;
+    } else if (!(itemWidth >= OverviewController.ITEM_MIN_WIDTH)) {
+      itemWidth = OverviewController.ITEM_MIN_WIDTH;
+    }
+    styles.push(this.makeStyleClause('td[data-key="ITEM"]', itemWidth));
+    if (visibleDataKeys.includes('LINK')) {
+      styles.push(this.makeStyleClause('td[data-key="LINK"]', 85));
+    }
+    styleJq.html(styles.join('\n'));
+  }
+  
+  static resizeColumns() {
+    if (OverviewController.current) {
+      OverviewController.current.resizeColumns();
     }
   }
   
@@ -379,6 +439,7 @@ class OverviewController {
 
   static addListeners() {
     OverviewController.getSortOverviewElement().click(OverviewController.handleSortOverviewClick);
+    $(window).resize(OverviewController.resizeColumns);
     $(document).keydown((event) => {
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 83 && event.metaKey) {
@@ -396,6 +457,11 @@ class OverviewController {
 }
 
 OverviewController.current = null;
+
+OverviewController.ITEM_MAX_WIDTH = 500;
+OverviewController.ITEM_MIN_WIDTH = 80;
+OverviewController.WIDTH_PADDING = 55;
+OverviewController.MIN_WIDTH_PER_COLUMN = 85;
 
 OverviewController.NO_PRIORITY_KEY = 'PUnknown';
 OverviewController.NO_PRIORITY_TEXT = 'No Priority';

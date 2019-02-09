@@ -19,12 +19,20 @@ class EditableLinkMaker {
     new EditLinkDialog(this.sheetIdCallback(dataJq), this.uuidCallback(dataJq), dataJq.attr('data-text'), dataJq.attr('data-href'), this.makeHandleChange(dataJq)).show();
   }
   
+  updateLink(linkJq, href, text) {
+    if (href) {
+      return linkJq.attr('href', href).attr('title', text).attr('target', '_blank').text(text).show();
+    } else {
+      linkJq.hide();
+    }
+  }
+  
   makeHandleChange(dataJq) {
     return function(sheetId, uuid, text, href) {
       dataJq.attr('data-href', href).attr('data-text', text)
       let linkJq = dataJq.find('a');
       if (href) {
-        linkJq.attr('href', href).attr('target', '_blank').text(text).show();
+        linkJq.attr('href', href).attr('title', text).attr('target', '_blank').text(text).show();
       } else {
         linkJq.hide();
       }
@@ -37,7 +45,8 @@ class EditableLinkMaker {
     let href = this.hrefCallback(data);
     let linkJq = $('<a />');
     if (href) {
-      linkJq.attr('href', href).text(text).attr('target', '_blank');
+      // TODO(lindahl) Collapse
+      linkJq.attr('href', href).text(text).attr('title', text).attr('target', '_blank');
     } else {
       linkJq.hide();
     }
@@ -45,7 +54,7 @@ class EditableLinkMaker {
     return $('<span />').
         attr('data-href', href || '').
         attr('data-text', text || '').
-        append(linkJq).
-        append(editLink);
+        append(editLink).
+        append(linkJq);
   }
 }

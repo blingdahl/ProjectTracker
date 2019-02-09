@@ -17,7 +17,7 @@ class EditableTextMaker {
   
   updateTextJq(textJq, newText, newValue) {
     if (newText) {
-      textJq.text(newText);
+      textJq.text(newText).attr('title', newText);
     } else {
       if (this.emptyContent instanceof jQuery) {
         textJq.append(this.emptyContent.clone());
