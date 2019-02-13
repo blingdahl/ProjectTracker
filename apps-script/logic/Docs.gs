@@ -31,13 +31,25 @@ Docs.getName = function(url) {
   var type = Docs.getType(url);
   Log.info(type);
   if (type === Docs.DOC) {
-    return DocumentApp.openByUrl(url).getName();
+    try {
+      return DocumentApp.openByUrl(url).getName();
+    } catch (e) {
+      return 'Unknown Doc';
+    }
   }
   if (type === Docs.SHEET) {
-    return SpreadsheetApp.openByUrl(url).getName();
+    try {
+      return SpreadsheetApp.openByUrl(url).getName();
+    } catch (e) {
+      return 'Unknown Sheet';
+    }
   }
   if (type === Docs.PRESENTATION) {
-    return SlidesApp.openByUrl(url).getName();
+    try {
+      return SlidesApp.openByUrl(url).getName();
+    } catch (e) {
+      return 'Unknown Presentation';
+    }
   }
   Log.info(url);
   if (type === Docs.FORM) {
