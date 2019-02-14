@@ -55,12 +55,14 @@ class FilterElement {
   }
   
   textClicked(e) {
-    let input = new MultiOptionInputMaker(this.allValues, this.textCallback).makeElement(this.getValues(),
-        newValues => {
-          this.setValues(newValues);
-          this.updateUrl();
-        },
-        () => this.jq.show());
+    let valueSets = [new MultiOptionInputValueSet(this.allValuesText, this.allValues)];
+    let input = new MultiOptionInputMaker(this.allValues, this.textCallback, valueSets).
+        makeElement(this.getValues(),
+          newValues => {
+            this.setValues(newValues);
+            this.updateUrl();
+          },
+          () => this.jq.show());
     this.jq.parent().append(input);
     this.jq.hide();
   }

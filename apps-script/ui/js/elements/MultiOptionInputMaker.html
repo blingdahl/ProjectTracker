@@ -1,22 +1,26 @@
 class MultiOptionInputMaker {
-  constructor(allValues, textCallback) {
+  constructor(allValues, textCallback, valueSets) {
     this.allValues = allValues;
     this.textCallback = textCallback;
+    this.valueSets = valueSets;
   }
   
   makeElement(currValues, changeCallback, cancelCallback) {
     let input = new MultiOptionInput(this.allValues,
-                                this.textCallback,
-                                currValues,
-                                changeCallback,
-                                cancelCallback);
+                                     this.valueSets,
+                                     this.textCallback,
+                                     currValues,
+                                     changeCallback,
+                                     cancelCallback);
     return input.makeElement();
   }
 }
 
 class MultiOptionInput {
-  constructor(allValues, textCallback, currValues, changeCallback, cancelCallback) {
+  constructor(allValues, valueSets, textCallback, currValues, changeCallback, 
+              cancelCallback) {
     this.allValues = allValues;
+    this.valueSets = valueSets;
     this.textCallback = textCallback;
     this.currValues = currValues;
     this.changeCallback = changeCallback;
@@ -46,6 +50,12 @@ class MultiOptionInput {
     this.cancelCallback();
   }
   
+  setValuesAndApply(values) {
+    this.optionsJq.find('.option').attr('data-selected', 'false');
+    values.forEach(value => this.optionsJq.find('.option[data-value="' + value + '"]').attr('data-selected', 'true'));
+    this.apply();
+  }
+  
   selectOnly(optionJq) {
     this.optionsJq.find('.option').attr('data-selected', 'false');
     optionJq.attr('data-selected', 'true');
@@ -60,30 +70,45 @@ class MultiOptionInput {
     }
   }
   
+  addOption(value) {
+		let text = this.textCallback(value);
+		let onlyJq = MultiOptionInput.ONLY_JQ.clone();
+		let optionJq = $('<div />').
+				attr('data-value', value).
+				attr('data-text', text).
+				addClass('option').
+				append(MultiOptionInput.CHECK_JQ.clone()).
+				append($('<span />').text(text).addClass('text')).
+				append(' (').append(onlyJq).append(')');
+		optionJq.onClick(event => this.toggleOption(optionJq));
+		onlyJq.onClick(event => this.selectOnly(optionJq));
+		if (this.currValues.some(currValue => value == currValue)) {
+			optionJq.attr('data-selected', 'true');
+		}
+		this.optionsJq.append(optionJq);
+  }
+  
+  addValueSetOption(valueSet) {
+		let optionJq = $('<div />').
+				attr('data-values', valueSet.values.join(',')).
+				attr('data-text', valueSet.text).
+				addClass('valueSetOption').
+				append($('<span />').text(valueSet.text).addClass('text'));
+		optionJq.onClick(event => this.setValuesAndApply(valueSet.values));
+		this.optionsJq.append(optionJq);
+  }
+  
   makeElement() {
     this.optionsJq = $('<div />').addClass('multiOptionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
-      let value = this.allValues[i];
-      let text = this.textCallback(value);
-      let onlyJq = MultiOptionInput.ONLY_JQ.clone();
-      let optionJq = $('<div />').
-          attr('data-value', value).
-          attr('data-text', text).
-          addClass('option').
-          append(MultiOptionInput.CHECK_JQ.clone()).
-          append($('<span />').text(text).addClass('text')).
-          append(' (').append(onlyJq).append(')');
-      optionJq.onClick(event => this.toggleOption(optionJq));
-      onlyJq.onClick(event => this.selectOnly(optionJq));
-      if (this.currValues.some(currValue => value == currValue)) {
-        optionJq.attr('data-selected', 'true');
-      }
-      this.optionsJq.append(optionJq);
+      this.addOption(this.allValues[i]);
+    }
+    for (var i = 0; i != this.valueSets.length; i++) {
+      this.addValueSetOption(this.valueSets[i]);
     }
     this.optionsJq.append(new MultiOptionInputButtonBar([
        {text: 'Apply', callback: this.apply.bind(this)},
        {text: 'Clear', callback: this.clear.bind(this)},
-       {text: 'All', callback: this.selectAll.bind(this)},
        {text: 'Cancel', callback: this.cancel.bind(this)}]).makeElement());
     return this.optionsJq;
   }
@@ -104,6 +129,13 @@ class MultiOptionInputButtonBar {
       buttonsJq.append($('<span />').text(button.text).addClass('button').onClick(button.callback));
     }
     return buttonsJq;
+  }
+}
+
+class MultiOptionInputValueSet {
+  constructor(text, values) {
+    this.text = text;
+    this.values = values;
   }
 }
 
