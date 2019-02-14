@@ -13,6 +13,9 @@ class FilterElement {
     this.textJq = $('<span />').addClass('filterText');
     this.jq.append(this.textJq).append($('<span>&#9660;</span>').addClass('arrow'));
     this.getFromUrl();
+    this.valueSets = [new MultiOptionInputValueSet(this.allValuesText, this.allValues,
+                                                   false)];
+    // TODO(lindahl) Get value sets from server
   }
   
   // Called once per table load
@@ -54,15 +57,41 @@ class FilterElement {
     return this.values.length > 0 ? this.values : this.emptyValues;
   }
   
+  addValueSet(values) {
+    let text = window.prompt('Name');
+    if (text) {
+      this.valueSets.push(new MultiOptionInputValueSet(text, values, true));
+    }
+    // TODO(lindahl) Save value sets to server
+  }
+  
+  removeValueSet(text, values) {
+    let newValueSets = [];
+    this.valueSets.forEach(valueSet => {
+      if (valueSet.text !== text) {
+        // TODO(lindahl) Compare values as well
+        newValueSets.push(valueSet);
+      }
+    });
+    // TODO(lindahl) Save value sets to server
+    this.valueSets = newValueSets;
+  }
+  
   textClicked(e) {
-    let valueSets = [new MultiOptionInputValueSet(this.allValuesText, this.allValues)];
-    let input = new MultiOptionInputMaker(this.allValues, this.textCallback, valueSets).
+    let input = new MultiOptionInputMaker(this.allValues, this.textCallback,
+                                          this.valueSets).
         makeElement(this.getValues(),
           newValues => {
             this.setValues(newValues);
             this.updateUrl();
           },
-          () => this.jq.show());
+          () => this.jq.show(),
+          values => {
+            this.addValueSet(values);
+          },
+          (text, values) => {
+            this.removeValueSet(text, values);
+          });
     this.jq.parent().append(input);
     this.jq.hide();
   }

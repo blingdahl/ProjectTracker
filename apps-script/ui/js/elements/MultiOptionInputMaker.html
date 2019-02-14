@@ -5,36 +5,53 @@ class MultiOptionInputMaker {
     this.valueSets = valueSets;
   }
   
-  makeElement(currValues, changeCallback, cancelCallback) {
+  // TODO(lindahl) There is no obvious reason for change callback and
+  // cancel callback to be set on makeElement
+  makeElement(currValues, changeCallback, cancelCallback, addValueSetCallback,
+      removeValueSetCallback) {
     let input = new MultiOptionInput(this.allValues,
                                      this.valueSets,
                                      this.textCallback,
                                      currValues,
                                      changeCallback,
-                                     cancelCallback);
+                                     cancelCallback,
+                                     addValueSetCallback,
+                                     removeValueSetCallback);
     return input.makeElement();
   }
 }
 
 class MultiOptionInput {
   constructor(allValues, valueSets, textCallback, currValues, changeCallback, 
-              cancelCallback) {
+              cancelCallback, addValueSetCallback, removeValueSetCallback) {
     this.allValues = allValues;
     this.valueSets = valueSets;
     this.textCallback = textCallback;
     this.currValues = currValues;
     this.changeCallback = changeCallback;
     this.cancelCallback = cancelCallback;
+    this.addValueSetCallback = addValueSetCallback;
+    this.removeValueSetCallback = removeValueSetCallback;
   }
   
-  apply() {
+  getCurrValues() {
     let newValues = [];
     this.optionsJq.find('[data-selected="true"]').each((index, elt) => {
       let optionJq = $(elt);
       newValues.push(optionJq.attr('data-value'));
     });
+    return newValues;
+  }
+  
+  apply() {
+    let newValues = this.getCurrValues();
     this.optionsJq.remove();
     this.changeCallback(newValues);
+  }
+  
+  saveValueSet() {
+    this.addValueSetCallback(this.getCurrValues());
+    this.apply();
   }
   
   clear() {
@@ -89,12 +106,20 @@ class MultiOptionInput {
   }
   
   addValueSetOption(valueSet) {
+    let removeJq = MultiOptionInputValueSet.REMOVE_JQ.clone();
 		let optionJq = $('<div />').
 				attr('data-values', valueSet.values.join(',')).
 				attr('data-text', valueSet.text).
 				addClass('valueSetOption').
 				append($('<span />').text(valueSet.text).addClass('text'));
+	  if (valueSet.removable) {
+  		optionJq.append(' (').append(removeJq).append(')');
+	  }
 		optionJq.onClick(event => this.setValuesAndApply(valueSet.values));
+		removeJq.onClick(event => {
+		  optionJq.remove();
+		  this.removeValueSetCallback(valueSet.text, valueSet.values);
+		});
 		this.optionsJq.append(optionJq);
   }
   
@@ -108,6 +133,7 @@ class MultiOptionInput {
     }
     this.optionsJq.append(new MultiOptionInputButtonBar([
        {text: 'Apply', callback: this.apply.bind(this)},
+       {text: 'Save Set', callback: this.saveValueSet.bind(this)},
        {text: 'Clear', callback: this.clear.bind(this)},
        {text: 'Cancel', callback: this.cancel.bind(this)}]).makeElement());
     return this.optionsJq;
@@ -133,11 +159,13 @@ class MultiOptionInputButtonBar {
 }
 
 class MultiOptionInputValueSet {
-  constructor(text, values) {
+  constructor(text, values, removable) {
     this.text = text;
     this.values = values;
+    this.removable = removable;
   }
 }
 
 MultiOptionInput.CHECK_JQ = $('<span>&check;</span>').addClass('check');
 MultiOptionInput.ONLY_JQ = $('<span />').text('Only').addClass('only');
+MultiOptionInputValueSet.REMOVE_JQ = $('<span />').text('Remove').addClass('remove');
