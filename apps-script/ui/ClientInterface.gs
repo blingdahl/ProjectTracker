@@ -146,14 +146,14 @@ function Preferences_updateScriptPreferences(appTitle, scriptUrl) {
 function Preferences_setValueSetsJsonForFilter(filterName, json) {
   Log.start('Preferences_setValueSetsJsonForFilter', [filterName, json]);
   Preferences.init();
-  Preferences.Properties.set(Preferences.Names.filterValueSetsJson(), json);
+  Preferences.Properties.set(Preferences.Names.filterValueSetsJson(filterName), json);
   Log.stop('Preferences_setValueSetsJsonForFilter', [filterName, json]);
 }
 
 function Preferences_getValueSetsJsonForFilter(filterName) {
   Log.start('Preferences_getValueSetsJsonForFilter', [filterName]);
   Preferences.init();
-  var json = Preferences.Properties.get(Preferences.Names.filterValueSetsJson());
+  var json = Preferences.Properties.get(Preferences.Names.filterValueSetsJson(filterName));
   Log.stop('Preferences_getValueSetsJsonForFilter', [filterName]);
   return json;
 }

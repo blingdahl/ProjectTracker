@@ -164,6 +164,19 @@ class MultiOptionInputValueSet {
     this.values = values;
     this.removable = removable;
   }
+  
+  static toJson(valueSets) {
+    let objs = [];
+    valueSets.forEach(valueSet => objs.push({'text': valueSet.text, 'values': valueSet.values}))
+    return JSON.stringify(objs);
+  }
+  
+  static fromJson(json) {
+    let objs = JSON.parse(json);
+    let valueSets = [];
+    objs.forEach(obj => valueSets.push(new MultiOptionInputValueSet(obj.text, obj.values, true)));
+    return valueSets;
+  }
 }
 
 MultiOptionInput.CHECK_JQ = $('<span>&check;</span>').addClass('check');

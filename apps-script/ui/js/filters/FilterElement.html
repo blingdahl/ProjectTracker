@@ -1,5 +1,6 @@
 class FilterElement {
-  constructor(cssClass, textCallback, allValuesText, emptyValues, emptyText, paramName, allValues, changeCallback) {
+  constructor(cssClass, textCallback, allValuesText, emptyValues, emptyText, paramName,
+      allValues, changeCallback) {
     this.cssClass = cssClass;
     this.textCallback = textCallback;
     this.allValuesText = allValuesText;
@@ -13,9 +14,8 @@ class FilterElement {
     this.textJq = $('<span />').addClass('filterText');
     this.jq.append(this.textJq).append($('<span>&#9660;</span>').addClass('arrow'));
     this.getFromUrl();
-    this.valueSets = [new MultiOptionInputValueSet(this.allValuesText, this.allValues,
-                                                   false)];
-    // TODO(lindahl) Get value sets from server
+    this.additionalValueSets = [];
+    this.loadValueSets();
   }
   
   // Called once per table load
@@ -57,29 +57,55 @@ class FilterElement {
     return this.values.length > 0 ? this.values : this.emptyValues;
   }
   
+  handleValueSetsJson(json) {
+    if (json) {
+      this.additionalValueSets = MultiOptionInputValueSet.fromJson(json);
+    }
+  }
+  
+  loadValueSets() {
+    return new RpcConfig('Preferences_getValueSetsJsonForFilter',
+                         runner => runner.Preferences_getValueSetsJsonForFilter(this.paramName)).
+        logAll().
+        callRpc().
+        then(msg => this.handleValueSetsJson(msg));
+  }
+  
+  saveValueSets() {
+    return new RpcConfig('Preferences_setValueSetsJsonForFilter',
+                         runner => runner.Preferences_setValueSetsJsonForFilter(this.paramName, MultiOptionInputValueSet.toJson(this.additionalValueSets))).
+        logAll().
+        callRpc();
+  }
+  
   addValueSet(values) {
     let text = window.prompt('Name');
     if (text) {
-      this.valueSets.push(new MultiOptionInputValueSet(text, values, true));
+      this.additionalValueSets.push(new MultiOptionInputValueSet(text, values, true));
     }
-    // TODO(lindahl) Save value sets to server
+    this.saveValueSets();
   }
   
   removeValueSet(text, values) {
     let newValueSets = [];
-    this.valueSets.forEach(valueSet => {
+    this.additionalValueSets.forEach(valueSet => {
       if (valueSet.text !== text) {
         // TODO(lindahl) Compare values as well
         newValueSets.push(valueSet);
       }
     });
-    // TODO(lindahl) Save value sets to server
-    this.valueSets = newValueSets;
+    this.additionalValueSets = newValueSets;
+    this.saveValueSets();
+  }
+  
+  valueSets() {
+    return [new MultiOptionInputValueSet(this.allValuesText, this.allValues, false)].
+         concat(this.additionalValueSets);
   }
   
   textClicked(e) {
     let input = new MultiOptionInputMaker(this.allValues, this.textCallback,
-                                          this.valueSets).
+                                          this.valueSets()).
         makeElement(this.getValues(),
           newValues => {
             this.setValues(newValues);
