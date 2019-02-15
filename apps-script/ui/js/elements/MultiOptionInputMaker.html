@@ -133,7 +133,7 @@ class MultiOptionInput {
     }
     this.optionsJq.append(new MultiOptionInputButtonBar([
        {text: 'Apply', callback: this.apply.bind(this)},
-       {text: 'Save Set', callback: this.saveValueSet.bind(this)},
+       {text: 'Save', callback: this.saveValueSet.bind(this)},
        {text: 'Clear', callback: this.clear.bind(this)},
        {text: 'Cancel', callback: this.cancel.bind(this)}]).makeElement());
     return this.optionsJq;
