@@ -27,7 +27,9 @@ class OptionInputMaker {
         let newValue = jq.attr('data-value');
         let newText = jq.text();
         options.remove();
-        changeCallback(newValue, newText);
+        if (newValue != currValue) {
+          changeCallback(newValue, newText);
+        }
       });
     }
     return options;
