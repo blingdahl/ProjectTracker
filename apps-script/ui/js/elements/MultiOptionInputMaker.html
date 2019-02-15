@@ -165,6 +165,13 @@ class MultiOptionInputValueSet {
     this.removable = removable;
   }
   
+  valuesEqual(values) {
+    if (values.length != this.values.length) {
+      return false;
+    }
+    return !values.some(value => !this.values.includes(value));
+  }
+  
   static toJson(valueSets) {
     let objs = [];
     valueSets.forEach(valueSet => objs.push({'text': valueSet.text, 'values': valueSet.values}))

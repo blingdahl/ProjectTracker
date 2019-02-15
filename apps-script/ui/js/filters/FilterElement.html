@@ -23,15 +23,6 @@ class FilterElement {
     ancestorJq.on('click', '.' + this.cssClass, this.textClicked.bind(this));
   }
   
-  valuesToText() {
-    if (this.values.length == 0) {
-      return this.emptyText;
-    }
-    let textParts = [];
-    this.values.forEach(value => textParts.push(this.textCallback(value)));
-    return textParts.join(', ');
-  }
-  
   updateTextJq() {
     let text;
     if (this.values.length == 0) {
@@ -39,9 +30,17 @@ class FilterElement {
     } else if (this.values.length === this.allValues.length) {
       text = this.allValuesText;
     } else {
-      let textParts = [];
-      this.values.forEach(value => textParts.push(this.textCallback(value)));
-      text = textParts.join(', ');
+      for (let i = 0; i != this.additionalValueSets.length; i++) {
+        let valueSet  = this.additionalValueSets[i];
+        if (valueSet.valuesEqual(this.values)) {
+          text = valueSet.text;
+        }
+      }
+      if (!text) {
+        let textParts = [];
+        this.values.forEach(value => textParts.push(this.textCallback(value)));
+        text = textParts.join(', ');
+      }
     }
     this.textJq.text(text);
     this.jq.show();
@@ -60,6 +59,7 @@ class FilterElement {
   handleValueSetsJson(json) {
     if (json) {
       this.additionalValueSets = MultiOptionInputValueSet.fromJson(json);
+      this.updateTextJq();
     }
   }
   
