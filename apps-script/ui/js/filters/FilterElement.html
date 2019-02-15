@@ -51,7 +51,7 @@ class FilterElement {
     this.updateTextJq();
     this.changeCallback(newValues);
   }
-  
+
   getValues() {
     return this.values.length > 0 ? this.values : this.emptyValues;
   }
@@ -81,20 +81,18 @@ class FilterElement {
   addValueSet(values) {
     let text = window.prompt('Name');
     if (text) {
-      this.additionalValueSets.push(new MultiOptionInputValueSet(text, values, true));
+      let valueSet = this.additionalValueSets.find(valueSet => valueSet.text === text);
+      if (valueSet) {
+        valueSet.values = values;
+      } else {
+        this.additionalValueSets.push(new MultiOptionInputValueSet(text, values, true));
+      }
     }
     this.saveValueSets();
   }
   
   removeValueSet(text, values) {
-    let newValueSets = [];
-    this.additionalValueSets.forEach(valueSet => {
-      if (valueSet.text !== text) {
-        // TODO(lindahl) Compare values as well
-        newValueSets.push(valueSet);
-      }
-    });
-    this.additionalValueSets = newValueSets;
+    this.additionalValueSets = this.additionalValueSets.filter(valueSet => valueSet.text !== text);
     this.saveValueSets();
   }
   
