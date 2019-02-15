@@ -42,6 +42,10 @@ Preferences.init = function() {
   Preferences.Names.tasklist = function(sheetId) {
     return 'tasklist:' + sheetId;
   }
+
+  Preferences.Names.filterValueSetsJson = function(filterName) {
+    return 'filterValueSetsJson:' + filterName;
+  }
   
   Preferences.Names.spreadsheetUrl = function() {
     return 'spreadsheetUrl';
