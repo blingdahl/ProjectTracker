@@ -20,7 +20,7 @@ class EditableTextMaker {
       textJq.text(newText).attr('title', newText);
     } else {
       if (this.emptyContent instanceof jQuery) {
-        textJq.append(this.emptyContent.clone());
+        textJq.empty().append(this.emptyContent.clone());
       } else {
         textJq.text(this.emptyContent);
       }
