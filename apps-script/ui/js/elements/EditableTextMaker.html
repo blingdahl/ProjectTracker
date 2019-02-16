@@ -30,10 +30,13 @@ class EditableTextMaker {
   
   textClicked(e) {
     var textJq = $(e.currentTarget);
-    let input = this.inputMaker.makeElement(textJq.attr('data-value'),
+    let currValue = textJq.attr('data-value');
+    let input = this.inputMaker.makeElement(currValue,
         (newValue, newText) => {
-          this.changeCallback(this.sheetIdCallback(textJq), this.uuidCallback(textJq), newValue);
-          this.updateTextJq(textJq, newText, newValue);
+          if (newValue != currValue) {
+            this.changeCallback(this.sheetIdCallback(textJq), this.uuidCallback(textJq), newValue);
+            this.updateTextJq(textJq, newText, newValue);
+          }
           textJq.show();
         },
         () => textJq.show());
