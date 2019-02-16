@@ -15,6 +15,7 @@ class OverviewController {
     this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass('editPencil'), rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] = new TextMaker('', rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
+    this.elementMakers['DUE_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'dueDate', $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass('editPencil'), rowData => rowData['DUE_DATE'], rowData => rowData['DUE_DATE'], this.handleDueDateChange.bind(this), new DateInputMaker());
   }
 
   // SECTION:
@@ -114,6 +115,10 @@ class OverviewController {
     tr.attr('data-next-action-category', nextActionCategory);
   }
   
+  updateDueDate(tr, newDueDate) {
+    tr.attr('data-due-date', newDueDate);
+  }
+  
   updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
     tr.attr('data-next-action-updated-date', newNextActionUpdatedDate);
     tr.find('[data-key="NEXT_ACTION_DATE_UPDATED"]').text(newNextActionUpdatedDate);
@@ -136,6 +141,12 @@ class OverviewController {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr('data-item', newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'ITEM', newValue);
+  }
+  
+  handleDueDateChange(sheetId, uuid, newValue) {
+    let tr = this.getDataRowElement(sheetId, uuid);
+    this.updateDueDate(tr, newValue);
+    SheetController.forSheet(sheetId).setValue(uuid, 'DUE_DATE', newValue);
   }
   
   handleNextActionDateChange(sheetId, uuid, newValue) {
@@ -250,6 +261,7 @@ class OverviewController {
     rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
     rowJq.attr('data-uuid', rowData['UUID']);
     this.updateNextActionDate(rowJq, rowData['NEXT_ACTION_DATE']);
+    this.updateDueDate(rowJq, rowData['DUE_DATE']);
     if (rowStatus === 'Obsolete' || rowStatus === 'Completed') {
       SheetController.forSheet(sheetId).markDirty();
     }
