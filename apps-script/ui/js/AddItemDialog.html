@@ -41,6 +41,14 @@ class AddItemDialog {
     return this.getNextActionDateElement().val();
   }
   
+  getDueDateElement() {
+    return this.itemForm.find('.dueDate');
+  }
+  
+  getDueDate() {
+    return this.getDueDateElement().val();
+  }
+  
   getSubmitElement() {
     return this.itemForm.find('.addItem');
   }
@@ -80,7 +88,7 @@ class AddItemDialog {
     var title = this.getTitle();
     this.addItemCallback();
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(
-            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate(), Common.getCurrDateStr())).
+            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate(), Common.getCurrDateStr(), this.getDueDate())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         callRpc();
   }
@@ -139,6 +147,7 @@ class AddItemDialog {
       }
     });
     this.dateInputMaker.attachToInput('', () => null, () => null, this.getNextActionDateElement())
+    this.dateInputMaker.attachToInput('', () => null, () => null, this.getDueDateElement())
     this.itemForm.dialog({
       title: 'Add item to ' + this.sheetName,
       minWidth: 500,

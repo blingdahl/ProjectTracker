@@ -16,4 +16,8 @@
 <div class="promptText">Next Action Date</div>
 <input type="text" class="nextActionDate field">
 </div>
+<div class="dueDateField">
+<div class="promptText">Due Date</div>
+<input type="text" class="dueDate field">
+</div>
 </div>
