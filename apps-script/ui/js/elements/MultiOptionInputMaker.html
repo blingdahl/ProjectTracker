@@ -109,7 +109,7 @@ class MultiOptionInput {
     let removeJq = MultiOptionInputValueSet.REMOVE_JQ.clone();
 		let optionJq = $('<div />').
 				attr('data-values', valueSet.values.join(',')).
-				attr('data-text', valueSet.text).
+				attr('data-text', valueSet.text + ' (group)').
 				addClass('valueSetOption').
 				append($('<span />').text(valueSet.text).addClass('text'));
 	  if (valueSet.removable) {
