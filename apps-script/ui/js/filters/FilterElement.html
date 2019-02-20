@@ -33,7 +33,7 @@ class FilterElement {
       for (let i = 0; i != this.additionalValueSets.length; i++) {
         let valueSet  = this.additionalValueSets[i];
         if (valueSet.valuesEqual(this.values)) {
-          text = valueSet.text + ' (group)';
+          text = valueSet.getDisplayText();
         }
       }
       if (!text) {

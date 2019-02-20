@@ -111,7 +111,7 @@ class MultiOptionInput {
 				attr('data-values', valueSet.values.join(',')).
 				attr('data-text', valueSet.text).
 				addClass('valueSetOption').
-				append($('<span />').text(valueSet.text + ' (group)').addClass('text'));
+				append($('<span />').text(valueSet.getDisplayText()).addClass('text'));
 	  if (valueSet.removable) {
   		optionJq.append(' (').append(removeJq).append(')');
 	  }
@@ -170,6 +170,10 @@ class MultiOptionInputValueSet {
       return false;
     }
     return !values.some(value => !this.values.includes(value));
+  }
+  
+  getDisplayText() {
+    return this.text + (this.removable ? ' (group)' : '');
   }
   
   static toJson(valueSets) {
