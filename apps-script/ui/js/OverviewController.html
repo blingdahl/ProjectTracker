@@ -97,26 +97,29 @@ class OverviewController {
     return $(link).closest('tr[data-uuid]').attr('data-uuid');
   }
   
+  static getDateCategory(dateStr) {
+    let currDateStr = OverviewController.currDateStr();
+    if (dateStr === '') {
+      return null;
+    }
+    if (dateStr > currDateStr) {
+      return 'future';
+    } else if (dateStr == currDateStr) {
+      return 'today';
+    } else {
+      return 'past';
+    }
+  }
+  
   updateNextActionDate(tr, newNextActionDate) {
     tr.attr('data-next-action-date', newNextActionDate);
-    let nextActionCategory;
-    if (newNextActionDate === '') {
-      nextActionCategory = null;
-    } else {
-      let currDateStr = OverviewController.currDateStr();
-      if (newNextActionDate > currDateStr) {
-        nextActionCategory = 'future';
-      } else if (newNextActionDate == currDateStr) {
-        nextActionCategory = 'today';
-      } else {
-        nextActionCategory = 'past';
-      }
-    }
-    tr.attr('data-next-action-category', nextActionCategory);
+    tr.attr('data-next-action-category',
+            OverviewController.getDateCategory(newNextActionDate));
   }
   
   updateDueDate(tr, newDueDate) {
     tr.attr('data-due-date', newDueDate);
+    tr.attr('data-due-category', OverviewController.getDateCategory(newDueDate));
   }
   
   updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
