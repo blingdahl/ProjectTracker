@@ -189,16 +189,30 @@ class OverviewController {
     return a.attr('data-priority').compare(b.attr(attrName))
   }
   
-  static compareAttributeFn(attrName, opt_customCompare) {
+  static compareAttributeOrderedFn(attrName, values) {
+    return function(a, b) {
+      let aAttr = $(a).attr(attrName) || null;
+      let bAttr = $(b).attr(attrName) || null;
+      for (let i = 0; i != values.length; i++) {
+        let value = values[i];
+        if (value === aAttr || value === bAttr) {
+          if (value === aAttr && value === bAttr) {
+            return compare.EQUAL;
+          } else if (value === aAttr) {
+            return compare.A_FIRST;
+          } else {
+            return compare.B_FIRST;
+          }
+        }
+      }
+      return compare.EQUAL;
+    };
+  }
+  
+  static compareAttributeLexicallyFn(attrName) {
     return function(a, b) {
       let aAttr = $(a).attr(attrName);
       let bAttr = $(b).attr(attrName);
-      if (opt_customCompare) {
-        let result = opt_customCompare(aAttr, bAttr);
-        if (result != 0) {
-          return result;
-        }
-      }
       return compare(aAttr, bAttr);
     };
   }
@@ -211,28 +225,15 @@ class OverviewController {
     return OverviewController.CURR_DATE_STR;
   }
   
-  static compareNextActionDate(aNextActionDate, bNextActionDate) {
-    let currDateStr = OverviewController.currDateStr();
-    let aEmpty = aNextActionDate == '';
-    let bEmpty = bNextActionDate == '';
-    let aAfterToday = !aEmpty && aNextActionDate > currDateStr;
-    let bAfterToday = !bEmpty && bNextActionDate > currDateStr;
-    if (aAfterToday != bAfterToday) {
-      return aAfterToday ? 1 : -1;
-    }
-    if (aEmpty != bEmpty) {
-      return aEmpty ? 1 : -1;
-    }
-    return 0;
-  }
-  
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.compareAttributeFn('data-next-action-date', OverviewController.compareNextActionDate),
-                       OverviewController.compareAttributeFn('data-priority'),
-                       OverviewController.compareAttributeFn('data-status-index'),
-                       OverviewController.compareAttributeFn('data-sheet-id'),
-                       OverviewController.compareAttributeFn('data-uuid'))
+      compare.fn.chain(OverviewController.compareAttributeOrderedFn('data-due-category', ['past', 'today', null, 'future']),
+                       OverviewController.compareAttributeOrderedFn('data-next-action-category', ['past', 'today', null, 'future']),
+                       OverviewController.compareAttributeLexicallyFn('data-next-action-date'),
+                       OverviewController.compareAttributeLexicallyFn('data-priority'),
+                       OverviewController.compareAttributeLexicallyFn('data-status-index'),
+                       OverviewController.compareAttributeLexicallyFn('data-sheet-id'),
+                       OverviewController.compareAttributeLexicallyFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
   

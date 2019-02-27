@@ -43,6 +43,12 @@ function compare(a, b, opt_comparator) {
   throw new Error('Unexpected type ' + typeof opt_comparator + ': ' + opt_comparator);
 }
 
+compare.A_BIGGER = 1;
+compare.B_BIGGER = -1;
+compare.A_FIRST = -1;
+compare.B_FIRST = 1;
+compare.EQUAL = 0;
+
 /**
  * Add comparison convenience functions to the type.  Requires that the type has
  * a compare method.
