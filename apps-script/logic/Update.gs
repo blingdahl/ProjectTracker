@@ -44,7 +44,7 @@ Update.init = function() {
       var row = rows[i];
       row.setDataValidation(TrackingSheet.COLUMNS.PRIORITY, TrackingSheet.PRIORITIES);
       row.setDataValidation(TrackingSheet.COLUMNS.STATUS, TrackingSheet.STATUSES);
-      if (!row.getValue(TrackingSheet.COLUMNS.ITEM)) {
+      if (!row.getValue(TrackingSheet.COLUMNS.ITEM) && !row.getFormula(TrackingSheet.COLUMNS.LINK)) {
         row.removeDataValidation(TrackingSheet.COLUMNS.ACTION);
         continue;
       }
