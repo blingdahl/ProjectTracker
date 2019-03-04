@@ -308,6 +308,16 @@ Spreadsheet.init = function() {
     });
   };
   
+  Spreadsheet.Columns.prototype.someColumn = function(callback) {
+    for (var i = 0; i < this.columnDefinitions.columnDefinitionsInOrder.length; i++) {
+      var val = callback(this.columnDefinitions.columnDefinitionsInOrder[i]);
+      if (val) {
+        return val;
+      }
+    }
+    return null;
+  };
+  
   Spreadsheet.Columns.prototype.refreshHeaders = function() {
     Log.info('refreshHeaders');
     this.sheet.markDirty();
@@ -459,6 +469,12 @@ Spreadsheet.init = function() {
   
   Spreadsheet.Row.prototype.getLinkUrl = function(columnHeader) {
     return Spreadsheet.getUrlFromHyperlinkFormula(this.getFormula(columnHeader));
+  };
+  
+  Spreadsheet.Row.prototype.isEmpty = function() {
+    return !this.columns.someColumn(function(columnHeader) {
+      return this.getValue(columnHeader) || this.getFormula(columnHeader);
+    }.bind(this));
   };
   
   Spreadsheet.Row.prototype.getRowNumber = function() {
