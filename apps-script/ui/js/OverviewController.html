@@ -189,23 +189,43 @@ class OverviewController {
     return a.attr('data-priority').compare(b.attr(attrName))
   }
   
-  static compareAttributeOrderedFn(attrName, values) {
-    return function(a, b) {
-      let aAttr = $(a).attr(attrName) || null;
-      let bAttr = $(b).attr(attrName) || null;
-      for (let i = 0; i != values.length; i++) {
-        let value = values[i];
-        if (value === aAttr || value === bAttr) {
-          if (value === aAttr && value === bAttr) {
-            return compare.EQUAL;
-          } else if (value === aAttr) {
-            return compare.A_FIRST;
-          } else {
-            return compare.B_FIRST;
-          }
+  static compareOrdered(a, b, values) {
+    a = Common.toArray(a);
+    b = Common.toArray(b);
+    for (let i = 0; i != values.length; i++) {
+      let value = values[i];
+      let aMatches = a.some(aVal => aVal == value);
+      let bMatches = b.some(bVal => bVal == value);
+      if (aMatches || bMatches) {
+        if (aMatches && bMatches) {
+          return compare.EQUAL;
+        } else if (aMatches) {
+          return compare.A_FIRST;
+        } else {
+          return compare.B_FIRST;
         }
       }
-      return compare.EQUAL;
+    }
+    return compare.EQUAL;
+  }
+  
+  static getAttr(jq, attr) {
+    if (typeof attr === 'function') {
+      return attr(jq);
+    }
+    return jq.attr(attr);
+  }
+  
+  static compareAttributeOrderedFn(attrName, values) {
+    return function(a, b) {
+      attrName = Common.toArray(attrName);
+      let aAttr = [];
+      let bAttr = [];
+      for (let i = 0; i != attrName.length; i++) {
+        aAttr.push(OverviewController.getAttr($(a), attrName[i]));
+        bAttr.push(OverviewController.getAttr($(b), attrName[i]));
+      }
+      return OverviewController.compareOrdered(aAttr, bAttr, values);
     };
   }
   
@@ -227,8 +247,7 @@ class OverviewController {
   
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.compareAttributeOrderedFn('data-due-category', ['past', 'today', null, 'future']),
-                       OverviewController.compareAttributeOrderedFn('data-next-action-category', ['past', 'today', null, 'future']),
+      compare.fn.chain(OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', null, 'future']),
                        OverviewController.compareAttributeLexicallyFn('data-next-action-date'),
                        OverviewController.compareAttributeLexicallyFn('data-priority'),
                        OverviewController.compareAttributeLexicallyFn('data-status-index'),
