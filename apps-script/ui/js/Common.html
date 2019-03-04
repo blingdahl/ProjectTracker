@@ -29,4 +29,11 @@ class Common {
     }
     return s;
   }
+  
+  static toArray(val) {
+    if (Common.typeOf(attrName) == 'array') {
+      return val;
+    }
+    return [val];
+  }
 }
