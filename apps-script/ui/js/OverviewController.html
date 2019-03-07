@@ -99,11 +99,16 @@ class OverviewController {
   
   static getDateCategory(dateStr) {
     let currDateStr = OverviewController.currDateStr();
+    let nextDateStr = OverviewController.nextDateStr();
     if (dateStr === '') {
       return null;
     }
     if (dateStr > currDateStr) {
-      return 'future';
+      if (dateStr == nextDateStr) {
+        return 'tomorrow';
+      } else {
+        return 'future';
+      }
     } else if (dateStr == currDateStr) {
       return 'today';
     } else {
@@ -245,9 +250,17 @@ class OverviewController {
     return OverviewController.CURR_DATE_STR;
   }
   
+  static nextDateStr() {
+    if (!OverviewController.NEXT_DATE_STR) {
+      OverviewController.NEXT_DATE_STR = Common.getNextDateStr();
+      console.log(OverviewController.NEXT_DATE_STR);
+    }
+    return OverviewController.NEXT_DATE_STR;
+  }
+  
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', null, 'future']),
+      compare.fn.chain(OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', 'tomorrow', null, 'future']),
                        OverviewController.compareAttributeLexicallyFn('data-next-action-date'),
                        OverviewController.compareAttributeLexicallyFn('data-priority'),
                        OverviewController.compareAttributeLexicallyFn('data-status-index'),
