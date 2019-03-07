@@ -74,6 +74,12 @@ GmailLabel.init = function() {
 
   GmailLabel.NO_TRACK = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('No-Track', true);
   
+  GmailLabel.START_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Start Today', true);
+  GmailLabel.START_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Start Tomorrow', true);
+  GmailLabel.DUE_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Due Today', true);
+  GmailLabel.DUE_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Due Tomorrow', true);
+  
+  
   GmailLabel.searchTerm = function(labelName) {
     return 'label:' + labelName.replace(' ', '-');
   };

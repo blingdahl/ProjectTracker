@@ -95,3 +95,23 @@ function indexMultimap(arr, fn) {
   }
   return ret;
 }
+
+function toDateStr(d) {
+  var monthStr = String(d.getMonth() + 1);
+  if (monthStr.length === 1) {
+    monthStr = '0' + monthStr;
+  }
+  var dayStr = String(d.getDate());
+  if (dayStr.length === 1) {
+    dayStr = '0' + dayStr;
+  }
+  return d.getYear() + '/' + monthStr + '/' + dayStr;
+}
+
+function getCurrDateStr() {
+  return toDateStr(new Date());
+}
+
+function getNextDateStr() {
+  return toDateStr(new Date());
+}

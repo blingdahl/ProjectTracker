@@ -65,8 +65,27 @@ GmailSync.init = function() {
     }
   }
   
+  GmailSync.copyDueDateFromLabel = function(thread, row) {
+    if (GmailLabel.removeLabel(thread, GmailLabel.DUE_TODAY)) {
+      row.setValue(TrackingSheet.COLUMNS.DUE_DATE, getCurrDateStr());
+    } else if (GmailLabel.removeLabel(thread, GmailLabel.DUE_TOMORROW)) {
+      row.setValue(TrackingSheet.COLUMNS.DUE_DATE, getNextDateStr());
+    }
+  }
+  
+  GmailSync.copyNextActionDateFromLabel = function(thread, row) {
+    if (GmailLabel.removeLabel(thread, GmailLabel.START_TODAY)) {
+      row.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE, getCurrDateStr());
+      row.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE_UPDATED, getCurrDateStr());
+    } else if (GmailLabel.removeLabel(thread, GmailLabel.START_TOMORROW)) {
+      row.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE, getNextDateStr());
+      row.setValue(TrackingSheet.COLUMNS.NEXT_ACTION_DATE_UPDATED, getCurrDateStr());
+    }
+  }
+  
   GmailSync.copyPriorityToLabel = function(thread, priority) {
-    GmailLabel.setActiveLabel(thread, GmailLabel.PRIORITY_LABEL_MAP[priority], GmailLabel.PRIORITY_LABELS);
+    GmailLabel.setActiveLabel(thread, GmailLabel.PRIORITY_LABEL_MAP[priority],
+        GmailLabel.PRIORITY_LABELS);
   }
   
   GmailSync.getOtherLabelNames = function(labelName) {
@@ -105,6 +124,8 @@ GmailSync.init = function() {
       GmailSync.copyPriorityFromLabel(thread, row);
       GmailSync.copyStatusFromLabel(thread, row);
       GmailSync.copyPriorityToLabel(thread, row.getValue(TrackingSheet.COLUMNS.PRIORITY));
+      GmailSync.copyDueDateFromLabel(thread, row);
+      GmailSync.copyNextActionDateFromLabel(thread, row);
       row.setDataValidation(TrackingSheet.COLUMNS.ACTION, ActionHandler.getGmailActions(otherLabelNames, thread));
       row.setValue(TrackingSheet.COLUMNS.SUBJECT, thread.getFirstMessageSubject() || '(No Subject)');
       if (!row.getFormula(TrackingSheet.COLUMNS.LINK)) {
