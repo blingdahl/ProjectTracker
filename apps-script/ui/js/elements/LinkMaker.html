@@ -1,8 +1,9 @@
 class LinkMaker {
-  constructor(cssClass, textCallback, urlCallback, opt_emptyCallback) {
+  constructor(cssClass, textCallback, urlCallback, styleOnClick, opt_emptyCallback) {
     this.cssClass = cssClass;
     this.textCallback = textCallback;
     this.urlCallback = urlCallback;
+    this.styleOnClick = styleOnClick;
     this.opt_emptyCallback = opt_emptyCallback;
   }
   
@@ -19,10 +20,14 @@ class LinkMaker {
       }
       return null;
     }
-    return $('<a />').
+    let a = $('<a />').
         attr('href', url).
         addClass(this.cssClass).
         attr('target', '_blank').
-        text(this.textCallback(data));
+        text(this.textCallback(data));;
+    if (this.styleOnClick) {
+      a.click(() => a.addClass('clicked'));
+    }
+    return a;
   }
 }

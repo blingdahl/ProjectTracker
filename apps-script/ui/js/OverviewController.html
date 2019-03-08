@@ -8,9 +8,9 @@ class OverviewController {
     this.elementMakers['STATUS'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'statusLink', OverviewController.NO_STATUS_TEXT, rowData => rowData['STATUS'], rowData => rowData['STATUS'], this.handleStatusChange.bind(this), new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
     this.elementMakers['ITEM'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'itemLink', 'Unknown item', rowData => rowData['ITEM'], rowData => rowData['ITEM'], this.handleItemChange.bind(this), new TextInputMaker());
     this.elementMakers['SHEET'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'changeSheetLink', 'Unknown Sheet', rowData => rowData['SHEET'], rowData => rowData['SHEET_ID'], this.handleSheetChange.bind(this), new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
-    this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL']);
-    this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL']);
-    this.elementMakers['LINK'] = new EditableLinkMaker(OverviewController.getSheetId, OverviewController.getUuid, 'editLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], this.handleLinkChange.bind(this));
+    this.elementMakers['VIEW_SHEET'] = new LinkMaker('viewSheetLink', () => 'View', rowData => rowData['SHEET_URL'], true);
+    this.elementMakers['EMAIL'] = new LinkMaker('emailLink', () => 'Email', rowData => rowData['EMAIL_URL'], true);
+    this.elementMakers['LINK'] = new EditableLinkMaker(OverviewController.getSheetId, OverviewController.getUuid, 'editLink', rowData => rowData['LINK'], rowData => rowData['LINK_URL'], this.handleLinkChange.bind(this), true);
     this.elementMakers['EMAIL_LAST_DATE'] = new TextMaker('', rowData => rowData['EMAIL_LAST_DATE_FORMATTED']);
     this.elementMakers['FROM'] = new TextMaker('', rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] = new EditableTextMaker(OverviewController.getSheetId, OverviewController.getUuid, 'nextActionDate', $('<img src="https://img.icons8.com/material/24/000000/edit.png">').addClass('editPencil'), rowData => rowData['NEXT_ACTION_DATE'], rowData => rowData['NEXT_ACTION_DATE'], this.handleNextActionDateChange.bind(this), new DateInputMaker());
