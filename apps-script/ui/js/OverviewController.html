@@ -198,6 +198,19 @@ class OverviewController {
     return ret;
   }
   
+  static needsAttention(a, b) {
+    let aNeedsAttention = OverviewController.isAttr(a, 'data-next-action-date-outdated');
+    let bNeedsAttention = OverviewController.isAttr(b, 'data-next-action-date-outdated');
+    if (aNeedsAttention != bNeedsAttention) {
+      if (aNeedsAttention) {
+        return compare.A_FIRST;
+      } else {
+        return compare.B_FIRST;
+      }
+    }
+    return compare.EQUAL;
+  }
+  
   static compareAttribute(a, b, attrName) {
     return a.attr('data-priority').compare(b.attr(attrName))
   }
@@ -226,7 +239,11 @@ class OverviewController {
     if (typeof attr === 'function') {
       return attr(jq);
     }
-    return jq.attr(attr);
+    return $(jq).attr(attr);
+  }
+  
+  static isAttr(jq, attr) {
+    return OverviewController.getAttr(jq, attr) == 'true';
   }
   
   static compareAttributeOrderedFn(attrName, values) {
@@ -268,7 +285,8 @@ class OverviewController {
   
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', 'tomorrow', null, 'future']),
+      compare.fn.chain(OverviewController.needsAttention,
+                       OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', 'tomorrow', null, 'future']),
                        OverviewController.compareAttributeLexicallyFn('data-next-action-date'),
                        OverviewController.compareAttributeLexicallyFn('data-priority'),
                        OverviewController.compareAttributeLexicallyFn('data-status-index'),
