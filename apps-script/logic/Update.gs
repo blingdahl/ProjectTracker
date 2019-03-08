@@ -8,7 +8,6 @@ Update.init = function() {
   
   Preferences.init();
   TrackingSheet.init();
-  TaskSync.init();
   GmailSync.init();
   ActionHandler.init();
   StatusHandler.init();
@@ -28,8 +27,6 @@ Update.init = function() {
   Update.update = function(sheetId) {
     var trackingSheet = TrackingSheet.forSheetId(sheetId);
     Update.clearScriptNotes(trackingSheet);
-    var taskSync = TaskSync.forTrackingSheet(trackingSheet);
-    taskSync.copyCompleted();
     trackingSheet.setNumBlankRows(Update.EXTRA_ROWS);
     var syncResult = GmailSync.syncFromGmail(trackingSheet);
     var threadsById = {};
@@ -93,7 +90,6 @@ Update.init = function() {
         sortBy(TrackingSheet.COLUMNS.INBOX, false).
         sortBy(TrackingSheet.COLUMNS.STATUS, true).
         sortBy(TrackingSheet.COLUMNS.PRIORITY);
-    taskSync.syncToTasks(trackingSheet);
     var response = '';
     var parentheticalMessages = [];
     for (var i = 0; i < TrackingSheet.PRIORITIES.length; i++) {
