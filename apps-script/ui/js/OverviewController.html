@@ -80,7 +80,7 @@ class OverviewController {
     headerCells.each((idx, elt) => {
       let headerCell = $(elt);
       if (headerCell.is(':visible')) {
-        ret.push(headerCell.attr('data-key'));
+        ret.push(headerCell.attr(OverviewController.ATTR.KEY));
       }
     });
     return ret;
@@ -91,11 +91,11 @@ class OverviewController {
   }
   
   static getSheetId(link) {
-    return $(link).closest('tr[data-sheet-id]').attr('data-sheet-id');
+    return $(link).closest('tr[data-sheet-id]').attr(OverviewController.ATTR.SHEET_ID);
   }
 
   static getUuid(link) {
-    return $(link).closest('tr[data-uuid]').attr('data-uuid');
+    return $(link).closest('tr[data-uuid]').attr(OverviewController.ATTR.UUID);
   }
 
   static toRichGmailLink(threadId) {
@@ -125,43 +125,44 @@ class OverviewController {
   }
   
   updateNextActionDate(tr, newNextActionDate) {
-    tr.attr('data-next-action-date', newNextActionDate);
-    tr.attr('data-next-action-category',
+    tr.attr(OverviewController.ATTR.NEXT_ACTION_DATE, newNextActionDate);
+    tr.attr(OverviewController.ATTR.NEXT_ACTION_CATEGORY,
             OverviewController.getDateCategory(newNextActionDate));
   }
   
   updateDueDate(tr, newDueDate) {
-    tr.attr('data-due-date', newDueDate);
-    tr.attr('data-due-category', OverviewController.getDateCategory(newDueDate));
+    tr.attr(OverviewController.ATTR.DUE_DATE, newDueDate);
+    tr.attr(OverviewController.ATTR.DUE_CATEGORY, OverviewController.getDateCategory(newDueDate));
   }
   
   updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
-    tr.attr('data-next-action-updated-date', newNextActionUpdatedDate);
+    tr.attr(OverviewController.ATTR.NEXT_ACTION_UPDATED, newNextActionUpdatedDate);
     tr.find('[data-key="NEXT_ACTION_DATE_UPDATED"]').text(newNextActionUpdatedDate);
   }
   
   handleStatusChange(sheetId, uuid, newStatus) {
     let tr = this.getDataRowElement(sheetId, uuid);
-    tr.attr('data-status', newStatus);
-    tr.attr('data-status-index', String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
+    tr.attr(OverviewController.ATTR.STATUS, newStatus);
+    tr.attr(OverviewController.ATTR.STATUS_INDEX, String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
     SheetController.forSheet(sheetId).setValue(uuid, 'STATUS', newStatus);
   }
   
   handlePriorityChange(sheetId, uuid, newPriority) {
     let tr = this.getDataRowElement(sheetId, uuid);
-    tr.attr('data-priority', newPriority);
+    tr.attr(OverviewController.ATTR.PRIORITY, newPriority);
     SheetController.forSheet(sheetId).setValue(uuid, 'PRIORITY', newPriority);
   }
   
   handleItemChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
-    tr.attr('data-item', newValue);
+    tr.attr(OverviewController.ATTR.ITEM, newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'ITEM', newValue);
   }
   
   handleDueDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateDueDate(tr, newValue);
+    OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValue(uuid, 'DUE_DATE', newValue);
   }
   
@@ -170,7 +171,7 @@ class OverviewController {
     this.updateNextActionDate(tr, newValue);
     let dateUpdated =  Common.getCurrDateStr();
     this.updateNextActionUpdatedDate(tr, dateUpdated);
-    tr.attr('data-next-action-date-outdated', 'false');
+    OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValues(uuid, {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
   }
   
@@ -179,7 +180,7 @@ class OverviewController {
       return;
     }
     let tr = this.getDataRowElement(sheetId, uuid);
-    tr.attr('data-sheet-id', newSheetId);
+    tr.attr(OverviewController.ATTR.SHEET_ID, newSheetId);
     SheetController.forSheet(sheetId).changeSheet(uuid, newSheetId);
   }
   
@@ -198,9 +199,11 @@ class OverviewController {
     return ret;
   }
   
-  static needsAttention(a, b) {
-    let aNeedsAttention = OverviewController.isAttr(a, 'data-next-action-date-outdated');
-    let bNeedsAttention = OverviewController.isAttr(b, 'data-next-action-date-outdated');
+  static compareNeedsAttention(a, b) {
+    let aNeedsAttention = OverviewController.isAttr(a,
+        OverviewController.ATTR.NEEDS_ATTENTION);
+    let bNeedsAttention = OverviewController.isAttr(b,
+        OverviewController.ATTR.NEEDS_ATTENTION);
     if (aNeedsAttention != bNeedsAttention) {
       if (aNeedsAttention) {
         return compare.A_FIRST;
@@ -209,10 +212,6 @@ class OverviewController {
       }
     }
     return compare.EQUAL;
-  }
-  
-  static compareAttribute(a, b, attrName) {
-    return a.attr('data-priority').compare(b.attr(attrName))
   }
   
   static compareOrdered(a, b, values) {
@@ -285,7 +284,7 @@ class OverviewController {
   
   sortRows() {
     this.getDataRowElements().sort(
-      compare.fn.chain(OverviewController.needsAttention,
+      compare.fn.chain(OverviewController.compareNeedsAttention,
                        OverviewController.compareAttributeOrderedFn(['data-due-category', 'data-next-action-category'], ['past', 'today', 'tomorrow', null, 'future']),
                        OverviewController.compareAttributeLexicallyFn('data-next-action-date'),
                        OverviewController.compareAttributeLexicallyFn('data-priority'),
@@ -296,7 +295,7 @@ class OverviewController {
   }
   
   fillText(cellJq, rowData) {
-    let key = cellJq.attr('data-key');
+    let key = cellJq.attr(OverviewController.ATTR.KEY);
     let elementMaker = this.elementMakers[key];
     if (!elementMaker) {
       console.log('No element maker for ' + key);
@@ -308,6 +307,22 @@ class OverviewController {
     }
   }
   
+  static updateNeedsAttention(rowJq) {
+    let emailLastDateFormatted =
+        rowJq.attr(OverviewController.ATTR.EMAIL_LAST_DATE_FORMATTED);
+    let nextActionUpdated =
+        rowJq.attr(OverviewController.ATTR.NEXT_ACTION_UPDATED);
+    let nextActionDate = rowJq.attr(OverviewController.ATTR.NEXT_ACTION_DATE);
+    let dueDate = rowJq.attr(OverviewController.ATTR.DUE_DATE);
+    if ((emailLastDateFormatted && nextActionUpdated &&
+        emailLastDateFormatted > nextActionUpdated) || 
+        (nextActionDate && dueDate && nextActionDate > dueDate)) {
+      rowJq.attr(OverviewController.ATTR.NEEDS_ATTENTION, 'true');
+    } else {
+      rowJq.attr(OverviewController.ATTR.NEEDS_ATTENTION, null);
+    }
+  }
+  
   addRow(rowData) {
     this.getTbodyElement().find('[data-uuid="' + rowData['UUID'] + '"]').remove();
     
@@ -316,20 +331,21 @@ class OverviewController {
     rowJq.find('td[data-key]').each((index, elt) => this.fillText($(elt), rowData));
     
     let sheetId = rowData['SHEET_ID'];
-    rowJq.attr('data-sheet-id', sheetId);
-    rowJq.attr('data-priority', rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
+    rowJq.attr(OverviewController.ATTR.SHEET_ID, sheetId);
+    rowJq.attr(OverviewController.ATTR.PRIORITY, rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
     let rowStatus = rowData['STATUS'];
-    rowJq.attr('data-status', rowStatus || OverviewController.NO_STATUS_KEY);
-    rowJq.attr('data-status-index', String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
-    rowJq.attr('data-uuid', rowData['UUID']);
+    rowJq.attr(OverviewController.ATTR.STATUS, rowStatus || OverviewController.NO_STATUS_KEY);
+    rowJq.attr(OverviewController.ATTR.STATUS_INDEX,
+        String(GlobalController.statusIndex(rowData['STATUS'])).padStart(2, '0'));
+    rowJq.attr(OverviewController.ATTR.UUID, rowData['UUID']);
+    rowJq.attr(OverviewController.ATTR.EMAIL_LAST_DATE_FORMATTED, rowData['EMAIL_LAST_DATE_FORMATTED']);
+    rowJq.attr(OverviewController.ATTR.NEXT_ACTION_UPDATED, rowData['NEXT_ACTION_DATE_UPDATED']);
     this.updateNextActionDate(rowJq, rowData['NEXT_ACTION_DATE']);
     this.updateDueDate(rowJq, rowData['DUE_DATE']);
     if (rowStatus === 'Obsolete' || rowStatus === 'Completed') {
       SheetController.forSheet(sheetId).markDirty();
     }
-    if (rowData['NEXT_ACTION_DATE_UPDATED'] && rowData['EMAIL_LAST_DATE_FORMATTED'] && rowData['EMAIL_LAST_DATE_FORMATTED'] > rowData['NEXT_ACTION_DATE_UPDATED']) {
-      rowJq.attr('data-next-action-date-outdated', 'true');
-    }
+    OverviewController.updateNeedsAttention(rowJq);
     this.getTbodyElement().append(rowJq);
   }
   
@@ -337,18 +353,18 @@ class OverviewController {
     let filters = this.filterBar.getFilters();
     this.getDataRowElements().each((index, elt) => {
       let rowJq = $(elt);
-      let rowPriority = rowJq.attr('data-priority');
+      let rowPriority = rowJq.attr(OverviewController.ATTR.PRIORITY);
       if (rowPriority === OverviewController.NO_PRIORITY_KEY) {
         rowPriority = '';
       }
-      let rowStatus = rowJq.attr('data-status');
+      let rowStatus = rowJq.attr(OverviewController.ATTR.STATUS);
       if (rowStatus === OverviewController.NO_STATUS_KEY) {
         rowStatus = '';
       }
       let showRow = filters.rowMatches(
           rowPriority,
           rowStatus,
-          rowJq.attr('data-sheet-id'));
+          rowJq.attr(OverviewController.ATTR.SHEET_ID));
       if (showRow) {
         rowJq.show();
       } else {
@@ -357,7 +373,7 @@ class OverviewController {
     });
     this.getHeaderCells().each((index, elt) => {
       let jq = $(elt);
-      let columnKey = jq.attr('data-key');
+      let columnKey = jq.attr(OverviewController.ATTR.KEY);
       if (Filters.FILTER_COLUMNS.includes(columnKey)) {
         if (filters.columnMatches(columnKey)) {
           this.getColumnCells(columnKey).show();
@@ -541,3 +557,18 @@ OverviewController.NO_PRIORITY_KEY = 'PUnknown';
 OverviewController.NO_PRIORITY_TEXT = 'No Priority';
 OverviewController.NO_STATUS_KEY = 'NoStatus';
 OverviewController.NO_STATUS_TEXT = 'No Status';
+
+OverviewController.ATTR = {'KEY': 'data-key',
+                           'SHEET_ID': 'data-sheet-id',
+                           'UUID': 'data-uuid',
+                           'NEXT_ACTION_DATE': 'data-next-action-date',
+                           'NEXT_ACTION_CATEGORY': 'data-next-action-category',
+                           'NEXT_ACTION_UPDATED': 'data-next-action-updated',
+                           'EMAIL_LAST_DATE_FORMATTED': 'data-email-last-date-formatted',
+                           'DUE_DATE': 'data-due-date',
+                           'DUE_CATEGORY': 'data-due-category',
+                           'STATUS': 'data-status',
+                           'STATUS_INDEX': 'data-status-index',
+                           'PRIORITY': 'data-priority',
+                           'ITEM': 'data-item',
+                           'NEEDS_ATTENTION': 'data-needs-attention'};
