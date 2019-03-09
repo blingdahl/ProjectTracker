@@ -29,6 +29,7 @@ AddItem.init = function() {
     if (dueDate) {
       newRow.setValue(TrackingSheet.COLUMNS.DUE_DATE, dueDate);
     }
+    newRow.setValue(TrackingSheet.COLUMNS.UUID, Utilities.getUuid());
     return 'Added "' + title + '" to ' + trackingSheet.getSheetName() + ' sheet';
   }
 }
