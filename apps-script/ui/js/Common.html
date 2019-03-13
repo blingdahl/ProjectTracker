@@ -45,4 +45,11 @@ class Common {
     }
     return [val];
   }
+  
+  static ensureProtocol(href) {
+    if (href.startsWith('http://') || href.startsWith('https://')) {
+      return href;
+    }
+    return 'http://' + href;
+  }
 }

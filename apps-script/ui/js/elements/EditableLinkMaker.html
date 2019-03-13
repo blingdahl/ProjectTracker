@@ -21,7 +21,7 @@ class EditableLinkMaker {
   
   updateLink(linkJq, href, text) {
     if (href) {
-      return linkJq.attr('href', href).attr('title', text).attr('target', '_blank').text(text).show();
+      return linkJq.attr('href', Common.ensureProtocol(href)).attr('title', text).attr('target', '_blank').text(text).show();
     } else {
       linkJq.hide();
     }
@@ -32,7 +32,7 @@ class EditableLinkMaker {
       dataJq.attr('data-href', href).attr('data-text', text)
       let linkJq = dataJq.find('a');
       if (href) {
-        linkJq.attr('href', href).attr('title', text).attr('target', '_blank').text(text).show();
+        this.updateLink(linkJq, href, text);
       } else {
         linkJq.hide();
       }
@@ -45,8 +45,7 @@ class EditableLinkMaker {
     let href = this.hrefCallback(data);
     let linkJq = $('<a />');
     if (href) {
-      // TODO(lindahl) Collapse
-      linkJq.attr('href', href).text(text).attr('title', text).attr('target', '_blank');
+      this.updateLink(linkJq, href, text);
     } else {
       linkJq.hide();
     }

@@ -21,7 +21,7 @@ class LinkMaker {
       return null;
     }
     let a = $('<a />').
-        attr('href', url).
+        attr('href', Common.ensureProtocol(url)).
         addClass(this.cssClass).
         attr('target', '_blank').
         text(this.textCallback(data));;
