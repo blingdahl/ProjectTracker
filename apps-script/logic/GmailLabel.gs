@@ -18,11 +18,11 @@ GmailLabel.init = function() {
     return label;
   }
   
-  GmailLabel.MAKE_P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P0', true);
-  GmailLabel.MAKE_P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P1', true);
-  GmailLabel.MAKE_P2 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P2', true);
-  GmailLabel.MAKE_P3 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P3', true);
-  GmailLabel.MAKE_P4 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Make P4', true);
+  GmailLabel.MAKE_P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Make P0', true);
+  GmailLabel.MAKE_P1 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Make P1', true);
+  GmailLabel.MAKE_P2 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Make P2', true);
+  GmailLabel.MAKE_P3 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Make P3', true);
+  GmailLabel.MAKE_P4 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Make P4', true);
   GmailLabel.MAKE_PRIORITY_LABEL_MAP = {'P0': GmailLabel.MAKE_P0, 'P1': GmailLabel.MAKE_P1, 'P2': GmailLabel.MAKE_P2, 'P3': GmailLabel.MAKE_P3, 'P4': GmailLabel.MAKE_P4};
 
   GmailLabel.P0 =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('P0', true);
@@ -55,13 +55,13 @@ GmailLabel.init = function() {
                                  'Waiting': GmailLabel.WAITING,
                                  'Backburner': GmailLabel.BACKBURNER};
   
-  GmailLabel.MARK_COMPLETED =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark Completed', true);
-  GmailLabel.MARK_OBSOLETE =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark Obsolete', true);
-  GmailLabel.MARK_IN_PROGRESS =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark In Progress', true);
-  GmailLabel.MARK_ON_DECK =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark On Deck', true);
-  GmailLabel.MARK_FOLLOWING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark Following', true);
-  GmailLabel.MARK_WAITING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark Waiting', true);
-  GmailLabel.MARK_BACKBURNER =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Mark Backburner', true);
+  GmailLabel.MARK_COMPLETED =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark Completed', true);
+  GmailLabel.MARK_OBSOLETE =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark Obsolete', true);
+  GmailLabel.MARK_IN_PROGRESS =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark In Progress', true);
+  GmailLabel.MARK_ON_DECK =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark On Deck', true);
+  GmailLabel.MARK_FOLLOWING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark Following', true);
+  GmailLabel.MARK_WAITING =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark Waiting', true);
+  GmailLabel.MARK_BACKBURNER =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Mark Backburner', true);
   GmailLabel.REMOVE_STATUS =  /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Remove Status', true);
   GmailLabel.MARK_STATUS_LABEL_MAP = {'Completed': GmailLabel.MARK_COMPLETED,
                                       'Obsolete': GmailLabel.MARK_OBSOLETE,
@@ -74,10 +74,10 @@ GmailLabel.init = function() {
 
   GmailLabel.NO_TRACK = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('No-Track', true);
   
-  GmailLabel.START_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Start Today', true);
-  GmailLabel.START_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Start Tomorrow', true);
-  GmailLabel.DUE_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Due Today', true);
-  GmailLabel.DUE_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!Due Tomorrow', true);
+  GmailLabel.START_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Start Today', true);
+  GmailLabel.START_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!!Start Tomorrow', true);
+  GmailLabel.DUE_TODAY = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Due Today', true);
+  GmailLabel.DUE_TOMORROW = /* GmailApp.getUserLabelByName */ GmailLabel.getUserDefined('!!Due Tomorrow', true);
   
   
   GmailLabel.searchTerm = function(labelName) {
