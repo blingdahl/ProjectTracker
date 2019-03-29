@@ -115,3 +115,22 @@ function getCurrDateStr() {
 function getNextDateStr() {
   return toDateStr(new Date());
 }
+
+function restOfText(prefix, text) {
+  if (text.startsWith(prefix)) {
+    return text.substring(prefix.length);
+  }
+  return null;
+}
+
+function restOfPath(prefix, text) {
+  var rest = restOfText(prefix, text);
+  if (rest) {
+    var queryIndex = rest.indexOf('?');
+    if (queryIndex == -1) {
+      return rest;
+    }
+    return rest.substring(0, queryIndex);
+  }
+  return null;
+}

@@ -59,7 +59,11 @@ GmailExtractor.init = function() {
     for (var i = 0; i < prefixes.length; i++) {
       var prefix = prefixes[i];
       if (s.startsWith(prefix)) {
-        return this.prefixMap[prefix];
+        var text = this.prefixMap[prefix];
+        if (typeOf(text) === 'function') {
+          return text(s);
+        }
+        return text;
       }
     }
   }
@@ -101,6 +105,9 @@ GmailExtractor.init = function() {
   
   GmailLinkExtractor.UrlStrategy = function() {
     this.urlPrefixMatcher = new GmailLinkExtractor.UrlPrefixMatcher().
+        add('https://ariane.googleplex.com/', function(text) {
+          return 'ariane/' + restOfPath('https://ariane.googleplex.com/launch/', text);
+        }).
         add('http://track.spe.schoolmessenger.com/', 'School Messenger').
         add('https://www.fablevisionlearning.com/', 'FableVision').
         add('https://photos.app.goo.gl/', 'Photos').
@@ -184,6 +191,7 @@ GmailExtractor.init = function() {
   }
   
   GmailLinkExtractor.COMBINED_STRATEGY = new GmailLinkExtractor.CombinedStrategy([
+    new GmailLinkExtractor.ShortLinkStrategy('ariane'),
     new GmailLinkExtractor.BugStrategy(),
     new GmailLinkExtractor.UrlStrategy(),
     new GmailLinkExtractor.ShortLinkStrategy('go'),
