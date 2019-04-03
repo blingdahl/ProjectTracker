@@ -12,9 +12,28 @@ class DateStrings {
     return (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
   }
 
+  static todayDate() {
+    if (!DateStrings.TODAY_DATE) {
+      DateStrings.TODAY_DATE = new Date();
+    }
+    return new Date(DateStrings.TODAY_DATE);
+  }
+
+  static yesterday(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      let d = DateStrings.todayDate();
+      d.setDate(d.getDate() - 1);
+      return DateStrings.toDateStr(d);
+    }
+    if (!DateStrings.YESTERDAY) {
+      DateStrings.YESTERDAY = DateStrings.yeterday(true);
+    }
+    return DateStrings.YESTERDAY;
+  }
+
   static today(opt_ignoreCache) {
     if (opt_ignoreCache) {
-      return DateStrings.toDateStr(new Date());
+      return DateStrings.toDateStr(DateStrings.todayDate());
     }
     if (!DateStrings.TODAY) {
       DateStrings.TODAY = DateStrings.today(true);
@@ -24,7 +43,7 @@ class DateStrings {
 
   static tomorrow(opt_ignoreCache) {
     if (opt_ignoreCache) {
-      let d = new Date();
+      let d = DateStrings.todayDate();
       d.setDate(d.getDate() + 1);
       return DateStrings.toDateStr(d);
     }
@@ -47,7 +66,7 @@ class DateStrings {
   static thisWeekend(opt_ignoreCache) {
     if (opt_ignoreCache) {
       return DateStrings.toDateStr(
-          DateStrings.nextDateForDay(new Date(), DateStrings.SATURDAY));
+          DateStrings.nextDateForDay(DateStrings.todayDate(), DateStrings.SATURDAY));
     }
     if (!DateStrings.THIS_WEEKEND) {
       DateStrings.THIS_WEEKEND = DateStrings.thisWeekend(true);
@@ -58,7 +77,7 @@ class DateStrings {
   static nextWeek(opt_ignoreCache) {
     if (opt_ignoreCache) {
       return DateStrings.toDateStr(
-          DateStrings.nextDateForDay(new Date(), DateStrings.MONDAY));
+          DateStrings.nextDateForDay(DateStrings.todayDate(), DateStrings.MONDAY));
     }
     if (!DateStrings.NEXT_WEEK) {
       DateStrings.NEXT_WEEK = DateStrings.nextWeek(true);
@@ -68,7 +87,7 @@ class DateStrings {
 
   static nextMonth(opt_ignoreCache) {
     if (opt_ignoreCache) {
-      let d = new Date();
+      let d = DateStrings.todayDate();
       for (let i = 0; i != 31; i++) {
         d.setDate(d.getDate() + 1);
         if (d.getDate() === 1) {
@@ -84,6 +103,9 @@ class DateStrings {
   }
 
   static stringFor(dateStr) {
+    if (dateStr == DateStrings.yesterday()) {
+      return 'Yesterday';
+    }
     if (dateStr == DateStrings.today()) {
       return 'Today';
     }
