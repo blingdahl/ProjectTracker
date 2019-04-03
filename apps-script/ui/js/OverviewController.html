@@ -300,7 +300,8 @@ class OverviewController {
   static getDateOptions() {
     return [
         {'text': 'Today', 'value': DateStrings.today()},
-        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()}];
+        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()},
+        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()}];
   }
 
   static compareNeedsAttention(a, b) {

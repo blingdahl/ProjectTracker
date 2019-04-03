@@ -1,7 +1,20 @@
 class DateStrings {
+
+  static toDateStr(d) {
+    let monthStr = String(d.getMonth() + 1);
+    if (monthStr.length === 1) {
+      monthStr = '0' + monthStr;
+    }
+    let dayStr = String(d.getDate());
+    if (dayStr.length === 1) {
+      dayStr = '0' + dayStr;
+    }
+    return (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
+  }
+
   static today(opt_ignoreCache) {
     if (opt_ignoreCache) {
-      return Common.toDateStr(new Date());
+      return DateStrings.toDateStr(new Date());
     }
     if (!DateStrings.TODAY) {
       DateStrings.TODAY = DateStrings.today(true);
@@ -13,12 +26,33 @@ class DateStrings {
     if (opt_ignoreCache) {
       let d = new Date();
       d.setDate(d.getDate() + 1);
-      return Common.toDateStr(d);
+      return DateStrings.toDateStr(d);
     }
     if (!DateStrings.TOMORROW) {
       DateStrings.TOMORROW = DateStrings.tomorrow(true);
     }
     return DateStrings.TOMORROW;
+  }
+
+  static nextDateForDay(d, dayOfWeek) {
+    for (let i = 0; i != 7; i++) {
+      d.setDate(d.getDate() + 1);
+      if (d.getDay() === dayOfWeek) {
+        return d;
+      }
+    }
+    return null;
+  }
+
+  static thisWeekend(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      return DateStrings.toDateStr(
+          DateStrings.nextDateForDay(new Date(), DateStrings.SATURDAY));
+    }
+    if (!DateStrings.THIS_WEEKEND) {
+      DateStrings.THIS_WEEKEND = DateStrings.thisWeekend(true);
+    }
+    return DateStrings.THIS_WEEKEND;
   }
 
   static stringFor(dateStr) {
@@ -28,6 +62,17 @@ class DateStrings {
     if (dateStr == DateStrings.tomorrow()) {
       return 'Tomorrow';
     }
+    if (dateStr == DateStrings.thisWeekend()) {
+      return 'This Weekend';
+    }
     return dateStr;
   }
 }
+
+DateStrings.SUNDAY = 0;
+DateStrings.MONDAY = 1;
+DateStrings.TUESDAY = 2;
+DateStrings.WEDNESDAY = 3;
+DateStrings.THURSDAY = 4;
+DateStrings.FRIDAY = 5;
+DateStrings.SATURDAY = 6;

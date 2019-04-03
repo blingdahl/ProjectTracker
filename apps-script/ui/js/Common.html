@@ -2,19 +2,7 @@ class Common {
   static textFn(emptyText) {
     return text => text || emptyText;
   }
-  
-  static toDateStr(d) {
-    let monthStr = String(d.getMonth() + 1);
-    if (monthStr.length === 1) {
-      monthStr = '0' + monthStr;
-    }
-    let dayStr = String(d.getDate());
-    if (dayStr.length === 1) {
-      dayStr = '0' + dayStr;
-    }
-    return (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
-  }
-  
+
   static typeOf(value) {
     var s = typeof value;
     if (s === 'object') {
@@ -28,14 +16,14 @@ class Common {
     }
     return s;
   }
-  
+
   static toArray(val) {
     if (Common.typeOf(val) == 'array') {
       return val;
     }
     return [val];
   }
-  
+
   static ensureProtocol(href) {
     if (href.startsWith('http://') || href.startsWith('https://')) {
       return href;
