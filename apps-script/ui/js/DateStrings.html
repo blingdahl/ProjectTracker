@@ -55,6 +55,34 @@ class DateStrings {
     return DateStrings.THIS_WEEKEND;
   }
 
+  static nextWeek(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      return DateStrings.toDateStr(
+          DateStrings.nextDateForDay(new Date(), DateStrings.MONDAY));
+    }
+    if (!DateStrings.NEXT_WEEK) {
+      DateStrings.NEXT_WEEK = DateStrings.nextWeek(true);
+    }
+    return DateStrings.NEXT_WEEK;
+  }
+
+  static nextMonth(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      let d = new Date();
+      for (let i = 0; i != 31; i++) {
+        d.setDate(d.getDate() + 1);
+        if (d.getDate() === 1) {
+          return DateStrings.toDateStr(d);
+        }
+      }
+      return null;
+    }
+    if (!DateStrings.NEXT_MONTH) {
+      DateStrings.NEXT_MONTH = DateStrings.nextMonth(true);
+    }
+    return DateStrings.NEXT_MONTH;
+  }
+
   static stringFor(dateStr) {
     if (dateStr == DateStrings.today()) {
       return 'Today';
@@ -64,6 +92,12 @@ class DateStrings {
     }
     if (dateStr == DateStrings.thisWeekend()) {
       return 'This Weekend';
+    }
+    if (dateStr == DateStrings.nextWeek()) {
+      return 'Next Week';
+    }
+    if (dateStr == DateStrings.nextMonth()) {
+      return 'Next Month';
     }
     return dateStr;
   }

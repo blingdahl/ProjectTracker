@@ -301,7 +301,9 @@ class OverviewController {
     return [
         {'text': 'Today', 'value': DateStrings.today()},
         {'text': 'Tomorrow', 'value': DateStrings.tomorrow()},
-        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()}];
+        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()},
+        {'text': 'Next Week', 'value': DateStrings.nextWeek()},
+        {'text': 'Next Month', 'value': DateStrings.nextMonth()}];
   }
 
   static compareNeedsAttention(a, b) {
