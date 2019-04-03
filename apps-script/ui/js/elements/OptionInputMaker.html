@@ -1,25 +1,35 @@
 class OptionInputMaker {
-  constructor(allValues, emptyText, cancelCallback) {
-    this.allValues = allValues;
+  constructor(allValues, emptyText, opt_customInputMaker) {
     this.emptyText = emptyText;
-    this.cancelCallback = cancelCallback;
+    this.allValues = allValues.map(value => {
+      if (typeof value === 'string') {
+        return {'text': value || this.emptyText, 'value': value};
+      }
+      return value;
+    });
+    this.opt_customInputMaker = opt_customInputMaker;
   }
-  
+
+  handleChange(changeCallback, currValue, newValue, newText) {
+    if (newValue != currValue) {
+      changeCallback(newValue, newText);
+    }
+  }
+
+  handleCancel(optionsJq, cancelCallback) {
+     optionsJq.remove();
+     cancelCallback();
+  }
+
   makeElement(currValue, changeCallback, cancelCallback) {
     let optionsJq = $('<div />').addClass('optionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
-      let text;
-      let value = optionValue;
-      if (typeof optionValue === 'string') {
-        text = optionValue || this.emptyText;
-        value = optionValue;
-      } else {
-        text = optionValue.text;
-        value = optionValue.value;
-      }
-      let optionJq = $('<div />').attr('data-value', value).attr('data-text', text).text(text).addClass('option');
-      if (currValue == value) {
+      let optionJq = $('<div />').
+          attr('data-value', optionValue.value).
+          attr('data-text', optionValue.text).
+          text(optionValue.text).addClass('option');
+      if (currValue == optionValue.value) {
         optionJq.addClass('currValue');
       }
       optionsJq.append(optionJq);
@@ -28,17 +38,32 @@ class OptionInputMaker {
         let newValue = jq.attr('data-value');
         let newText = jq.text();
         optionsJq.remove();
-        if (newValue != currValue) {
-          changeCallback(newValue, newText);
-        }
+        this.handleChange(changeCallback, currValue, newValue, newText);
       });
     }
+    if (this.opt_customInputMaker) {
+      let optionJq = $('<div />').
+          text('Custom').
+          addClass('option');
+      optionsJq.append(optionJq);
+      optionJq.click((event) => {
+        let input = this.opt_customInputMaker.makeElement(currValue,
+            (newValue, newText) => {
+              this.handleChange(changeCallback, currValue, newValue, newText);
+            },
+            cancelCallback);
+        optionsJq.parent().append(input);
+        optionsJq.remove();
+      });
+
+    }
     optionsJq.append(new ButtonBar([
-       {text: 'Cancel', callback: () => {
+        {text: 'Cancel',
+         callback: () => {
            optionsJq.remove();
            cancelCallback();
          }
-       }]).makeElement());
+        }]).makeElement());
     return optionsJq;
   }
 }

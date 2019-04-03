@@ -8,7 +8,7 @@ class DateStrings {
     }
     return DateStrings.TODAY;
   }
-  
+
   static tomorrow(opt_ignoreCache) {
     if (opt_ignoreCache) {
       let d = new Date();
@@ -19,5 +19,15 @@ class DateStrings {
       DateStrings.TOMORROW = DateStrings.tomorrow(true);
     }
     return DateStrings.TOMORROW;
+  }
+
+  static stringFor(dateStr) {
+    if (dateStr == DateStrings.today()) {
+      return 'Today';
+    }
+    if (dateStr == DateStrings.tomorrow()) {
+      return 'Tomorrow';
+    }
+    return dateStr;
   }
 }

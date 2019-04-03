@@ -6,50 +6,52 @@ class OverviewController {
     this.elementMakers = {};
     this.elementMakers['PRIORITY'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'priorityLink',
-            OverviewController.NO_PRIORITY_TEXT,
-            rowData => rowData['PRIORITY'],
-            rowData => rowData['PRIORITY'],
-            this.handlePriorityChange.bind(this),
-            new OptionInputMaker(
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'priorityLink',
+            /* emptyTextContent */ OverviewController.NO_PRIORITY_TEXT,
+            /* textCallback */ rowData => rowData['PRIORITY'],
+            /* valueCallback */ rowData => rowData['PRIORITY'],
+            /* changeCallback */ this.handlePriorityChange.bind(this),
+            /* inputMaker */ new OptionInputMaker(
                 GlobalController.PRIORITIES,
                 OverviewController.NO_PRIORITY_TEXT));
     this.elementMakers['STATUS'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'statusLink',
-            OverviewController.NO_STATUS_TEXT,
-            rowData => rowData['STATUS'],
-            rowData => rowData['STATUS'],
-            this.handleStatusChange.bind(this),
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'statusLink',
+            /* emptyTextContent */ OverviewController.NO_STATUS_TEXT,
+            /* textCallback */ rowData => rowData['STATUS'],
+            /* valueCallback */ rowData => rowData['STATUS'],
+            /* changeCallback */ this.handleStatusChange.bind(this),
+            /* inputMaker */
             new OptionInputMaker(
                 GlobalController.STATUSES,
                 OverviewController.NO_STATUS_TEXT));
     this.elementMakers['ITEM'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'itemLink',
-            'Unknown item',
-            rowData => rowData['ITEM'],
-            rowData => rowData['ITEM'],
-            this.handleItemChange.bind(this),
-            new TextInputMaker());
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'itemLink',
+            /* emptyTextContent */ 'Unknown item',
+            /* textCallback */ rowData => rowData['ITEM'],
+            /* valueCallback */ rowData => rowData['ITEM'],
+            /* changeCallback */ this.handleItemChange.bind(this),
+            /* inputMaker */ new TextInputMaker());
     this.elementMakers['SHEET'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'changeSheetLink',
-           'Unknown Sheet',
-           rowData => rowData['SHEET'],
-           rowData => rowData['SHEET_ID'],
-           this.handleSheetChange.bind(this),
-           new OptionInputMaker(
-               OverviewController.getSheetOptions(),
-               'Unknown Sheet'));
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'changeSheetLink',
+            /* emptyTextContent */ 'Unknown Sheet',
+            /* textCallback */ rowData => rowData['SHEET'],
+            /* valueCallback */ rowData => rowData['SHEET_ID'],
+             /* changeCallback */ this.handleSheetChange.bind(this),
+            /* inputMaker */
+            new OptionInputMaker(
+                OverviewController.getSheetOptions(),
+                'Unknown Sheet'));
     this.elementMakers['VIEW_SHEET'] =
         new LinkMaker(
             'viewSheetLink',
@@ -70,12 +72,12 @@ class OverviewController {
             true);
     this.elementMakers['LINK'] =
         new EditableLinkMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'editLink',
-            rowData => rowData['LINK'],
-            rowData => rowData['LINK_URL'],
-            this.handleLinkChange.bind(this),
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'editLink',
+            /* textCallback */ rowData => rowData['LINK'],
+            /* valueCallback */ rowData => rowData['LINK_URL'],
+            /* changeCallback */ this.handleLinkChange.bind(this),
             true);
     this.elementMakers['EMAIL_LAST_DATE'] =
         new TextMaker(
@@ -87,27 +89,32 @@ class OverviewController {
             rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'nextActionDate', OverviewController.PENCIL.clone(),
-            rowData => rowData['NEXT_ACTION_DATE'],
-            rowData => rowData['NEXT_ACTION_DATE'],
-            this.handleNextActionDateChange.bind(this),
-            new DateInputMaker());
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'nextActionDate',
+            /* emptyTextContent */ OverviewController.PENCIL.clone(),
+            /* textCallback */ rowData => DateStrings.stringFor(rowData['NEXT_ACTION_DATE']),
+            /* valueCallback */ rowData => rowData['NEXT_ACTION_DATE'],
+            /* changeCallback */ this.handleNextActionDateChange.bind(this),
+            /* inputMaker */
+            new OptionInputMaker(
+                OverviewController.getDateOptions(),
+                'None',
+                new DateInputMaker()));
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] =
         new TextMaker(
             '',
             rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
     this.elementMakers['DUE_DATE'] =
         new EditableTextMaker(
-            OverviewController.getSheetId,
-            OverviewController.getUuid,
-            'dueDate',
-            OverviewController.PENCIL.clone(),
-            rowData => rowData['DUE_DATE'],
-            rowData => rowData['DUE_DATE'],
-            this.handleDueDateChange.bind(this),
-            new DateInputMaker());
+            /* sheetIdCallback */ OverviewController.getSheetId,
+            /* uuidCallback */ OverviewController.getUuid,
+            /* textCssClass */ 'dueDate',
+            /* emptyTextContent */ OverviewController.PENCIL.clone(),
+            /* textCallback */ rowData => rowData['DUE_DATE'],
+            /* valueCallback */ rowData => rowData['DUE_DATE'],
+            /* changeCallback */ this.handleDueDateChange.bind(this),
+            /* inputMaker */ new DateInputMaker());
   }
 
   // SECTION:
@@ -288,6 +295,12 @@ class OverviewController {
     let ret = [];
     SheetController.getSheetInfos().forEach(sheetInfo => ret.push({text: sheetInfo.sheetName, value: sheetInfo.sheetId}));
     return ret;
+  }
+
+  static getDateOptions() {
+    return [
+        {'text': 'Today', 'value': DateStrings.today()},
+        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()}];
   }
 
   static compareNeedsAttention(a, b) {
