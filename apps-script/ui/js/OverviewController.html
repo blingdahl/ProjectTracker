@@ -13,7 +13,9 @@ class OverviewController {
             rowData => rowData['PRIORITY'],
             rowData => rowData['PRIORITY'],
             this.handlePriorityChange.bind(this),
-            new OptionInputMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT));
+            new OptionInputMaker(
+                GlobalController.PRIORITIES,
+                OverviewController.NO_PRIORITY_TEXT));
     this.elementMakers['STATUS'] =
         new EditableTextMaker(
             OverviewController.getSheetId,
@@ -23,7 +25,9 @@ class OverviewController {
             rowData => rowData['STATUS'],
             rowData => rowData['STATUS'],
             this.handleStatusChange.bind(this),
-            new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
+            new OptionInputMaker(
+                GlobalController.STATUSES,
+                OverviewController.NO_STATUS_TEXT));
     this.elementMakers['ITEM'] =
         new EditableTextMaker(
             OverviewController.getSheetId,
@@ -43,7 +47,9 @@ class OverviewController {
            rowData => rowData['SHEET'],
            rowData => rowData['SHEET_ID'],
            this.handleSheetChange.bind(this),
-           new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
+           new OptionInputMaker(
+               OverviewController.getSheetOptions(),
+               'Unknown Sheet'));
     this.elementMakers['VIEW_SHEET'] =
         new LinkMaker(
             'viewSheetLink',
