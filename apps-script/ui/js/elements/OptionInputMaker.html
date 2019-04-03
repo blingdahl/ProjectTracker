@@ -1,11 +1,12 @@
 class OptionInputMaker {
-  constructor(allValues, emptyText) {
+  constructor(allValues, emptyText, cancelCallback) {
     this.allValues = allValues;
     this.emptyText = emptyText;
+    this.cancelCallback = cancelCallback;
   }
   
   makeElement(currValue, changeCallback, cancelCallback) {
-    let options = $('<div />').addClass('optionPicker');
+    let optionsJq = $('<div />').addClass('optionPicker');
     for (var i = 0; i != this.allValues.length; i++) {
       let optionValue = this.allValues[i];
       let text;
@@ -17,21 +18,27 @@ class OptionInputMaker {
         text = optionValue.text;
         value = optionValue.value;
       }
-      let option = $('<div />').attr('data-value', value).attr('data-text', text).text(text);
+      let optionJq = $('<div />').attr('data-value', value).attr('data-text', text).text(text).addClass('option');
       if (currValue == value) {
-        option.addClass('currValue');
+        optionJq.addClass('currValue');
       }
-      options.append(option);
-      option.click((event) => {
+      optionsJq.append(optionJq);
+      optionJq.click((event) => {
         let jq = $(event.currentTarget);
         let newValue = jq.attr('data-value');
         let newText = jq.text();
-        options.remove();
+        optionsJq.remove();
         if (newValue != currValue) {
           changeCallback(newValue, newText);
         }
       });
     }
-    return options;
+    optionsJq.append(new ButtonBar([
+       {text: 'Cancel', callback: () => {
+           optionsJq.remove();
+           cancelCallback();
+         }
+       }]).makeElement());
+    return optionsJq;
   }
 }

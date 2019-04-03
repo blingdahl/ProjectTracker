@@ -132,7 +132,7 @@
     background: #eeeeee;
   }
   
-  .optionPicker div {
+  .optionPicker .option {
     font-size: 14px;
     text-decoration: underline;
     cursor: pointer;
@@ -152,7 +152,7 @@
     border-top: none;
   }
   
-  .optionPicker div:hover {
+  .optionPicker .option:hover {
     background: #aaaaaa;
   }
   
@@ -240,24 +240,6 @@
     font-size: 10px;
   }
   
-  .multiOptionPicker .buttons {
-    font-size: 12px;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-  }
-  
-  .multiOptionPicker .betweenButtons {
-    display: inline-block;
-    width: 6px;
-  }
-  
-  .multiOptionPicker .button {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  
   .multiOptionPicker .check {
     display: inline-block;
     visibility: hidden;
@@ -339,5 +321,23 @@
   
   .overviewTable tr {
     height: 26px;
+  }
+  
+  .buttons {
+    font-size: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .buttons .betweenButtons {
+    display: inline-block;
+    width: 6px;
+  }
+  
+  .buttons .button {
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

@@ -1,0 +1,17 @@
+class ButtonBar {
+  constructor(buttons) {
+    this.buttons = buttons;
+  }
+  
+  makeElement() {
+    let buttonsJq = $('<div />').addClass('buttons');
+    for (let i = 0; i != this.buttons.length; i++) {
+      if (i != 0) {
+        buttonsJq.append($('<span />').addClass('betweenButtons'));
+      }
+      let button = this.buttons[i];
+      buttonsJq.append($('<span />').text(button.text).addClass('button').onClick(button.callback));
+    }
+    return buttonsJq;
+  }
+}
