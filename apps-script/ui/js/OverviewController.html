@@ -16,39 +16,39 @@ class OverviewController {
             new OptionInputMaker(GlobalController.PRIORITIES, OverviewController.NO_PRIORITY_TEXT));
     this.elementMakers['STATUS'] =
         new EditableTextMaker(
-            OverviewController.getSheetId, 
-            OverviewController.getUuid, 
-            'statusLink', 
-            OverviewController.NO_STATUS_TEXT, 
-            rowData => rowData['STATUS'], 
-            rowData => rowData['STATUS'], 
-            this.handleStatusChange.bind(this), 
+            OverviewController.getSheetId,
+            OverviewController.getUuid,
+            'statusLink',
+            OverviewController.NO_STATUS_TEXT,
+            rowData => rowData['STATUS'],
+            rowData => rowData['STATUS'],
+            this.handleStatusChange.bind(this),
             new OptionInputMaker(GlobalController.STATUSES, OverviewController.NO_STATUS_TEXT));
-    this.elementMakers['ITEM'] = 
+    this.elementMakers['ITEM'] =
         new EditableTextMaker(
-            OverviewController.getSheetId, 
-            OverviewController.getUuid, 
-            'itemLink', 
-            'Unknown item', 
-            rowData => rowData['ITEM'], 
-            rowData => rowData['ITEM'], 
-            this.handleItemChange.bind(this), 
+            OverviewController.getSheetId,
+            OverviewController.getUuid,
+            'itemLink',
+            'Unknown item',
+            rowData => rowData['ITEM'],
+            rowData => rowData['ITEM'],
+            this.handleItemChange.bind(this),
             new TextInputMaker());
-    this.elementMakers['SHEET'] = 
+    this.elementMakers['SHEET'] =
         new EditableTextMaker(
-            OverviewController.getSheetId, 
-            OverviewController.getUuid, 
+            OverviewController.getSheetId,
+            OverviewController.getUuid,
             'changeSheetLink',
-           'Unknown Sheet', 
+           'Unknown Sheet',
            rowData => rowData['SHEET'],
-           rowData => rowData['SHEET_ID'], 
-           this.handleSheetChange.bind(this), 
+           rowData => rowData['SHEET_ID'],
+           this.handleSheetChange.bind(this),
            new OptionInputMaker(OverviewController.getSheetOptions(), 'Unknown Sheet'));
-    this.elementMakers['VIEW_SHEET'] = 
+    this.elementMakers['VIEW_SHEET'] =
         new LinkMaker(
-            'viewSheetLink', 
-            () => 'View', 
-            rowData => rowData['SHEET_URL'], 
+            'viewSheetLink',
+            () => 'View',
+            rowData => rowData['SHEET_URL'],
             true);
     this.elementMakers['EMAIL'] =
         new LinkMaker(
@@ -88,77 +88,77 @@ class OverviewController {
             rowData => rowData['NEXT_ACTION_DATE'],
             this.handleNextActionDateChange.bind(this),
             new DateInputMaker());
-    this.elementMakers['NEXT_ACTION_DATE_UPDATED'] = 
+    this.elementMakers['NEXT_ACTION_DATE_UPDATED'] =
         new TextMaker(
-            '', 
+            '',
             rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
-    this.elementMakers['DUE_DATE'] = 
+    this.elementMakers['DUE_DATE'] =
         new EditableTextMaker(
-            OverviewController.getSheetId, 
-            OverviewController.getUuid, 
-            'dueDate', 
+            OverviewController.getSheetId,
+            OverviewController.getUuid,
+            'dueDate',
             OverviewController.PENCIL.clone(),
             rowData => rowData['DUE_DATE'],
-            rowData => rowData['DUE_DATE'], 
-            this.handleDueDateChange.bind(this), 
+            rowData => rowData['DUE_DATE'],
+            this.handleDueDateChange.bind(this),
             new DateInputMaker());
   }
 
   // SECTION:
   // Elements
-  
+
   static getSortOverviewElement() {
     return $('.sortOverview');
   }
-  
+
   static getPlaceholderElement() {
     return $('.overviewPlaceholder');
   }
-  
+
   static getTemplateElement() {
     return $('.overviewTemplate');
   }
-  
+
   getLoadTimeElement() {
     return this.jq.find('.loadTime');
   }
-  
+
   getDisplayCountWrapperElement() {
     return this.jq.find('.displayCountWrapper');
   }
-  
+
   getDisplayCountElement() {
     return this.jq.find('.displayCount');
   }
-  
+
   getLoadingElement() {
     return this.jq.find('.overviewLoading');
   }
-  
+
   getTableElement() {
     return this.jq.find('table');
   }
-  
+
   isVisible() {
     return this.getTableElement().is(':visible');
   }
-  
+
   getTbodyElement() {
     return this.jq.find('tbody').first();
   }
-  
+
   getDataRowElements() {
     return this.getTbodyElement().find('tr[data-sheet-id]');
   }
-  
+
   getDataRowElement(sheetId, uuid) {
     return this.getTbodyElement().find('tr[data-sheet-id="' + sheetId + '"][data-uuid="' + uuid + '"]');
   }
-  
+
   getHeaderCells() {
     return this.getTableElement().find('th[data-key]');
   }
-  
+
   getVisibleDataKeys() {
     let headerCells = this.getHeaderCells();
     let ret = [];
@@ -170,11 +170,11 @@ class OverviewController {
     });
     return ret;
   }
-  
+
   getColumnCells(columnKey) {
     return this.getTableElement().find('[data-key="' + columnKey + '"]');
   }
-  
+
   static getSheetId(link) {
     return $(link).closest('tr[data-sheet-id]').attr(OverviewController.ATTR.SHEET_ID);
   }
@@ -189,7 +189,7 @@ class OverviewController {
     }
     return 'https://mail.google.com/mail/u/0/?view=cv&fs=1&th=' + threadId + '&search=all';
   }
-  
+
   static getDateCategory(dateStr) {
     let currDateStr = OverviewController.currDateStr();
     let nextDateStr = OverviewController.nextDateStr();
@@ -208,49 +208,49 @@ class OverviewController {
       return 'past';
     }
   }
-  
+
   updateNextActionDate(tr, newNextActionDate) {
     tr.attr(OverviewController.ATTR.NEXT_ACTION_DATE, newNextActionDate);
     tr.attr(OverviewController.ATTR.NEXT_ACTION_CATEGORY,
             OverviewController.getDateCategory(newNextActionDate));
   }
-  
+
   updateDueDate(tr, newDueDate) {
     tr.attr(OverviewController.ATTR.DUE_DATE, newDueDate);
     tr.attr(OverviewController.ATTR.DUE_CATEGORY, OverviewController.getDateCategory(newDueDate));
   }
-  
+
   updateNextActionUpdatedDate(tr, newNextActionUpdatedDate) {
     tr.attr(OverviewController.ATTR.NEXT_ACTION_UPDATED, newNextActionUpdatedDate);
     tr.find('[data-key="NEXT_ACTION_DATE_UPDATED"]').text(newNextActionUpdatedDate);
   }
-  
+
   handleStatusChange(sheetId, uuid, newStatus) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr(OverviewController.ATTR.STATUS, newStatus);
     tr.attr(OverviewController.ATTR.STATUS_INDEX, String(GlobalController.statusIndex(newStatus)).padStart(2, '0'));
     SheetController.forSheet(sheetId).setValue(uuid, 'STATUS', newStatus);
   }
-  
+
   handlePriorityChange(sheetId, uuid, newPriority) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr(OverviewController.ATTR.PRIORITY, newPriority);
     SheetController.forSheet(sheetId).setValue(uuid, 'PRIORITY', newPriority);
   }
-  
+
   handleItemChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     tr.attr(OverviewController.ATTR.ITEM, newValue);
     SheetController.forSheet(sheetId).setValue(uuid, 'ITEM', newValue);
   }
-  
+
   handleDueDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateDueDate(tr, newValue);
     OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValue(uuid, 'DUE_DATE', newValue);
   }
-  
+
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateNextActionDate(tr, newValue);
@@ -259,7 +259,7 @@ class OverviewController {
     OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValues(uuid, {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
   }
-  
+
   handleSheetChange(sheetId, uuid, newSheetId) {
     if (sheetId == newSheetId) {
       return;
@@ -268,7 +268,7 @@ class OverviewController {
     tr.attr(OverviewController.ATTR.SHEET_ID, newSheetId);
     SheetController.forSheet(sheetId).changeSheet(uuid, newSheetId);
   }
-  
+
   handleLinkChange(sheetId, uuid, newText, newHref) {
     let tr = this.getDataRowElement(sheetId, uuid);
     if (newText && newHref) {
@@ -277,13 +277,13 @@ class OverviewController {
       SheetController.forSheet(sheetId).clearLink(uuid);
     }
   }
-  
+
   static getSheetOptions() {
     let ret = [];
     SheetController.getSheetInfos().forEach(sheetInfo => ret.push({text: sheetInfo.sheetName, value: sheetInfo.sheetId}));
     return ret;
   }
-  
+
   static compareNeedsAttention(a, b) {
     let aNeedsAttention = OverviewController.isAttr(a,
         OverviewController.ATTR.NEEDS_ATTENTION);
@@ -298,7 +298,7 @@ class OverviewController {
     }
     return compare.EQUAL;
   }
-  
+
   static compareOrdered(a, b, values) {
     a = Common.toArray(a);
     b = Common.toArray(b);
@@ -318,18 +318,18 @@ class OverviewController {
     }
     return compare.EQUAL;
   }
-  
+
   static getAttr(jq, attr) {
     if (typeof attr === 'function') {
       return attr(jq);
     }
     return $(jq).attr(attr);
   }
-  
+
   static isAttr(jq, attr) {
     return OverviewController.getAttr(jq, attr) == 'true';
   }
-  
+
   static compareAttributeOrderedFn(attrName, values) {
     return function(a, b) {
       attrName = Common.toArray(attrName);
@@ -342,7 +342,7 @@ class OverviewController {
       return OverviewController.compareOrdered(aAttr, bAttr, values);
     };
   }
-  
+
   static compareAttributeLexicallyFn(attrName) {
     return function(a, b) {
       let aAttr = $(a).attr(attrName);
@@ -350,7 +350,7 @@ class OverviewController {
       return compare(aAttr, bAttr);
     };
   }
-  
+
   static currDateStr() {
     if (!OverviewController.CURR_DATE_STR) {
       OverviewController.CURR_DATE_STR = Common.getCurrDateStr();
@@ -358,7 +358,7 @@ class OverviewController {
     }
     return OverviewController.CURR_DATE_STR;
   }
-  
+
   static nextDateStr() {
     if (!OverviewController.NEXT_DATE_STR) {
       OverviewController.NEXT_DATE_STR = Common.getNextDateStr();
@@ -366,7 +366,7 @@ class OverviewController {
     }
     return OverviewController.NEXT_DATE_STR;
   }
-  
+
   sortRows() {
     this.getDataRowElements().sort(
       compare.fn.chain(OverviewController.compareNeedsAttention,
@@ -378,7 +378,7 @@ class OverviewController {
                        OverviewController.compareAttributeLexicallyFn('data-uuid'))
     ).appendTo(this.getTbodyElement());
   }
-  
+
   fillText(cellJq, rowData) {
     let key = cellJq.attr(OverviewController.ATTR.KEY);
     let elementMaker = this.elementMakers[key];
@@ -391,7 +391,7 @@ class OverviewController {
       cellJq.append(element);
     }
   }
-  
+
   static updateNeedsAttention(rowJq) {
     let emailLastDateFormatted =
         rowJq.attr(OverviewController.ATTR.EMAIL_LAST_DATE_FORMATTED);
@@ -400,21 +400,21 @@ class OverviewController {
     let nextActionDate = rowJq.attr(OverviewController.ATTR.NEXT_ACTION_DATE);
     let dueDate = rowJq.attr(OverviewController.ATTR.DUE_DATE);
     if ((emailLastDateFormatted && nextActionUpdated &&
-        emailLastDateFormatted > nextActionUpdated) || 
+        emailLastDateFormatted > nextActionUpdated) ||
         (nextActionDate && dueDate && nextActionDate > dueDate)) {
       rowJq.attr(OverviewController.ATTR.NEEDS_ATTENTION, 'true');
     } else {
       rowJq.attr(OverviewController.ATTR.NEEDS_ATTENTION, null);
     }
   }
-  
+
   addRow(rowData) {
     this.getTbodyElement().find('[data-uuid="' + rowData['UUID'] + '"]').remove();
-    
+
     let rowJq = this.rowTemplateJq.clone().removeClass('overviewRowTemplate');
-    
+
     rowJq.find('td[data-key]').each((index, elt) => this.fillText($(elt), rowData));
-    
+
     let sheetId = rowData['SHEET_ID'];
     rowJq.attr(OverviewController.ATTR.SHEET_ID, sheetId);
     rowJq.attr(OverviewController.ATTR.PRIORITY, rowData['PRIORITY'] || OverviewController.NO_PRIORITY_KEY);
@@ -433,7 +433,7 @@ class OverviewController {
     OverviewController.updateNeedsAttention(rowJq);
     this.getTbodyElement().append(rowJq);
   }
-  
+
   applyFilters() {
     let filters = this.filterBar.getFilters();
     this.getDataRowElements().each((index, elt) => {
@@ -470,27 +470,27 @@ class OverviewController {
     this.getDisplayCountElement().text(this.getDataRowElements().filter(':visible').length);
     this.resizeColumns();
   }
-  
+
   addRows(rows) {
     rows.forEach(rowData => this.addRow(rowData));
     this.sortRows();
     this.applyFilters();
     this.resizeColumns();
   }
-  
+
   handleData(msg) {
     let rows = JSON.parse(msg);
     this.setTableShown(true);
     this.addRows(rows);
     this.getLoadingElement().hide();
   }
-  
+
   initListeners() {
     for (let field in this.elementMakers) {
       this.elementMakers[field].attachClickHandler(this.jq);
     }
   }
-  
+
   setTableShown(show) {
     if (show) {
       this.getTableElement().show();
@@ -500,11 +500,11 @@ class OverviewController {
       this.getDisplayCountWrapperElement().hide();
     }
   }
-  
+
   makeStyleClause(selector, width) {
     return selector + '{width: ' + width + 'px;max-width: ' + width + 'px;}';
   }
-  
+
   resizeColumns() {
     if (!this.isVisible()) {
       return;
@@ -532,13 +532,13 @@ class OverviewController {
     }
     styleJq.html(styles.join('\n'));
   }
-  
+
   static resizeColumns() {
     if (OverviewController.current) {
       OverviewController.current.resizeColumns();
     }
   }
-  
+
   init() {
     let templateJq = OverviewController.getTemplateElement();
     this.rowTemplateJq = templateJq.find('.overviewRowTemplate');
@@ -552,7 +552,7 @@ class OverviewController {
     this.initListeners();
     return this;
   }
-  
+
   updateOverviewForSheet(sheetId) {
     this.getDataRowElements().filter('[data-sheet-id="' + sheetId + '"]').remove();
     $('.overviewPlaceholder').find('.overviewLoading').show();
@@ -562,7 +562,7 @@ class OverviewController {
         callRpc().
         then(msg => this.handleData(msg));
   }
-  
+
   load() {
     $('.overviewPlaceholder').find('.overviewLoading').show();
     new RpcConfig('Overview_getRows', runner => runner.Overview_getRows()).
@@ -571,7 +571,7 @@ class OverviewController {
         callRpc().
         then(msg => this.handleData(msg));
   }
-  
+
   static updateOverviewForSheet(sheetId) {
     if (OverviewController.current) {
       OverviewController.current.updateOverviewForSheet(sheetId);
@@ -579,35 +579,35 @@ class OverviewController {
       OverviewController.showOverview();
     }
   }
-  
+
   show() {
     this.init();
     OverviewController.getPlaceholderElement().append(this.jq.show());
     return this;
   }
-  
+
   static showOverview() {
     OverviewController.hideOverview();
     OverviewController.current = new OverviewController().show();
   }
-  
+
   hide() {
     this.jq.remove();
   }
-  
+
   static hideOverview() {
     if (OverviewController.current) {
       OverviewController.current.hide();
       OverviewController.current = null;
     }
   }
-  
+
   static sortOverview() {
     if (OverviewController.current) {
       OverviewController.current.sortRows();
     }
   }
-  
+
   static handleSortOverviewClick() {
     OverviewController.current.sortRows();
   }
@@ -624,7 +624,7 @@ class OverviewController {
       }
     });
   }
-  
+
   static init() {
     OverviewController.addListeners();
     window.setTimeout(OverviewController.showOverview, 1);
