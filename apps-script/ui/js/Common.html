@@ -15,16 +15,6 @@ class Common {
     return (d.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
   }
   
-  static getCurrDateStr() {
-    return Common.toDateStr(new Date());
-  }
-  
-  static getNextDateStr() {
-    let d = new Date();
-    d.setDate(d.getDate() + 1);
-    return Common.toDateStr(d);
-  }
-  
   static typeOf(value) {
     var s = typeof value;
     if (s === 'object') {

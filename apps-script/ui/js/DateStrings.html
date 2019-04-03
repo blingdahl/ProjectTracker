@@ -1,0 +1,23 @@
+class DateStrings {
+  static today(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      return Common.toDateStr(new Date());
+    }
+    if (!DateStrings.TODAY) {
+      DateStrings.TODAY = DateStrings.today(true);
+    }
+    return DateStrings.TODAY;
+  }
+  
+  static tomorrow(opt_ignoreCache) {
+    if (opt_ignoreCache) {
+      let d = new Date();
+      d.setDate(d.getDate() + 1);
+      return Common.toDateStr(d);
+    }
+    if (!DateStrings.TOMORROW) {
+      DateStrings.TOMORROW = DateStrings.tomorrow(true);
+    }
+    return DateStrings.TOMORROW;
+  }
+}

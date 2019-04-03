@@ -8,63 +8,63 @@ class AddItemDialog {
     GlobalController.PRIORITIES.forEach(priority => this.getPriorityElement().append($('<option />').attr('value', priority).text(priority)));
     this.dateInputMaker = new DateInputMaker();
   }
-  
+
   getTitleElement() {
     return this.itemForm.find('.title');
   }
-  
+
   getTitle() {
     return this.getTitleElement().val();
   }
-  
+
   getUrlElement() {
     return this.itemForm.find('.url');
   }
-  
+
   getUrl() {
     return this.getUrlElement().val();
   }
-  
+
   getPriorityElement() {
     return this.itemForm.find('.priority');
   }
-  
+
   getPriority() {
     return this.getPriorityElement().val();
   }
-  
+
   getNextActionDateElement() {
     return this.itemForm.find('.nextActionDate');
   }
-  
+
   getNextActionDate() {
     return this.getNextActionDateElement().val();
   }
-  
+
   getDueDateElement() {
     return this.itemForm.find('.dueDate');
   }
-  
+
   getDueDate() {
     return this.getDueDateElement().val();
   }
-  
+
   getSubmitElement() {
     return this.itemForm.find('.addItem');
   }
-  
+
   getFieldElements() {
     return this.itemForm.find('.field');
   }
-  
+
   getErrorElement() {
     return this.itemForm.find('.error');
   }
-  
+
   isDirty() {
     return this.getTitle() || this.getUrl() || this.getPriority() || this.getNextActionDate();
   }
-  
+
   getErrors(dirtyOnly) {
     let errors = [];
     if (!dirtyOnly || this.isDirty()) {
@@ -79,7 +79,7 @@ class AddItemDialog {
     this.getErrorElement().hide();
     return null;
   }
-  
+
   save() {
     let errors = this.getErrors(false);
     if (errors) {
@@ -88,17 +88,17 @@ class AddItemDialog {
     var title = this.getTitle();
     this.addItemCallback();
     return new RpcConfig('AddItem_addItem', runner => runner.AddItem_addItem(
-            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate(), Common.getCurrDateStr(), this.getDueDate())).
+            this.sheetId, title, this.getUrl(), this.getPriority(), this.getNextActionDate(), DateStrings.today(true), this.getDueDate())).
         output('Adding "' + title + '" to ' + this.sheetName + '...').
         callRpc();
   }
-  
+
   clearForm() {
     this.getTitleElement().val('');
     this.getUrlElement().val('');
     this.getTitleElement().focus();
   }
-  
+
   addItem() {
      var errors = this.getErrors(false);
      if (errors) {
@@ -107,7 +107,7 @@ class AddItemDialog {
      this.save();
      this.clearForm();
   }
-  
+
   addItemAndUpdate() {
      var errors = this.getErrors(false);
      if (errors) {
@@ -117,7 +117,7 @@ class AddItemDialog {
      savePromise.then(() => SheetController.forSheet(this.sheetId).update());
      this.itemForm.dialog('close');
   }
-  
+
   show() {
     this.getFieldElements().change(() => this.getErrors(true));
     this.getFieldElements().keydown((event) => {

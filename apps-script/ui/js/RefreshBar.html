@@ -2,28 +2,28 @@ class RefreshBar {
 
   // SECTION:
   // Elements
-  
+
   static getRefreshBarElement() {
     return $('.refreshBar');
   }
-  
+
   static getMessageElement() {
     return RefreshBar.getRefreshBarElement().find('.refreshBarMessage');
   }
-  
+
   static checkForRefresh() {
-    let currDateStr = Common.getCurrDateStr();
-    if (RefreshBar.currDateStr) {
-      if (RefreshBar.currDateStr !== currDateStr) {
+    let todayStr = DateStrings.today();
+    if (RefreshBar.todayStr) {
+      if (RefreshBar.todayStr !== todayStr) {
         RefreshBar.getRefreshBarElement().show();
         RefreshBar.getMessageElement().text('Date changed, please refresh');
         window.clearInterval(RefreshBar.intervalId);
       }
     } else {
-      RefreshBar.currDateStr = currDateStr;
+      RefreshBar.todayStr = todayStr;
     }
   }
-  
+
   static init() {
     RefreshBar.intervalId = window.setInterval(RefreshBar.checkForRefresh, RefreshBar.PERIOD_SECONDS * 1000);
   }

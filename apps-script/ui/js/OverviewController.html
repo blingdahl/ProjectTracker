@@ -197,18 +197,18 @@ class OverviewController {
   }
 
   static getDateCategory(dateStr) {
-    let currDateStr = OverviewController.currDateStr();
-    let nextDateStr = OverviewController.nextDateStr();
     if (dateStr === '') {
       return null;
     }
-    if (dateStr > currDateStr) {
-      if (dateStr == nextDateStr) {
+    let todayStr = DateStrings.today();
+    let tomorrowStr = DateStrings.tomorrow();
+    if (dateStr > todayStr) {
+      if (dateStr == tomorrowStr) {
         return 'tomorrow';
       } else {
         return 'future';
       }
-    } else if (dateStr == currDateStr) {
+    } else if (dateStr == todayStr) {
       return 'today';
     } else {
       return 'past';
@@ -260,7 +260,7 @@ class OverviewController {
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateNextActionDate(tr, newValue);
-    let dateUpdated =  Common.getCurrDateStr();
+    let dateUpdated =  DateStrings.today(true);
     this.updateNextActionUpdatedDate(tr, dateUpdated);
     OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValues(uuid, {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});
@@ -355,22 +355,6 @@ class OverviewController {
       let bAttr = $(b).attr(attrName);
       return compare(aAttr, bAttr);
     };
-  }
-
-  static currDateStr() {
-    if (!OverviewController.CURR_DATE_STR) {
-      OverviewController.CURR_DATE_STR = Common.getCurrDateStr();
-      console.log(OverviewController.CURR_DATE_STR);
-    }
-    return OverviewController.CURR_DATE_STR;
-  }
-
-  static nextDateStr() {
-    if (!OverviewController.NEXT_DATE_STR) {
-      OverviewController.NEXT_DATE_STR = Common.getNextDateStr();
-      console.log(OverviewController.NEXT_DATE_STR);
-    }
-    return OverviewController.NEXT_DATE_STR;
   }
 
   sortRows() {
