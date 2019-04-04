@@ -12,7 +12,7 @@ class RefreshBar {
   }
 
   static checkForRefresh() {
-    let todayStr = DateStrings.today();
+    let todayStr = DateStrings.today(true);
     if (RefreshBar.todayStr) {
       if (RefreshBar.todayStr !== todayStr) {
         RefreshBar.getRefreshBarElement().show();
