@@ -17,12 +17,12 @@ class FilterElement {
     this.additionalValueSets = [];
     this.loadValueSets();
   }
-  
+
   // Called once per table load
   attachClickHandler(ancestorJq) {
     ancestorJq.on('click', '.' + this.cssClass, this.textClicked.bind(this));
   }
-  
+
   updateTextJq() {
     let text;
     if (this.values.length == 0) {
@@ -43,9 +43,9 @@ class FilterElement {
       }
     }
     this.textJq.text(text);
-    this.jq.show();
+    this.jq.css('visibility', 'visible');
   }
-  
+
   setValues(newValues) {
     this.values = newValues;
     this.updateTextJq();
@@ -55,14 +55,14 @@ class FilterElement {
   getValues() {
     return this.values.length > 0 ? this.values : this.emptyValues;
   }
-  
+
   handleValueSetsJson(json) {
     if (json) {
       this.additionalValueSets = MultiOptionInputValueSet.fromJson(json);
       this.updateTextJq();
     }
   }
-  
+
   loadValueSets() {
     return new RpcConfig('Preferences_getValueSetsJsonForFilter',
                          runner => runner.Preferences_getValueSetsJsonForFilter(this.paramName)).
@@ -70,14 +70,14 @@ class FilterElement {
         callRpc().
         then(msg => this.handleValueSetsJson(msg));
   }
-  
+
   saveValueSets() {
     return new RpcConfig('Preferences_setValueSetsJsonForFilter',
                          runner => runner.Preferences_setValueSetsJsonForFilter(this.paramName, MultiOptionInputValueSet.toJson(this.additionalValueSets))).
         logAll().
         callRpc();
   }
-  
+
   addValueSet(values) {
     let text = window.prompt('Name');
     if (text) {
@@ -90,17 +90,17 @@ class FilterElement {
     }
     this.saveValueSets();
   }
-  
+
   removeValueSet(text, values) {
     this.additionalValueSets = this.additionalValueSets.filter(valueSet => valueSet.text !== text);
     this.saveValueSets();
   }
-  
+
   valueSets() {
     return [new MultiOptionInputValueSet(this.allValuesText, this.allValues, false)].
          concat(this.additionalValueSets);
   }
-  
+
   textClicked(e) {
     let input = new MultiOptionInputMaker(this.allValues, this.textCallback,
                                           this.valueSets()).
@@ -109,23 +109,23 @@ class FilterElement {
             this.setValues(newValues);
             this.updateUrl();
           },
-          () => this.jq.show(),
+          () => this.jq.css('visibility', 'visible'),
           values => {
             this.addValueSet(values);
           },
           (text, values) => {
             this.removeValueSet(text, values);
           });
-    this.jq.parent().append(input);
-    this.jq.hide();
+    this.jq.before(input);
+    this.jq.css('visibility', 'hidden');
   }
-  
+
   appendTo(parentJq) {
     this.updateTextJq();
     parentJq.append(this.jq);
     this.attachClickHandler(parentJq);
   }
-  
+
   getFromUrl() {
     Hash.withParam(this.paramName, paramValue => {
       if (paramValue) {
@@ -133,7 +133,7 @@ class FilterElement {
       }
     });
   }
-  
+
   updateUrl() {
     Hash.setParam(this.paramName, this.getValues().join(','));
   }
