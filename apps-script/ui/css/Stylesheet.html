@@ -3,77 +3,77 @@
     font-family: sans-serif;
     font-size: 13px;
   }
-  
+
   td, div, body {
     font-family: sans-serif;
     vertical-align: top;
   }
-  
+
   error {
     color: red;
   }
-  
+
   .maxThreads {
     width: 30px;
   }
-  
+
   h1 {
     margin-top: 30px;
   }
-  
+
   [data-dirty="true"] .update {
     background-color: #ffaaaa;
   }
-  
+
   [data-mode="SELECT"] .labelDisplayMode {
     display: none;
   }
-  
+
   [data-mode="DISPLAY"] .labelSelectMode {
     display: none;
   }
-  
+
   [data-label-name=""] .labelOnly {
     display: none;
   }
-  
+
   [data-label-name]:not([data-label-name=""]) .nonLabelOnly {
     display: none;
   }
-  
+
   .removeLog {
     cursor: pointer;
     display: inline-block;
     margin-left: 8px;
   }
-  
+
   a, .labelName {
     font-size: 16px;
     text-decoration: underline;
     cursor: pointer;
     color: #0000ff;
   }
-  
+
   a.editableField {
     text-decoration: none;
     cursor: pointer;
     color: #000000;
   }
-  
+
   .editableText {
     cursor: pointer;
   }
-  
+
   .textInput {
     font-size: 16px;
     width: 100%;
   }
-  
+
   .clearSpreadsheetUrl {
     display: block;
     margin-top: 20px;
   }
-  
+
   .overviewTable tr:nth-child(even) {
     background: #dddddd;
   }
@@ -81,57 +81,57 @@
   .overviewTable tr:nth-child(odd) {
     background: #ffffff;
   }
-  
+
   .overviewTable tr[data-status="Completed"],
   .overviewTable tr[data-status="Obsolete"],
   .overviewTable tr[data-status="Completed"]  a.editableField,
   .overviewTable tr[data-status="Obsolete"]  a.editableField {
     color: #999999;
   }
-  
+
   a.addLink {
     color: #9999cc;
   }
-  
+
   .overviewTable tr[data-status="Completed"] a.addLink,
   .overviewTable tr[data-status="Obsolete"] a.addLink {
     display: none;
   }
-  
+
   .loadTime {
     font-size: 11px;
     margin-top: 4px;
   }
-  
+
   .priority {
     width: 90px;
   }
-  
+
   .status {
     width: 90px;
   }
-  
+
   .clicked {
     background: #0000ff;
     color: #ffffff;
   }
-  
+
   input.field[type="text"] {
     width: 100%;
   }
-  
+
   .error {
     font-size: 13px;
     color: red;
   }
-  
+
   .optionPicker {
     margin-top: 5px;
     border-radius: 4px;
     border: 1px solid #333333;
     background: #eeeeee;
   }
-  
+
   .optionPicker .option {
     font-size: 14px;
     text-decoration: underline;
@@ -142,20 +142,20 @@
     margin-left: 3px;
     border-top: 1px solid #333333;
   }
-  
+
   .optionPicker div.currValue {
     background: #cccccc;
   }
-  
+
   .optionPicker div:first-child {
     margin-top: 0;
     border-top: none;
   }
-  
+
   .optionPicker .option:hover {
     background: #aaaaaa;
   }
-  
+
   .editLink, .editPencil {
     cursor: pointer;
     color: black;
@@ -164,26 +164,22 @@
     opacity: .6;
     float: right;
   }
-  
+
   [data-href=""] .editLink {
     opacity: .3;
   }
-  
-  [data-key="NEXT_ACTION_DATE"] [data-value=""] {
-    color: #999999;
-  }
-  
+
   .filter .multiOptionPicker {
     display: inline-block;
   }
-  
+
   .multiOptionPicker {
     margin-top: 5px;
     border-radius: 4px;
     border: 1px solid #333333;
     background: #eeeeee;
   }
-  
+
   .multiOptionPicker .option {
     font-size: 12px;
     cursor: pointer;
@@ -192,25 +188,25 @@
     margin-left: 3px;
     border-top: 1px solid #333333;
   }
-  
+
   .multiOptionPicker .option .text {
     font-size: 16px;
     text-decoration: underline;
   }
-  
+
   .multiOptionPicker .option[data-selected="true"] {
     background: #cccccc;
   }
-  
+
   .multiOptionPicker .option:first-child {
     margin-top: 0;
     border-top: none;
   }
-  
+
   .multiOptionPicker .option:hover {
     background: #aaaaaa;
   }
-  
+
   .multiOptionPicker .valueSetOption {
     font-size: 12px;
     cursor: pointer;
@@ -220,42 +216,42 @@
     border-top: 1px solid #999999;
     background: #ffffff;
   }
-  
+
   .multiOptionPicker .valueSetOption .text {
     font-size: 16px;
     text-decoration: underline;
   }
-  
+
   .multiOptionPicker .valueSetOption:first-child {
     margin-top: 0;
     border-top: 1px solid black;
   }
-  
+
   .multiOptionPicker .valueSetOption:hover {
     background: #aaaaaa;
   }
-  
+
   .multiOptionPicker .valueSetOption .remove {
     text-decoration: underline;
     font-size: 10px;
   }
-  
+
   .multiOptionPicker .check {
     display: inline-block;
     visibility: hidden;
     width: 12px;
     font-size: 16px;
   }
-  
+
   .multiOptionPicker .option .only {
     text-decoration: underline;
     font-size: 10px;
   }
-  
+
   .multiOptionPicker [data-selected="true"] .check {
     visibility: visible;
   }
-  
+
   .filterElement {
     background: #dddddd;
     border: 1px solid black;
@@ -263,43 +259,43 @@
     padding: 2px;
     cursor: pointer;
   }
-  
+
   .filterElement .arrow {
     font-size: 11px;
     padding-left: 3px;
   }
-  
+
   .filters {
     margin: 3px;
   }
-  
+
   .displayCountWrapper {
     margin-top: 10px;
   }
-  
+
   .expandSheetList, .collapseSheetList {
     font-size: 13px;
     text-decoration: underline;
     color: blue;
     cursor: pointer;
   }
-  
+
   [data-next-action-category="today"] {
     background-color: #ffcccc !important;
   }
-  
+
   [data-next-action-category="past"] {
     background-color: #ff9999 !important;
   }
-  
+
   [data-needs-attention="true"] {
     color: red;
   }
-  
+
   .dirty {
     background-color: #ffaaaa;
   }
-  
+
   .refreshBar {
     width: 100%;
     background: #ffaaaa;
@@ -311,18 +307,18 @@
     font-size: 18px;
     text-align: center;
   }
-  
+
   td[data-key] {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     vertical-align: middle;
   }
-  
+
   .overviewTable tr {
     height: 26px;
   }
-  
+
   .buttons {
     font-size: 12px;
     margin-left: 10px;
@@ -330,12 +326,12 @@
     margin-top: 5px;
     margin-bottom: 5px;
   }
-  
+
   .buttons .betweenButtons {
     display: inline-block;
     width: 6px;
   }
-  
+
   .buttons .button {
     text-decoration: underline;
     cursor: pointer;
