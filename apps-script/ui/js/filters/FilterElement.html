@@ -12,7 +12,7 @@ class FilterElement {
     this.allValues = allValues;
     this.jq = $('<span />').addClass('filterElement').addClass(cssClass);
     this.textJq = $('<span />').addClass('filterText');
-    this.jq.append(this.textJq).append($('<span>&#9660;</span>').addClass('arrow'));
+    this.jq.append(this.textJq).append(FilterElement.ARROW.clone());
     this.getFromUrl();
     this.additionalValueSets = [];
     this.loadValueSets();
@@ -138,3 +138,5 @@ class FilterElement {
     Hash.setParam(this.paramName, this.getValues().join(','));
   }
 }
+
+FilterElement.ARROW = $('<span>&#9660;</span>').addClass('arrow');
