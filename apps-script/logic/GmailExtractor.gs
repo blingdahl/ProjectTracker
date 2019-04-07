@@ -7,15 +7,15 @@ GmailExtractor.init = function() {
   if (GmailExtractor.initialized) {
     return;
   }
-  
+
   UrlFetcher.init();
   Log.info('GmailExtractor.init()');
   GmailExtractor.initialized = true
-  
+
   GmailExtractor.extractSubject = function(thread) {
     return thread.getFirstMessageSubject();
   }
-  
+
   GmailExtractor.extractBody = function(thread) {
     var messages = thread.getMessages();
     if (messages.length === 0) {
@@ -23,7 +23,7 @@ GmailExtractor.init = function() {
     }
     return messages[0].getBody();
   }
-    
+
   GmailExtractor.getFrom = function(thread) {
     var messages = thread.getMessages();
     if (messages.length === 0) {
@@ -36,24 +36,24 @@ GmailExtractor.init = function() {
     from = from.replace(/"/g, '');
     return from;
   }
-  
+
   GmailItemNameExtractor.extractItemNameFromBody = function(body) {
     return body;
   }
-  
+
   GmailItemNameExtractor.extractItemName = function(thread) {
     return GmailExtractor.extractSubject(thread) || GmailItemNameExtractor.extractItemNameFromBody(GmailExtractor.extractBody(thread));
   }
-  
+
   GmailLinkExtractor.UrlPrefixMatcher = function() {
     this.prefixMap = {};
   }
-  
+
   GmailLinkExtractor.UrlPrefixMatcher.prototype.add = function(prefix, linkText) {
     this.prefixMap[prefix] = linkText;
     return this;
   }
-  
+
   GmailLinkExtractor.UrlPrefixMatcher.prototype.matchingLinkText = function(s) {
     var prefixes = Object.keys(this.prefixMap);
     for (var i = 0; i < prefixes.length; i++) {
@@ -67,28 +67,28 @@ GmailExtractor.init = function() {
       }
     }
   }
-  
+
   GmailLinkExtractor.ExtractorStrategy = function() { }
-  
+
   GmailLinkExtractor.ExtractorStrategy.prototype.extract = function(thread) {
     var subject = GmailExtractor.extractSubject(thread);
     var body = GmailExtractor.extractBody(thread);
     return ((subject && this.extractFromSubject(subject)) ||
             (body && this.extractFromBody(body)));
   }
-  
+
   GmailLinkExtractor.ExtractorStrategy.prototype.extractFromSubject = function(subject) {
     return null;
   }
-  
+
   GmailLinkExtractor.ExtractorStrategy.prototype.extractFromBody = function(body) {
     return null;
   }
-  
+
   GmailLinkExtractor.BugStrategy = function() { }
-  
+
   GmailLinkExtractor.BugStrategy.prototype = Object.create(GmailLinkExtractor.ExtractorStrategy.prototype);
-  
+
   GmailLinkExtractor.BugStrategy.prototype.extractFromSubject = function(subject) {
     var issueIndex = subject.indexOf('Issue ');
     if (issueIndex < 0) {
@@ -102,7 +102,7 @@ GmailExtractor.init = function() {
     var bugId = subject.substring(nextWordIndex, endOfNextWordIndex);
     return Spreadsheet.hyperlinkFormula('http://b/' + bugId, 'b/' + bugId);
   }
-  
+
   GmailLinkExtractor.UrlStrategy = function() {
     this.urlPrefixMatcher = new GmailLinkExtractor.UrlPrefixMatcher().
         add('https://ariane.googleplex.com/', function(text) {
@@ -115,9 +115,9 @@ GmailExtractor.init = function() {
         add('https://drive.google.com/', 'Drive').
         add('https://critique.corp.google.com/', 'Critique');
   }
-  
+
   GmailLinkExtractor.UrlStrategy.prototype = Object.create(GmailLinkExtractor.ExtractorStrategy.prototype);
-  
+
   GmailLinkExtractor.UrlStrategy.prototype.extractFromBody = function(body) {
     var urls = body.match(/https?:\/\/[^ )"><]+/g);
     if (!urls) {
@@ -150,13 +150,13 @@ GmailExtractor.init = function() {
     }
     return null;
   }
-  
+
   GmailLinkExtractor.ShortLinkStrategy = function(shortlinkName) {
     this.shortlinkName = shortlinkName;
   }
-  
+
   GmailLinkExtractor.ShortLinkStrategy.prototype = Object.create(GmailLinkExtractor.ExtractorStrategy.prototype);
-  
+
   GmailLinkExtractor.ShortLinkStrategy.prototype.extractFromBody = function(body) {
     var shortlinks = body.match(new RegExp('\\W' + this.shortlinkName + '\\/[^ )"><.\r\n]+', 'g'));
     if (!shortlinks) {
@@ -173,13 +173,13 @@ GmailExtractor.init = function() {
     }
     return Spreadsheet.hyperlinkFormula('http://' + shortlinks[0], shortlinks[0]);
   }
-  
+
   GmailLinkExtractor.CombinedStrategy = function(delegateStrategies) {
     this.delegateStrategies = delegateStrategies;
   }
-  
+
   GmailLinkExtractor.CombinedStrategy.prototype = Object.create(GmailLinkExtractor.ExtractorStrategy.prototype);
-  
+
   GmailLinkExtractor.CombinedStrategy.prototype.extract = function(thread) {
     for (var i = 0; i < this.delegateStrategies.length; i++) {
       var ret = this.delegateStrategies[i].extract(thread);
@@ -189,7 +189,7 @@ GmailExtractor.init = function() {
     }
     return null;
   }
-  
+
   GmailLinkExtractor.COMBINED_STRATEGY = new GmailLinkExtractor.CombinedStrategy([
     new GmailLinkExtractor.ShortLinkStrategy('ariane'),
     new GmailLinkExtractor.BugStrategy(),
@@ -197,7 +197,7 @@ GmailExtractor.init = function() {
     new GmailLinkExtractor.ShortLinkStrategy('go'),
     new GmailLinkExtractor.ShortLinkStrategy('omg')
   ]);
-  
+
   GmailLinkExtractor.extractLinkFormula = function(thread) {
     return GmailLinkExtractor.COMBINED_STRATEGY.extract(thread);
   }
