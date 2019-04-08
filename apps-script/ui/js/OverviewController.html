@@ -101,15 +101,14 @@ class OverviewController {
             '',
             rowData => rowData['NEXT_ACTION_DATE_UPDATED']);
     this.elementMakers['DUE_DATE'] =
-        new EditableTextMaker(
+        new DatePicker(
             /* sheetIdCallback */ OverviewController.getSheetId,
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'dueDate',
             /* emptyTextContent */ OverviewController.PENCIL.clone(),
             /* textCallback */ rowData => rowData['DUE_DATE'],
             /* valueCallback */ rowData => rowData['DUE_DATE'],
-            /* changeCallback */ this.handleDueDateChange.bind(this),
-            /* inputMaker */ new DateInputMaker());
+            /* changeCallback */ this.handleDueDateChange.bind(this));
   }
 
   // SECTION:
