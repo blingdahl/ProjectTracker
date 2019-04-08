@@ -1,0 +1,36 @@
+class DatePicker {
+  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, textCallback, valueCallback, changeCallback, inputMaker) {
+    this.editableTextMaker = new EditableTextMaker(
+            /* sheetIdCallback */ sheetIdCallback,
+            /* uuidCallback */ uuidCallback,
+            /* textCssClass */ textCssClass,
+            /* emptyTextContent */ emptyContent,
+            /* textCallback */ textCallback,
+            /* valueCallback */ valueCallback,
+            /* changeCallback */ changeCallback,
+            /* inputMaker */
+            new OptionInputMaker(
+                DatePicker.getDateOptions(),
+                'None',
+                new DateInputMaker()));
+  }
+
+  // Called once per table load
+  attachClickHandler(ancestorJq) {
+    this.editableTextMaker.attachClickHandler(ancestorJq);
+  }
+
+  makeElement(data) {
+    return this.editableTextMaker.makeElement(data);
+  }
+
+  static getDateOptions() {
+    return [
+        {'text': 'Today', 'value': DateStrings.today()},
+        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()},
+        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()},
+        {'text': 'Next Week', 'value': DateStrings.nextWeek()},
+        {'text': 'Next Month', 'value': DateStrings.nextMonth()},
+        {'text': 'Clear', 'value': ''}];
+  }
+}

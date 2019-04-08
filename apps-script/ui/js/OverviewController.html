@@ -88,19 +88,14 @@ class OverviewController {
             '',
             rowData => rowData['FROM']);
     this.elementMakers['NEXT_ACTION_DATE'] =
-        new EditableTextMaker(
+        new DatePicker(
             /* sheetIdCallback */ OverviewController.getSheetId,
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'nextActionDate',
             /* emptyTextContent */ OverviewController.PENCIL.clone(),
             /* textCallback */ rowData => DateStrings.stringFor(rowData['NEXT_ACTION_DATE']),
             /* valueCallback */ rowData => rowData['NEXT_ACTION_DATE'],
-            /* changeCallback */ this.handleNextActionDateChange.bind(this),
-            /* inputMaker */
-            new OptionInputMaker(
-                OverviewController.getDateOptions(),
-                'None',
-                new DateInputMaker()));
+            /* changeCallback */ this.handleNextActionDateChange.bind(this));
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] =
         new TextMaker(
             '',
@@ -295,16 +290,6 @@ class OverviewController {
     let ret = [];
     SheetController.getSheetInfos().forEach(sheetInfo => ret.push({text: sheetInfo.sheetName, value: sheetInfo.sheetId}));
     return ret;
-  }
-
-  static getDateOptions() {
-    return [
-        {'text': 'Today', 'value': DateStrings.today()},
-        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()},
-        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()},
-        {'text': 'Next Week', 'value': DateStrings.nextWeek()},
-        {'text': 'Next Month', 'value': DateStrings.nextMonth()},
-        {'text': 'Clear', 'value': ''}];
   }
 
   static compareNeedsAttention(a, b) {
