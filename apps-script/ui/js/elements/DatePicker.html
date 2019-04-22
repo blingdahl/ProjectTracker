@@ -25,7 +25,7 @@ class DatePicker {
   }
 
   static makeDateOption(extDate) {
-    return {'text': extDate.toFriendlyString(), 'value': extDate.toString()};
+    return {'text': extDate.toExtendedString(), 'value': extDate.toString()};
   }
 
   static getDateOptions() {

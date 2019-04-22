@@ -100,7 +100,7 @@ class Dates {
   static getExtDateForDateString(dateStr) {
     if (!Dates.EXT_DATE_BY_STRING[dateStr]) {
       Dates.EXT_DATE_BY_STRING[dateStr] = Dates.newExtDate_(Dates.parse_(dateStr),
-          dateStr);
+          null);
     }
     return Dates.EXT_DATE_BY_STRING[dateStr];
   }
@@ -120,7 +120,14 @@ class ExtDate {
   }
 
   toFriendlyString() {
-    return this.friendlyStr;
+    return this.friendlyStr || this.toString();
+  }
+
+  toExtendedString() {
+    if (!this.friendlyStr) {
+      return this.toString();
+    }
+    return this.friendlyStr + ' (' + this.toString() + ')';
   }
 
   toString() {
