@@ -98,6 +98,9 @@ class Dates {
   }
 
   static getExtDateForDateString(dateStr) {
+    if (!dateStr) {
+      return null;
+    }
     if (!Dates.EXT_DATE_BY_STRING[dateStr]) {
       Dates.EXT_DATE_BY_STRING[dateStr] = Dates.newExtDate_(Dates.parse_(dateStr),
           null);
@@ -106,6 +109,9 @@ class Dates {
   }
 
   static getFriendlyStringForDateString(dateStr) {
+    if (!dateStr) {
+      return null;
+    }
     return Dates.getExtDateForDateString(dateStr).toFriendlyString();
   }
 }
