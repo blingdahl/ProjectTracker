@@ -1,0 +1,156 @@
+class Dates {
+
+  static calculateToday_() {
+    let d = new Date();
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+    return d;
+  }
+
+  static todayChanged() {
+    return Dates.TODAY_DATE.getTime() != Dates.calculateToday_().getTime();
+  }
+
+  static todayDate_() {
+    return new Date(Dates.TODAY_DATE.getTime());
+  }
+
+  static nextDateMatching_(startDate, pred) {
+    let d = new Date(startDate.getTime());
+    for (let i = 0; i != 100; i++) {
+      d.setDate(d.getDate() + 1);
+      if (pred(d)) {
+        return d;
+      }
+    }
+    throw 'No matching date found';
+  }
+
+  static newExtDate_(d, friendlyStr) {
+    let ret = new ExtDate(d, friendlyStr);
+    Dates.EXT_DATE_BY_STRING[ret.toString()] = ret;
+    return ret;
+  }
+
+  static yesterday_(opt_ignoreCache) {
+    let d = Dates.todayDate_();
+    d.setDate(d.getDate() - 1);
+    return Dates.newExtDate_(d, 'Yesterday');
+  }
+
+  static today_() {
+    return Dates.newExtDate_(Dates.todayDate_(), 'Today');
+  }
+
+  static tomorrow_() {
+    let d = Dates.todayDate_();
+    d.setDate(d.getDate() + 1);
+    return Dates.newExtDate_(d, 'Tomorrow');
+  }
+
+  static weekend_() {
+    let d = Dates.todayDate_();
+    let text;
+    if (d.getDay() === Dates.SATURDAY || d.getDay() === Dates.SUNDAY) {
+      text === 'Next Weekend';
+    } else {
+      text = 'This Weekend';
+    }
+    d = Dates.nextDateMatching_(d, pd => pd.getDay() === Dates.SATURDAY);
+    return Dates.newExtDate_(d, text);
+  }
+
+  static nextWeek_() {
+    let d = Dates.todayDate_();
+    // If tomorrow is the first day of the week, go to the next month.
+    d.setDate(d.getDate() + 1);
+    let text;
+    if (d.getDay() === Dates.SATURDAY) {
+      text === 'This Week';
+    } else {
+      text = 'Next Week';
+    }
+    d = Dates.nextDateMatching_(d, pd => pd.getDay() === Dates.MONDAY);
+    return Dates.newExtDate_(d, text);
+  }
+
+  static nextMonth_() {
+    let d = Dates.todayDate_();
+    // If tomorrow is the first, go to the next month.
+    d.setDate(d.getDate() + 1);
+    for (let i = 0; i != 31; i++) {
+      d.setDate(d.getDate() + 1);
+      if (d.getDate() === 1) {
+        break;
+      }
+    }
+    return Dates.newExtDate_(d, 'Next Month');
+  }
+
+  static parse_(dateStr) {
+    let parts = dateStr.split('/');
+    let year = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10);
+    let day = parseInt(parts[2], 10);
+    return new Date(year, month - 1, day);
+  }
+
+  static getExtDateForDateString(dateStr) {
+    if (!Dates.EXT_DATE_BY_STRING[dateStr]) {
+      Dates.EXT_DATE_BY_STRING[dateStr] = Dates.newExtDate_(Dates.parse_(dateStr),
+          dateStr);
+    }
+    return Dates.EXT_DATE_BY_STRING[dateStr];
+  }
+
+  static getFriendlyStringForDateString(dateStr) {
+    return Dates.getExtDateForDateString(dateStr).toFriendlyString();
+  }
+}
+
+class ExtDate {
+  constructor(date, friendlyStr) {
+    if (!date) {
+      throw 'No date';
+    }
+    this.date = date;
+    this.friendlyStr = friendlyStr;
+  }
+
+  toFriendlyString() {
+    return this.friendlyStr;
+  }
+
+  toString() {
+    let monthStr = String(this.date.getMonth() + 1);
+    if (monthStr.length === 1) {
+      monthStr = '0' + monthStr;
+    }
+    let dayStr = String(this.date.getDate());
+    if (dayStr.length === 1) {
+      dayStr = '0' + dayStr;
+    }
+    return (this.date.getYear() + 1900) + '/' + monthStr + '/' + dayStr;
+  }
+}
+
+Dates.SUNDAY = 0;
+Dates.MONDAY = 1;
+Dates.TUESDAY = 2;
+Dates.WEDNESDAY = 3;
+Dates.THURSDAY = 4;
+Dates.FRIDAY = 5;
+Dates.SATURDAY = 6;
+
+Dates.TODAY_DATE = Dates.calculateToday_();
+
+Dates.EXT_DATE_BY_STRING = {};
+
+Dates.YESTERDAY = Dates.yesterday_();
+Dates.TODAY = Dates.today_();
+Dates.TOMORROW = Dates.tomorrow_();
+Dates.WEEKEND = Dates.weekend_();
+Dates.NEXT_WEEK = Dates.nextWeek_();
+Dates.NEXT_MONTH = Dates.nextMonth_();

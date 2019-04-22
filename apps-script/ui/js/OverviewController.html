@@ -93,7 +93,8 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'nextActionDate',
             /* emptyTextContent */ OverviewController.PENCIL.clone(),
-            /* textCallback */ rowData => DateStrings.stringFor(rowData['NEXT_ACTION_DATE']),
+            /* textCallback */ rowData => Dates.getFriendlyStringForDateString(
+                rowData['NEXT_ACTION_DATE']),
             /* valueCallback */ rowData => rowData['NEXT_ACTION_DATE'],
             /* changeCallback */ this.handleNextActionDateChange.bind(this));
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] =
@@ -201,8 +202,8 @@ class OverviewController {
     if (dateStr === '') {
       return null;
     }
-    let todayStr = DateStrings.today();
-    let tomorrowStr = DateStrings.tomorrow();
+    let todayStr = Dates.TODAY.toString();
+    let tomorrowStr = Dates.TOMORROW.toString();
     if (dateStr > todayStr) {
       if (dateStr == tomorrowStr) {
         return 'tomorrow';
@@ -261,7 +262,7 @@ class OverviewController {
   handleNextActionDateChange(sheetId, uuid, newValue) {
     let tr = this.getDataRowElement(sheetId, uuid);
     this.updateNextActionDate(tr, newValue);
-    let dateUpdated =  DateStrings.today(true);
+    let dateUpdated =  Dates.TODAY.toString();
     this.updateNextActionUpdatedDate(tr, dateUpdated);
     OverviewController.updateNeedsAttention(tr);
     SheetController.forSheet(sheetId).setValues(uuid, {'NEXT_ACTION_DATE': newValue, 'NEXT_ACTION_DATE_UPDATED': dateUpdated});

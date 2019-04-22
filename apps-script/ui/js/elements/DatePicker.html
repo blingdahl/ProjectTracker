@@ -24,13 +24,18 @@ class DatePicker {
     return this.editableTextMaker.makeElement(data);
   }
 
+  static makeDateOption(extDate) {
+    return {'text': extDate.toFriendlyString(), 'value': extDate.toString()};
+  }
+
   static getDateOptions() {
-    return [
-        {'text': 'Today', 'value': DateStrings.today()},
-        {'text': 'Tomorrow', 'value': DateStrings.tomorrow()},
-        {'text': 'This Weekend', 'value': DateStrings.thisWeekend()},
-        {'text': 'Next Week', 'value': DateStrings.nextWeek()},
-        {'text': 'Next Month', 'value': DateStrings.nextMonth()},
-        {'text': 'Clear', 'value': ''}];
+    let dateOptions = [];
+    dateOptions.push(DatePicker.makeDateOption(Dates.TODAY));
+    dateOptions.push(DatePicker.makeDateOption(Dates.TOMORROW));
+    dateOptions.push(DatePicker.makeDateOption(Dates.WEEKEND));
+    dateOptions.push(DatePicker.makeDateOption(Dates.NEXT_WEEK));
+    dateOptions.push(DatePicker.makeDateOption(Dates.NEXT_MONTH));
+    dateOptions.push({'text': 'Clear', 'value': ''});
+    return dateOptions;
   }
 }

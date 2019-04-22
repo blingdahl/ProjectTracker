@@ -12,15 +12,10 @@ class RefreshBar {
   }
 
   static checkForRefresh() {
-    let todayStr = DateStrings.today(true);
-    if (RefreshBar.todayStr) {
-      if (RefreshBar.todayStr !== todayStr) {
-        RefreshBar.getRefreshBarElement().show();
-        RefreshBar.getMessageElement().text('Date changed, please refresh');
-        window.clearInterval(RefreshBar.intervalId);
-      }
-    } else {
-      RefreshBar.todayStr = todayStr;
+    if (Dates.todayChanged()) {
+      RefreshBar.getRefreshBarElement().show();
+      RefreshBar.getMessageElement().text('Date changed, please refresh');
+      window.clearInterval(RefreshBar.intervalId);
     }
   }
 
