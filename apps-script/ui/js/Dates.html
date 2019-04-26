@@ -53,8 +53,9 @@ class Dates {
   static weekend_() {
     let d = Dates.todayDate_();
     let text;
-    if (d.getDay() === Dates.SATURDAY || d.getDay() === Dates.SUNDAY) {
+    if (d.getDay() === Dates.FRIDAY || d.getDay() === Dates.SATURDAY || d.getDay() === Dates.SUNDAY) {
       text = 'Next Weekend';
+      d.setDate(d.getDate() + 1);
     } else {
       text = 'This Weekend';
     }
@@ -65,13 +66,13 @@ class Dates {
   static nextWeek_() {
     let d = Dates.todayDate_();
     // If tomorrow is the first day of the week, go to the next month.
-    d.setDate(d.getDate() + 1);
     let text;
     if (d.getDay() === Dates.SATURDAY) {
-      text === 'This Week';
+      text = 'This Week';
     } else {
       text = 'Next Week';
     }
+    d.setDate(d.getDate() + 1);
     d = Dates.nextDateMatching_(d, pd => pd.getDay() === Dates.MONDAY);
     return Dates.newExtDate_(d, text);
   }
@@ -133,7 +134,19 @@ class ExtDate {
     if (!this.friendlyStr) {
       return this.toString();
     }
-    return this.friendlyStr + ' (' + this.toString() + ')';
+    return this.friendlyStr + ' (' + this.getDayOfWeekString_() + ', ' + this.toString() + ')';
+  }
+
+  getDayOfWeekString_() {
+    switch (this.date.getDay()) {
+      case Dates.SUNDAY: return 'Sun';
+      case Dates.MONDAY: return 'Mon';
+      case Dates.TUESDAY: return 'Tue';
+      case Dates.WEDNESDAY: return 'Wed';
+      case Dates.THURSDAY: return 'Thu';
+      case Dates.FRIDAY: return 'Fri';
+      case Dates.SATURDAY: return 'Sat';
+    }
   }
 
   toString() {
