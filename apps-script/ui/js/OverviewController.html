@@ -10,7 +10,8 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'priorityLink',
             /* emptyTextContent */ OverviewController.NO_PRIORITY_TEXT,
-            /* textCallback */ rowData => rowData['PRIORITY'],
+            /* textFromDataCallback */ rowData => rowData['PRIORITY'],
+            /* textFromValueCallback */ null,
             /* valueCallback */ rowData => rowData['PRIORITY'],
             /* changeCallback */ this.handlePriorityChange.bind(this),
             /* inputMaker */ new OptionInputMaker(
@@ -22,7 +23,8 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'statusLink',
             /* emptyTextContent */ OverviewController.NO_STATUS_TEXT,
-            /* textCallback */ rowData => rowData['STATUS'],
+            /* textFromDataCallback */ rowData => rowData['STATUS'],
+            /* textFromValueCallback */ null,
             /* valueCallback */ rowData => rowData['STATUS'],
             /* changeCallback */ this.handleStatusChange.bind(this),
             /* inputMaker */
@@ -35,7 +37,8 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'itemLink',
             /* emptyTextContent */ 'Unknown item',
-            /* textCallback */ rowData => rowData['ITEM'],
+            /* textFromDataCallback */ rowData => rowData['ITEM'],
+            /* textFromValueCallback */ null,
             /* valueCallback */ rowData => rowData['ITEM'],
             /* changeCallback */ this.handleItemChange.bind(this),
             /* inputMaker */ new TextInputMaker());
@@ -45,7 +48,8 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'changeSheetLink',
             /* emptyTextContent */ 'Unknown Sheet',
-            /* textCallback */ rowData => rowData['SHEET'],
+            /* textFromDataCallback */ rowData => rowData['SHEET'],
+            /* textFromValueCallback */ null,
             /* valueCallback */ rowData => rowData['SHEET_ID'],
              /* changeCallback */ this.handleSheetChange.bind(this),
             /* inputMaker */
@@ -75,7 +79,7 @@ class OverviewController {
             /* sheetIdCallback */ OverviewController.getSheetId,
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'editLink',
-            /* textCallback */ rowData => rowData['LINK'],
+            /* textFromDataCallback */ rowData => rowData['LINK'],
             /* valueCallback */ rowData => rowData['LINK_URL'],
             /* changeCallback */ this.handleLinkChange.bind(this),
             true);
@@ -93,8 +97,6 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'nextActionDate',
             /* emptyTextContent */ OverviewController.PENCIL.clone(),
-            /* textCallback */ rowData => Dates.getFriendlyStringForDateString(
-                rowData['NEXT_ACTION_DATE']),
             /* valueCallback */ rowData => rowData['NEXT_ACTION_DATE'],
             /* changeCallback */ this.handleNextActionDateChange.bind(this));
     this.elementMakers['NEXT_ACTION_DATE_UPDATED'] =
@@ -107,7 +109,6 @@ class OverviewController {
             /* uuidCallback */ OverviewController.getUuid,
             /* textCssClass */ 'dueDate',
             /* emptyTextContent */ OverviewController.PENCIL.clone(),
-            /* textCallback */ rowData => rowData['DUE_DATE'],
             /* valueCallback */ rowData => rowData['DUE_DATE'],
             /* changeCallback */ this.handleDueDateChange.bind(this));
   }

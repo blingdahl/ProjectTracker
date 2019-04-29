@@ -1,11 +1,12 @@
 class DatePicker {
-  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, textCallback, valueCallback, changeCallback, inputMaker) {
+  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, valueCallback, changeCallback, inputMaker) {
     this.editableTextMaker = new EditableTextMaker(
             /* sheetIdCallback */ sheetIdCallback,
             /* uuidCallback */ uuidCallback,
             /* textCssClass */ textCssClass,
             /* emptyTextContent */ emptyContent,
-            /* textCallback */ textCallback,
+            /* textFromDataCallback */ null,
+            /* textFromValueCallback */ Dates.getFriendlyStringForDateString,
             /* valueCallback */ valueCallback,
             /* changeCallback */ changeCallback,
             /* inputMaker */
@@ -22,6 +23,10 @@ class DatePicker {
 
   makeElement(data) {
     return this.editableTextMaker.makeElement(data);
+  }
+
+  getTextFromValue(value) {
+    return
   }
 
   static makeDateOption(extDate) {

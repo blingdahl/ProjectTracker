@@ -1,25 +1,25 @@
 class EditableLinkMaker {
-  constructor(sheetIdCallback, uuidCallback, editLinkCssClass, textCallback, hrefCallback, changeCallback, styleOnClick) {
+  constructor(sheetIdCallback, uuidCallback, editLinkCssClass, textFromDataCallback, hrefCallback, changeCallback, styleOnClick) {
     this.sheetIdCallback = sheetIdCallback;
     this.uuidCallback = uuidCallback;
     this.editLinkCssClass = editLinkCssClass;
-    this.textCallback = textCallback;
+    this.textFromDataCallback = textFromDataCallback;
     this.hrefCallback = hrefCallback;
     this.changeCallback = changeCallback;
     this.styleOnClick = styleOnClick;
   }
-  
+
   // Called once per table load
   attachClickHandler(ancestorJq) {
     ancestorJq.on('click', '.' + this.editLinkCssClass, this.editClicked.bind(this));
   }
-  
+
   editClicked(e) {
     var editLinkJq = $(e.currentTarget);
     let dataJq = editLinkJq.closest('[data-href]');
     new EditLinkDialog(this.sheetIdCallback(dataJq), this.uuidCallback(dataJq), dataJq.attr('data-text'), dataJq.attr('data-href'), this.makeHandleChange(dataJq)).show();
   }
-  
+
   updateLink(linkJq, href, text) {
     if (href) {
       return linkJq.attr('href', Common.ensureProtocol(href)).attr('title', text).attr('target', '_blank').text(text).show();
@@ -27,7 +27,7 @@ class EditableLinkMaker {
       linkJq.hide();
     }
   }
-  
+
   makeHandleChange(dataJq) {
     return function(sheetId, uuid, text, href) {
       dataJq.attr('data-href', href).attr('data-text', text)
@@ -40,9 +40,9 @@ class EditableLinkMaker {
       this.changeCallback(sheetId, uuid, text, href);
     }.bind(this);
   }
-  
+
   makeElement(data) {
-    let text = this.textCallback(data);
+    let text = this.textFromDataCallback(data);
     let href = this.hrefCallback(data);
     let linkJq = $('<a />');
     if (href) {

@@ -1,21 +1,25 @@
 class EditableTextMaker {
-  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, textCallback, valueCallback, changeCallback, inputMaker) {
+  constructor(sheetIdCallback, uuidCallback, textCssClass, emptyContent, textFromDataCallback, textFromValueCallback, valueCallback, changeCallback, inputMaker) {
     this.sheetIdCallback = sheetIdCallback;
     this.uuidCallback = uuidCallback;
     this.textCssClass = textCssClass;
     this.emptyContent = emptyContent;
-    this.textCallback = textCallback;
+    this.textFromDataCallback = textFromDataCallback;
+    this.textFromValueCallback = textFromValueCallback;
     this.valueCallback = valueCallback;
     this.changeCallback = changeCallback;
     this.inputMaker = inputMaker;
   }
-  
+
   // Called once per table load
   attachClickHandler(ancestorJq) {
     ancestorJq.on('click', '.' + this.textCssClass, this.textClicked.bind(this));
   }
-  
+
   updateTextJq(textJq, newText, newValue) {
+    if (this.textFromValueCallback) {
+      newText = this.getText(null, newValue);
+    }
     if (newText) {
       textJq.text(newText).attr('title', newText);
     } else {
@@ -27,7 +31,7 @@ class EditableTextMaker {
     }
     textJq.attr('data-value', newValue || '');
   }
-  
+
   textClicked(e) {
     var textJq = $(e.currentTarget);
     let currValue = textJq.attr('data-value');
@@ -44,12 +48,23 @@ class EditableTextMaker {
     input.focus();
     textJq.hide();
   }
-  
+
+  getText(data, value) {
+    if (data && this.textFromDataCallback) {
+      return this.textFromDataCallback(data);
+    }
+    if (value && this.textFromValueCallback) {
+      return this.textFromValueCallback(value);
+    }
+    return value;
+  }
+
   makeElement(data) {
     let textJq = $('<span />').
         addClass(this.textCssClass).
         addClass('editableText');
-    this.updateTextJq(textJq, this.textCallback(data), this.valueCallback(data));
+    let value = this.valueCallback(data);
+    this.updateTextJq(textJq, this.getText(data, value), value);
     return textJq;
   }
 }
