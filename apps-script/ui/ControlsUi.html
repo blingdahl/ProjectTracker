@@ -2,41 +2,43 @@
 <div class="refreshBar" style="display: none">
   <span class="refreshBarMessage"></span>
 </div>
-<button class="clearCompleted">Clear completed</button>
-<div class="rpcMessages"></div>
-<div class="controls">
-  <?!= renderSheetList() ?>
-  <?!= include("ui/OverviewTemplate"); ?>
-  <?!= include("ui/AddItemTemplate"); ?>
-  <?!= include("ui/EditLinkTemplate"); ?>
-  <script>
-    <?!= include("ui/js/RpcConfig"); ?>
-    <?!= include("ui/js/Common"); ?>
-    <?!= include("ui/js/Hash"); ?>
-    <?!= include("ui/js/Jquery"); ?>
-    <?!= include("ui/js/Dates"); ?>
-    <?!= include("ui/js/elements/DateInputMaker"); ?>
-    <?!= include("ui/js/elements/ButtonBar"); ?>
-    <?!= include("ui/js/elements/LabelPicker"); ?>
-    <?!= include("ui/js/elements/MultiOptionInputMaker"); ?>
-    <?!= include("ui/js/elements/OptionInputMaker"); ?>
-    <?!= include("ui/js/elements/TextMaker"); ?>
-    <?!= include("ui/js/elements/TextInputMaker"); ?>
-    <?!= include("ui/js/elements/EditableLinkMaker"); ?>
-    <?!= include("ui/js/elements/EditableTextMaker"); ?>
-    <?!= include("ui/js/elements/DatePicker"); ?>
-    <?!= include("ui/js/elements/LinkMaker"); ?>
-    <?!= include("ui/js/filters/Filters"); ?>
-    <?!= include("ui/js/filters/FilterElement"); ?>
-    <?!= include("ui/js/OverviewController"); ?>
-    <?!= include("ui/js/SheetListController"); ?>
-    <?!= include("ui/js/AddItemDialog"); ?>
-    <?!= include("ui/js/EditLinkDialog"); ?>
-    <?!= include("ui/js/Compare"); ?>
-    <?!= include("ui/js/SheetController"); ?>
-    <?!= include("ui/js/GlobalController"); ?>
-    <?!= include("ui/js/RefreshBar"); ?>
-    <?!= include("ui/js/Controls"); ?>
-  </script>
+  <div class="controls">
+  <button class="clearCompleted">Clear completed</button>
+  <div class="rpcMessages"></div>
+  <div class="controls">
+    <?!= renderSheetList() ?>
+    <?!= include("ui/OverviewTemplate"); ?>
+    <?!= include("ui/AddItemTemplate"); ?>
+    <?!= include("ui/EditLinkTemplate"); ?>
+    <script>
+      <?!= include("ui/js/RpcConfig"); ?>
+      <?!= include("ui/js/Common"); ?>
+      <?!= include("ui/js/Hash"); ?>
+      <?!= include("ui/js/Jquery"); ?>
+      <?!= include("ui/js/Dates"); ?>
+      <?!= include("ui/js/elements/DateInputMaker"); ?>
+      <?!= include("ui/js/elements/ButtonBar"); ?>
+      <?!= include("ui/js/elements/LabelPicker"); ?>
+      <?!= include("ui/js/elements/MultiOptionInputMaker"); ?>
+      <?!= include("ui/js/elements/OptionInputMaker"); ?>
+      <?!= include("ui/js/elements/TextMaker"); ?>
+      <?!= include("ui/js/elements/TextInputMaker"); ?>
+      <?!= include("ui/js/elements/EditableLinkMaker"); ?>
+      <?!= include("ui/js/elements/EditableTextMaker"); ?>
+      <?!= include("ui/js/elements/DatePicker"); ?>
+      <?!= include("ui/js/elements/LinkMaker"); ?>
+      <?!= include("ui/js/filters/Filters"); ?>
+      <?!= include("ui/js/filters/FilterElement"); ?>
+      <?!= include("ui/js/OverviewController"); ?>
+      <?!= include("ui/js/SheetListController"); ?>
+      <?!= include("ui/js/AddItemDialog"); ?>
+      <?!= include("ui/js/EditLinkDialog"); ?>
+      <?!= include("ui/js/Compare"); ?>
+      <?!= include("ui/js/SheetController"); ?>
+      <?!= include("ui/js/GlobalController"); ?>
+      <?!= include("ui/js/RefreshBar"); ?>
+      <?!= include("ui/js/Controls"); ?>
+    </script>
+  </div>
 </div>
 <div class="overviewPlaceholder"></div>

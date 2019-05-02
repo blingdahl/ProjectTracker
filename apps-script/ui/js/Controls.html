@@ -4,8 +4,19 @@ class Log {
   }
 }
 
-RpcConfig.init();
-GlobalController.init();
-OverviewController.init();
-SheetListController.init();
-RefreshBar.init();
+class Controls {
+  static init() {
+    RpcConfig.init();
+    GlobalController.init();
+    OverviewController.init();
+    SheetListController.init();
+    RefreshBar.init();
+  }
+
+  static clear() {
+    $('.controls').remove();
+    $(document).off();
+  }
+}
+
+Controls.init();

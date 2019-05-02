@@ -11,17 +11,32 @@ class RefreshBar {
     return RefreshBar.getRefreshBarElement().find('.refreshBarMessage');
   }
 
+  static handleShouldRefresh() {
+    RefreshBar.getRefreshBarElement().show();
+    RefreshBar.getMessageElement().text('Date changed, please refresh');
+    Controls.clear();
+  }
+
   static checkForRefresh() {
+  console.log('checkForRefresh');
     if (Dates.todayChanged()) {
-      RefreshBar.getRefreshBarElement().show();
-      RefreshBar.getMessageElement().text('Date changed, please refresh');
+      RefreshBar.handleShouldRefresh();
       window.clearInterval(RefreshBar.intervalId);
+    }
+  }
+
+  static maybeAddTestButton() {
+    if (RefreshBar.TEST_ENABLED) {
+      let triggerTodayChangedButton = $('<button></button>').text('trigger date change').css('display', 'block').click(() => RefreshBar.handleShouldRefresh());
+      RefreshBar.getRefreshBarElement().parent().prepend(triggerTodayChangedButton);
     }
   }
 
   static init() {
     RefreshBar.intervalId = window.setInterval(RefreshBar.checkForRefresh, RefreshBar.PERIOD_SECONDS * 1000);
+    RefreshBar.maybeAddTestButton();
   }
 }
 
 RefreshBar.PERIOD_SECONDS = 5;
+RefreshBar.TEST_ENABLED = false;
